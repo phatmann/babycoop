@@ -50,23 +50,26 @@ updateCalendar' history (week:remainingWeeks) = let updatedWeek = updateWeek his
                                                 in  updatedWeek : updateCalendar' updatedHistory remainingWeeks
 
 updateWeek :: [Week] -> Week -> Week
-updateWeek history (date, slots) = let  sorted = sortBy (compare `on` outCount history) slots
-                                        (eligible, ineligible) = partition (isEligible) sorted
-                                        (limitedEligible, restEligible) = splitAt maxChosen eligible
-                                        chooseSlot (person, status) = (person, Chosen)
-                                        unchooseSlot (person, Available) = (person, NotChosen)
-                                        unchooseSlot slot = slot
-                                        chosen = map chooseSlot limitedEligible
-                                        notChosen = map unchooseSlot $ restEligible ++ ineligible
+updateWeek history (date, slots) = let  (available, unavailable) = partition (\(person, status) -> status == Available) slots
+                                        (favored, unfavored) = partition (\slot -> (outCount history slot) < maxOuts) (shuffle available)
+                                        (eligible, notEligible) = partitionEligible favored unfavored
+                                        chosen = map (setStatus Chosen) eligible
+                                        notChosen = map (setStatus NotChosen) (notEligible ++ unavailable)
                                     in  (date, chosen ++ notChosen)
+
+partitionEligible :: [Slot] -> [Slot] -> ([Slot], [Slot])
+partitionEligible favored unfavored = let (eligibleFavored, ineligibleFavored) = splitAt maxChosen favored
+                                          numberEligibleNeeded = maxChosen - length eligibleFavored
+                                          (eligibleUnfavored, ineligibleUnfavored) = splitAt numberEligibleNeeded unfavored
+                                      in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
 outCount :: [Week] -> Slot -> Int
 outCount history slot@(person, status) =  let statusHistory = map (lookupStatus person) history
                                               wasOut status = status `elem` [Chosen, Requested]
                                           in  length $ filter wasOut statusHistory
 
-isEligible :: Slot -> Bool
-isEligible slot@(person, status) = status == Available -- TODO: correct?
+shuffle :: [a] -> [a]
+shuffle = id -- TODO
 
 lookupStatus :: Person -> Week -> Status
 lookupStatus person week@(_, slots) =  let s = lookup person slots
@@ -74,6 +77,12 @@ lookupStatus person week@(_, slots) =  let s = lookup person slots
                                                   Nothing     -> Unavailable
                                                   Just status -> status
 
+setStatus :: Status -> Slot -> Slot
+setStatus Chosen (person, Available)     = (person, Chosen)
+setStatus NotChosen (person, Available)  = (person, NotChosen)
+setStatus Chosen slot  = slot
+setStatus NotChosen slot  = slot
+setStatus newStatus (person, status)  = (person, newStatus)
 
 main = do print $ updateCalendar theCalendar
 
