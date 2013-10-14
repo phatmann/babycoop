@@ -47,28 +47,24 @@ updateCalendar' history (week:remainingWeeks) = let updatedWeek = updateWeek his
                                                 in  updatedWeek : updateCalendar' updatedHistory remainingWeeks
 
 updateWeek :: [Week] -> Week -> Week
-updateWeek history (date, avails) = let rankedSlots           = map (pairWithOutCount history) avails
-                                        sortedRankedSlots     = sortBy (compare `on` fst) rankedSlots
-                                        groupedRankedSlots    = partition (isEligible) sortedRankedSlots
-                                        eligibleRankedSlots   = fst groupedRankedSlots
-                                        ineligibleRankedSlots = snd groupedRankedSlots
-                                        (limitedEligibleRankedSlots, restEligibleRankedSlots) = splitAt maxChosen eligibleRankedSlots
-                                        chooseRankedSlot (rank, (person, status)) = (rank, (person, Chosen))
-                                        unchooseRankedSlot (rank, slot@(person, Available)) = (rank, (person, NotChosen))
-                                        unchooseRankedSlot rankedSlot = rankedSlot
-                                        chosenRankedSlots   = map chooseRankedSlot limitedEligibleRankedSlots
-                                        notChosenRankedSlots = map unchooseRankedSlot $ restEligibleRankedSlots ++ ineligibleRankedSlots
-                                        allRankedSlots      = chosenRankedSlots ++ notChosenRankedSlots
-                                    in  (date, map snd allRankedSlots)
+updateWeek history (date, slots) = let  sortedSlots = sortBy (compare `on` outCount history) slots
+                                        (eligibleSlots,ineligibleSlots) = partition (isEligible) sortedSlots
+                                        (limitedEligibleSlots, restEligibleSlots) = splitAt maxChosen eligibleSlots
+                                        chooseSlot (person, status) = (person, Chosen)
+                                        unchooseSlot (person, Available) = (person, NotChosen)
+                                        unchooseSlot slot = slot
+                                        chosenSlots = map chooseSlot limitedEligibleSlots
+                                        notChosenSlots = map unchooseSlot $ restEligibleSlots ++ ineligibleSlots
+                                        allSlots = chosenSlots ++ notChosenSlots
+                                    in  (date, allSlots)
 
-pairWithOutCount :: [Week] -> Slot -> (Int, Slot)
-pairWithOutCount history slot@(person, status) =  let statusHistory = map (lookupStatus person) history
-                                                      wasOut status = status `elem` [Chosen, Requested]
-                                                      outCount = length $ filter wasOut statusHistory
-                                                  in  (outCount, slot)
+outCount :: [Week] -> Slot -> Int
+outCount history slot@(person, status) =  let statusHistory = map (lookupStatus person) history
+                                              wasOut status = status `elem` [Chosen, Requested]
+                                          in  length $ filter wasOut statusHistory
 
-isEligible :: (Int, Slot) -> Bool
-isEligible (outCount, slot@(person, status)) = status == Available && outCount <= maxOuts -- TODO: correct?
+isEligible :: Slot -> Bool
+isEligible slot@(person, status) = status == Available -- TODO: correct?
 
 lookupStatus :: Person -> Week -> Status
 lookupStatus person week@(_, slots) =  let s = lookup person slots
