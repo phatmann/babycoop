@@ -18,6 +18,9 @@ historyCount = 2
 persons = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
 initialSlots = map (\x -> (x, Available)) persons
 
+-- Kasey, Neha, *Rebecca NotChosen 10/14
+-- *Kate, Erica, Jenny NotChosen 10/21
+
 theCalendar = [((2013, 10, 14), initialSlots), ((2013, 10, 21), initialSlots), ((2013, 10, 28), initialSlots)]
 
 {-
@@ -47,16 +50,15 @@ updateCalendar' history (week:remainingWeeks) = let updatedWeek = updateWeek his
                                                 in  updatedWeek : updateCalendar' updatedHistory remainingWeeks
 
 updateWeek :: [Week] -> Week -> Week
-updateWeek history (date, slots) = let  sortedSlots = sortBy (compare `on` outCount history) slots
-                                        (eligibleSlots,ineligibleSlots) = partition (isEligible) sortedSlots
-                                        (limitedEligibleSlots, restEligibleSlots) = splitAt maxChosen eligibleSlots
+updateWeek history (date, slots) = let  sorted = sortBy (compare `on` outCount history) slots
+                                        (eligible, ineligible) = partition (isEligible) sorted
+                                        (limitedEligible, restEligible) = splitAt maxChosen eligible
                                         chooseSlot (person, status) = (person, Chosen)
                                         unchooseSlot (person, Available) = (person, NotChosen)
                                         unchooseSlot slot = slot
-                                        chosenSlots = map chooseSlot limitedEligibleSlots
-                                        notChosenSlots = map unchooseSlot $ restEligibleSlots ++ ineligibleSlots
-                                        allSlots = chosenSlots ++ notChosenSlots
-                                    in  (date, allSlots)
+                                        chosen = map chooseSlot limitedEligible
+                                        notChosen = map unchooseSlot $ restEligible ++ ineligible
+                                    in  (date, chosen ++ notChosen)
 
 outCount :: [Week] -> Slot -> Int
 outCount history slot@(person, status) =  let statusHistory = map (lookupStatus person) history
