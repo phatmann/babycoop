@@ -1,13 +1,8 @@
-module Main where
-
 import Data.List
+import Data.Time.Calendar
 import System.Random
-import RandPerm
 
-moms = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
-
-type Name = [Char]
-type Group = [Name]
+type Group  = [Person]
 type Grouping = (Group, Group)
 
 split_into_groupings :: Int -> [Name] -> [Grouping]
@@ -30,5 +25,11 @@ print_week (week_number, grouping@(group1, group2)) = do
   print_group "Go out: " group2
   putStrLn ""
 
-main = do gen <- newStdGen
-          mapM_ print_week $ zip [1..] $ randPerm gen $ split_into_groupings 3 moms
+isAvailable :: Status -> Bool
+isAvailable status = status == Available || status == Requested
+
+priorWeek :: Date -> Date
+priorWeek date@(y, m, d) = toGregorian priorSysDay 
+                             where sysDay = fromGregorian y m d
+                                   weekAgo = -7
+--                                   priorSysDay = addDays weekAgo sysDay

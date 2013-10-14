@@ -1,0 +1,1060 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"grou",
+				"group2"
+			],
+			[
+				"scre",
+				"screenshot"
+			],
+			[
+				"sc",
+				"screenshot_name"
+			],
+			[
+				"mask_",
+				"mask_type"
+			],
+			[
+				"screen",
+				"screenshot"
+			],
+			[
+				"mask_base_",
+				"masks_base_path"
+			],
+			[
+				"mask",
+				"mask_name"
+			],
+			[
+				"exp",
+				"expected_mask_suffix"
+			],
+			[
+				"mas",
+				"mask_type"
+			],
+			[
+				"masks",
+				"masks_path"
+			],
+			[
+				"base",
+				"base_path"
+			],
+			[
+				"in",
+				"index"
+			],
+			[
+				"ref",
+				"reference_screenshot_paths"
+			],
+			[
+				"each",
+				"each_with_index"
+			],
+			[
+				"scr",
+				"screenshot_paths"
+			],
+			[
+				"scree",
+				"screenshot_paths"
+			],
+			[
+				"file",
+				"file_path"
+			],
+			[
+				"run_",
+				"run_data_path"
+			],
+			[
+				"l",
+				"Log"
+			],
+			[
+				"se",
+				"sequence_number"
+			],
+			[
+				"sct",
+				"screenshot_name"
+			],
+			[
+				"fil",
+				"file_name"
+			],
+			[
+				"spec",
+				"specific"
+			],
+			[
+				"be",
+				"be_true"
+			],
+			[
+				"ini",
+				"initial_orientation"
+			],
+			[
+				"wind",
+				"window_orientation"
+			],
+			[
+				"si",
+				"simulated_device"
+			],
+			[
+				"dev",
+				"device_params"
+			],
+			[
+				"o",
+				"original_file_path"
+			],
+			[
+				"ori",
+				"original_path"
+			],
+			[
+				"File",
+				"FileUtils"
+			],
+			[
+				"oi",
+				"original_path"
+			],
+			[
+				"new",
+				"new_file_path"
+			],
+			[
+				"or",
+				"orientation"
+			],
+			[
+				"key",
+				"keyboardAppeared"
+			],
+			[
+				"table",
+				"tableView"
+			],
+			[
+				"actv",
+				"activeCell"
+			],
+			[
+				"pro",
+				"productPanelViewController"
+			],
+			[
+				"log",
+				"logElementTree"
+			],
+			[
+				"acti",
+				"activityIndicator"
+			],
+			[
+				"image",
+				"imageViewContainer"
+			],
+			[
+				"app",
+				"app_name"
+			],
+			[
+				"ma",
+				"maxScrolls"
+			],
+			[
+				"coll",
+				"collectionView"
+			],
+			[
+				"ac",
+				"actualMessage"
+			],
+			[
+				"ex",
+				"expectedMessage"
+			],
+			[
+				"search",
+				"searchResults"
+			],
+			[
+				"max",
+				"maxTries"
+			],
+			[
+				"margin",
+				"margin-top"
+			],
+			[
+				"bio",
+				"biographies"
+			],
+			[
+				"a",
+				"artist"
+			],
+			[
+				"B",
+				"biography"
+			],
+			[
+				"bi",
+				"biographies"
+			],
+			[
+				"to",
+				"toUpperCase"
+			],
+			[
+				"vew",
+				"view_params"
+			],
+			[
+				"lo",
+				"locale"
+			],
+			[
+				"call",
+				"callback"
+			],
+			[
+				"res",
+				"response"
+			],
+			[
+				"kan",
+				"kanbanStateDone"
+			],
+			[
+				"types",
+				"typesFilter"
+			],
+			[
+				"card",
+				"cardboard"
+			],
+			[
+				"work",
+				"workProduct"
+			],
+			[
+				"_re",
+				"_refObjectName"
+			],
+			[
+				"get",
+				"getValue"
+			],
+			[
+				"tasks",
+				"tasksStore"
+			],
+			[
+				"defects",
+				"defects_cb"
+			],
+			[
+				"car",
+				"cardboard"
+			],
+			[
+				"ca",
+				"cardBoard"
+			],
+			[
+				"wor",
+				"workProduct"
+			],
+			[
+				"ge",
+				"getRecord"
+			],
+			[
+				"it",
+				"iterationCombobox"
+			],
+			[
+				"defect",
+				"defectFilter"
+			],
+			[
+				"de",
+				"defectFilter"
+			],
+			[
+				"def",
+				"defectStore"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"iteration",
+				"iterationFilter"
+			],
+			[
+				"onS",
+				"onStoryComboboxLoad"
+			],
+			[
+				"sto",
+				"storyCombobox"
+			],
+			[
+				"rela",
+				"relationship_name"
+			],
+			[
+				"stop",
+				"stop_date"
+			],
+			[
+				"hour",
+				"hours_per_day"
+			],
+			[
+				"start",
+				"start_date"
+			],
+			[
+				"we",
+				"week_end"
+			],
+			[
+				"time_entry",
+				"time_entry_ids"
+			],
+			[
+				"week_",
+				"week_start"
+			],
+			[
+				"time",
+				"time_entry_item"
+			],
+			[
+				"week",
+				"week_start"
+			],
+			[
+				"work_",
+				"work_item_id"
+			],
+			[
+				"field",
+				"field_change"
+			],
+			[
+				"Rally",
+				"RallyObject"
+			],
+			[
+				"rev",
+				"revision_history"
+			],
+			[
+				"revision",
+				"revision_history"
+			],
+			[
+				"acc",
+				"accepted_date"
+			],
+			[
+				"A",
+				"AcceptedDate"
+			],
+			[
+				"desc",
+				"descendants"
+			],
+			[
+				"codn",
+				"conditions"
+			],
+			[
+				"op",
+				"operands"
+			],
+			[
+				"pair",
+				"pair_conditions"
+			],
+			[
+				"Ar",
+				"Artifact"
+			],
+			[
+				"raise",
+				"raise_error"
+			],
+			[
+				"qu",
+				"query_string"
+			],
+			[
+				"ot",
+				"other_workspace"
+			],
+			[
+				"rally",
+				"rally_default_workspace"
+			],
+			[
+				"Rall",
+				"RallyObject"
+			],
+			[
+				"Allow",
+				"AllowedQueryOperator"
+			],
+			[
+				"Type",
+				"TypeDefinition"
+			],
+			[
+				"prop",
+				"property_name"
+			],
+			[
+				"Time",
+				"TimeEntryValue"
+			],
+			[
+				"pr",
+				"predecessors"
+			],
+			[
+				"cre",
+				"create_story"
+			],
+			[
+				"to_",
+				"to_record"
+			],
+			[
+				"condi",
+				"condition1"
+			],
+			[
+				"revis",
+				"revision_history"
+			],
+			[
+				"belon",
+				"belongs_to"
+			],
+			[
+				"req",
+				"Required"
+			],
+			[
+				"user",
+				"user_id"
+			],
+			[
+				"be_",
+				"be_nil"
+			],
+			[
+				"works",
+				"workspace"
+			],
+			[
+				"q",
+				"q_comparison"
+			],
+			[
+				"query",
+				"query_builder"
+			],
+			[
+				"con",
+				"condition_pair"
+			],
+			[
+				"rall",
+				"rally_object"
+			],
+			[
+				"sub",
+				"subscription"
+			],
+			[
+				"Art",
+				"ArtifactObject"
+			],
+			[
+				"wr",
+				"writer_visibility"
+			],
+			[
+				"fiel",
+				"field_name"
+			],
+			[
+				"st",
+				"storage_name"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"disc",
+				"Package Control: Discover Packages"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Snippet: ",
+				"Snippet: Take a screenshot named"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"Rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"packa",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: In",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 593.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": true,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/tony/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/tony/Desktop/haskell/greet.hs",
+		"/Users/tony/Desktop/haskell/cd-fit.hs",
+		"/Users/tony/Desktop/haskell/cd-fit-1-1.hs",
+		"/Users/tony/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/product_details.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/search/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/search_results.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/menu/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/filters/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/menu/run_data/feature.js",
+		"/var/log/system.log",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/filters.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/lib/root_screen.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/lib/tf_screen.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/autofill/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/autofill/run_data/feature.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/autofill/run_data/feature.js",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/filters/run_data/feature.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/filters/run_data/feature.js",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/menu/run_data/feature.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/private_mode/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/private_mode/run_data/feature.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/private_mode/run_data/feature.js",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/search/run_data/feature.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/search/run_data/feature.js",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/search_suggestions.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/menu.coffee",
+		"/Users/tony/.gitconfig",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/config.yml",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/support/screens/web_view.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/menu/run_data/Run 1/Automation Results.plist",
+		"/Users/tony/.git",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/generator_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/screens/masks/retina_ios5/splash2.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/screenshot.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/screenshot_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/log.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/feature_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/feature.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/log_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/report_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/Automation Results.plist",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/screenshots.yml",
+		"/Users/tony/.bashrc",
+		"/Users/tony/.bash_prompt",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/reference/retina_ios5/06_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/06_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/uia/screen.coffee",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/splash_portrait.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/retina_ios5_portrait.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/zucchini-ios.gemspec",
+		"/Users/tony/Documents/src/phatmann/zucchini/bin/zucchini",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/masks/retina_ios5/07_sign up_spinner_portrait.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/09_Portrait_splash-screen_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/masks/retina_ios5/07_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/masks/retina_ios5/07_sign up_spinner_landscape.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/masks/retina_ios5/08_sign up_spinner2.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/08_LandscapeRight_splash2-screen_sign up_spinner2.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/08_LandscapeRight_splash-screen_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/low_ios6.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/retina_ios5_landscape.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/splash_landscape.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/support/masks/splash2.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/coverage/index.html",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/06_LandscapeRight_splash-screen_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/sample_setup/feature_one/run_data/Run 1/06_splash-LandscapeRight-screen_sign up_spinner.png",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/uia/base.coffee",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/detector_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/zucchini/config.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/zucchini/config_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/detector.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/config.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/screenshot.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/uia/screen.coffee",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/report/css/zucchini.report.css",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/uia/base.coffee",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/feature.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/README.md",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/report_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/spec/lib/screenshot_spec.rb",
+		"/Users/tony/Documents/src/phatmann/zucchini/lib/runner.rb",
+		"/Users/tony/.bash_profile",
+		"/Users/tony/Library/Application Support/Sublime Text 2/Packages/Zucchini/Zucchini.tmLanguage",
+		"/Users/tony/Library/Application Support/Sublime Text 2/Packages/Zucchini/Comments.tmPreferences",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/hide_keyboard/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Features/search/run_data/Masked/actual/01_home.png",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/UI/Shopping.app/TFSAutoFillConfigViewController.nib",
+		"/Users/tony/Dropbox/Music/Massy/site/public/js/site.js",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeViewController.xib",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0010-Added-loading-animation.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0008-Moved-product-panel-to-root-level-and-generalized-fo.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Search Results/TFSSearchResultContentViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0008-Moved-product-panel-to-root-level-and-generalized-fo.patch.copy",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/App/TFSRootViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/App/TFSRootViewController.h",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/App/TFSMainViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/App/TFSMainViewController.h",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Product Panel/TFSProductTableViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Product Panel/TFSPanelViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Product Panel/TFSPanelViewController.h",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0007-Added-menu-button-assets-alternate-hit-states-on-sli.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.m",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.m.rej",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.h",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.h.rej",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.m.orig",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0006-View-All-on-Home-and-SERP-now-uses-buttons-including.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Home/TFSHomeContentViewController.h.orig",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0005-Added-Landing-Page-menu-panel-classes-and-assets.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0004-Added-updated-assets-for-Home-screen.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0003-Moved-Your-from-side-bar-to-box-labels-on-Home-scree.patch",
+		"/Users/tony/Documents/src/thefind/ios-shopping/0001-Updated-app-icon-with-Retina-version.patch",
+		"/Users/tony/Documents/src/thefind/huge-prototype/diff.txt",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Classes/Search Display/Suggestions/SearchStoryboard.storyboard",
+		"/Users/tony/Documents/src/github/zucchini/templates/project/features/support/masks/ipad_ios5.png",
+		"/Users/tony/Documents/src/thefind/ios-shared/Demo/Tests/Features/TFStyledLabel/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shared/Demo/Tests/Features/TFStyledLabel/run_data/Run 1/01_tf-styled-label.png",
+		"/Users/tony/Documents/src/thefind/ios-shared/Demo/Tests/Features/TFStyledLabel/reference/retina_ios5/01_tf-image-view.png",
+		"/Users/tony/Documents/src/thefind/ios-shared/Demo/Tests/Features/TFImageView/run_data/Run 1/01_tf-image-view.png",
+		"/usr/local/Cellar/ruby/1.9.3-p362/lib/ruby/gems/1.9.1/gems/zucchini-ios-0.5.9/lib/feature.rb",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/README.txt",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/Features/search/feature.zucchini",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/Features/support/screens/home.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/Features/support/screens/search_results.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/Features/support/lib/helpers.coffee",
+		"/Users/tony/Documents/src/thefind/ios-shopping/Tests/run"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"",
+			"Type \\1 in search bar",
+			"Type \"\\1\" in search bar",
+			"",
+			"/Users/tmann/Documents/ttc/src/github/backoffice/rally/client/lib/dm_rally/lib/dm-rally/models",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"simulator",
+			"default",
+			"Type \"([^\"]*)\" into \"([^\"]*)\"",
+			"Save To Your",
+			"Type (\"[^\"]*\") in search bar",
+			"Type (\"[^\"]*\") in the \"Search Text\" field",
+			"Type \"([^\"]*)\" in the \"Search Text\" field",
+			"isNullElement",
+			"Type (\"[^\"]*\") in search bar",
+			"Type \"[^\"]*\" in search bar",
+			"Type \"shirt\" in search bar",
+			"tapWithOptions",
+			"Screenshot.new",
+			"@screenshot = ",
+			"@screenshot =",
+			"stub!",
+			", \"splash\"",
+			"run_data_path",
+			"mask_path",
+			"support_masks_path",
+			"mask_present",
+			"rotate",
+			"Screenshot of",
+			"diff_path",
+			"mask_reference",
+			"test_path",
+			"screenshot_name",
+			"tmp",
+			"@file_name",
+			"be true",
+			"Screenshot.new",
+			"run_data_path",
+			"clamp",
+			"file_base_path",
+			"mask?",
+			"mask_paths",
+			"screenshot_path",
+			"screenshot1_path",
+			"original_path",
+			"orig",
+			"mask_paths",
+			"masks_paths",
+			"screen",
+			"set_simulator_device",
+			"chomp",
+			"iOS Simulator",
+			"device[:screen]",
+			"screenshots",
+			"masks_paths",
+			"processed_path",
+			"original_path",
+			"@file_path",
+			"file_path",
+			"file_name",
+			"original_file_path",
+			"rotate",
+			"Screenshot.new",
+			"Screenshot",
+			"Screenshot.new",
+			"specifically",
+			"globally",
+			"global_masked",
+			"specifically_masked",
+			"globally_masked",
+			"masked_paths",
+			"run_data_path",
+			"feature.coffee",
+			"waitForElement",
+			"anchor",
+			"git",
+			"=======",
+			"==",
+			"Graphicsthefind",
+			"TFSRootViewController.m",
+			"TFPLoadingAnimationView",
+			"TFSRootViewController.m",
+			"Default-",
+			"Classes/TFSRootView",
+			"GraphicsLoader",
+			"MainStoryboard.storyboard ",
+			"ShoppingPrototype-Info",
+			"ShoppingPrototype",
+			"TFPRootViewController",
+			"Classes/TFPLoading",
+			"Images/",
+			"ShoppingPrototype/",
+			".../",
+			"didSelect",
+			"TFPRootViewController",
+			"ProductPanelStoryboard",
+			"showHom",
+			"DidHide",
+			"animateWithDuration",
+			"TFSPanelViewController",
+			"Copied",
+			"showSearch",
+			"showRelated",
+			"addPanel",
+			"Classes/Classes",
+			"MainStoryboard",
+			"Product Panel/",
+			"Home/MainStoryboard",
+			"ProductPanelStoryboard",
+			"MainStoryboard",
+			"/TFSSearchResultContentViewController",
+			"/TFSRootViewController",
+			"TFSRootViewController",
+			"/TFSMainViewController",
+			"/TFSProductTableViewController",
+			"/TFSPanelViewController",
+			"TFPSearchResultContentViewController",
+			"TFPRootViewController",
+			"TFPMainViewController",
+			"HGProductTable",
+			"HGPanel",
+			".../",
+			"ShoppingPrototype/",
+			"TO",
+			"displayS",
+			"Search Results",
+			"TFP",
+			"TFPHomeContentViewController",
+			"Classes/TFSPersonalizedProductCell",
+			"ShoppingPrototype/",
+			"TFPPersonalizedProductCell",
+			"/TFPHome",
+			".../",
+			"ShoppingPrototype/Classes"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"Type \\1 into \"Search Text\"",
+			"Type \\1 in search bar",
+			"Type \\1 in the \"Search Text\" field",
+			"Type $1 in the \"Search Text\" field",
+			"Type \\1 in the \"Search Text\" field",
+			"",
+			"run_path",
+			"be_true",
+			"run_data_path",
+			"mask_paths",
+			"specific_masked",
+			"global_masked",
+			"Graphics/thefind",
+			"TFSLoadingAnimationView",
+			"Resources/Images/Launch/Default-",
+			"Classes/App/TFSRootView",
+			"Graphics/Loader",
+			"TFSRootViewController",
+			"Classes/App/TFSLoading",
+			"Resources/Images/Graphics",
+			"",
+			"Classes",
+			"MainStoryboard_iPad",
+			"Classes/Product Panel/",
+			"Classes/Home/MainStoryboard",
+			"Product Panel/ProductPanelStoryboard",
+			"Home/MainStoryboard",
+			"/Search Results/TFSSearchResultContentViewController",
+			"/App/TFSRootViewController",
+			"/App/TFSMainViewController",
+			"/Product Panel/TFSProductTableViewController",
+			"/Product Panel/TFSPanelViewController",
+			"TFSSearchResultContentViewController",
+			"TFSRootViewController",
+			"TFSMainViewController",
+			"TFSProductTable",
+			"TFSPanel",
+			"",
+			"Search\\ Results",
+			"TFSHomeContentViewController",
+			"Classes/Search Results/TFSPersonalizedProductCell",
+			"",
+			"TFSPersonalizedProductCell",
+			"/Home/TFSHome",
+			"",
+			"Classes",
+			"TFSH",
+			"",
+			"TFS",
+			"Resources/Images/Graphics/",
+			"Resources/Images/Graphics",
+			"Classes/Home/TFSHomeContentViewController",
+			"",
+			"TFS",
+			"",
+			"workProductCombobox",
+			"WorkProductCombobox",
+			"Defect",
+			"defect",
+			"@conn",
+			"RallyConnection",
+			"DateTime",
+			":writer => false",
+			":read_only => true",
+			":writer => :private",
+			":",
+			":name",
+			"plan_estimate",
+			"@five",
+			"@two",
+			"project.defects",
+			"@minor",
+			"@major",
+			"Defect",
+			"make_defect",
+			"create_defect",
+			"@service",
+			"rally_to_field_name"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": false,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 280.0
+	},
+	"output.find_results":
+	{
+		"height": 256.0
+	},
+	"output.haskell_sublime_load":
+	{
+		"height": 148.0
+	},
+	"output.run_mocha":
+	{
+		"height": 0.0
+	},
+	"output.tests":
+	{
+		"height": 405.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"searchres",
+				"Classes/Search Results/TFSSearchResultContentViewController.h"
+			],
+			[
+				"query",
+				"rally/dm-rally/lib/dm-rally/adapter/query_builder.rb"
+			],
+			[
+				"conn",
+				"rally/dm-rally/lib/dm-rally/connection.rb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 308.0,
+	"status_bar_visible": true
+}
