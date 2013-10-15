@@ -12,8 +12,9 @@ type Week = (Date, [Slot])
 type Calendar = [Week]
 
 maxChosen = 3
+maxIns    = 2
 maxOuts   = 2
-historyCount = 2
+historyCount = 6
 persons = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
 allAvailable = map (\x -> (x, Available)) persons
 
@@ -48,12 +49,11 @@ Rules:
 # Rotate who hosts
 -}
 
-emptyDate = (0, 0, 0)
-emptySlot = (emptyDate, [])
-emptyHistory = take historyCount $ repeat emptySlot
-
 updateCalendar :: Calendar -> Calendar
-updateCalendar calendar = updateCalendar' emptyHistory calendar
+updateCalendar calendar = let emptyDate = (0, 0, 0)
+                              emptySlot = (emptyDate, [])
+                              emptyHistory =  take historyCount $ repeat emptySlot
+                          in updateCalendar' emptyHistory calendar
 
 updateCalendar' :: [Week] -> Calendar -> Calendar
 updateCalendar' history [] = []
@@ -63,7 +63,9 @@ updateCalendar' history (week:remainingWeeks) = let updatedWeek = updateWeek his
 
 updateWeek :: [Week] -> Week -> Week
 updateWeek history (date, slots) = let  (available, unavailable) = partition (\(person, status) -> status == Available) slots
-                                        (favored, unfavored) = partition (\slot -> (outCount history slot) < maxOuts) (shuffle available)
+                                        isFavored (person, _) = let counts = inOutCount history person
+                                                                in (fst counts) > maxIns || (snd counts) < maxOuts
+                                        (favored, unfavored) = partition isFavored (shuffle available)
                                         (eligible, notEligible) = partitionEligible favored unfavored
                                         chosen = map (setStatus Chosen) eligible
                                         notChosen = map (setStatus NotChosen) (notEligible ++ unavailable)
@@ -75,26 +77,29 @@ partitionEligible favored unfavored = let (eligibleFavored, ineligibleFavored) =
                                           (eligibleUnfavored, ineligibleUnfavored) = splitAt numberEligibleNeeded unfavored
                                       in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
-outCount :: [Week] -> Slot -> Int
-outCount history slot@(person, status) =  let statusHistory = map (lookupStatus person) history
-                                              wasOut status = status `elem` [Chosen, Requested]
-                                          in  length $ filter wasOut statusHistory
+inOutCount :: [Week] -> Person -> (Int, Int)
+inOutCount history person = let statusHistory = map (lookupStatus person) history
+                                wasOut status = status `elem` [Chosen, Requested]
+                                wasIn status  = status `elem` [NotChosen, Rejected, Hosting]
+                                testStatus acc status  = (if wasIn status then fst acc + 1 else fst acc,
+                                                          if wasOut status then snd acc + 1 else snd acc)
+                            in  foldl testStatus (0, 0) statusHistory
 
 shuffle :: [a] -> [a]
 shuffle = id -- TODO
 
 lookupStatus :: Person -> Week -> Status
-lookupStatus person week@(_, slots) =  let s = lookup person slots
-                                                in case s of
-                                                  Nothing     -> Unavailable
-                                                  Just status -> status
+lookupStatus person (_, slots) =  let s = lookup person slots
+                                  in case s of
+                                    Nothing     -> Unavailable
+                                    Just status -> status
 
 setStatus :: Status -> Slot -> Slot
-setStatus Chosen (person, Available)     = (person, Chosen)
-setStatus NotChosen (person, Available)  = (person, NotChosen)
+setStatus Chosen (person, Available) = (person, Chosen)
+setStatus NotChosen (person, Available) = (person, NotChosen)
 setStatus Chosen slot  = slot
 setStatus NotChosen slot  = slot
-setStatus newStatus (person, status)  = (person, newStatus)
+setStatus newStatus (person, status) = (person, newStatus)
 
 showStatus :: Status -> String
 showStatus status = case status of
