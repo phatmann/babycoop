@@ -5,40 +5,12 @@ import Debug.Trace
 import Data.Function (on)
 import System.Random
 import Shuffle
-
-data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving (Eq, Ord)
-type Date = (Int, Int, Int) -- year, month, date
-type Person = String
-type Slot = (Person, Status)
-type Week = (Date, [Slot])
-type Calendar = [Week]
+import Calendar
 
 maxChosen = 3
 maxIns    = 2
 maxOuts   = 2
 historyCount = 6
-persons = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
-allAvailable = map (\x -> (x, Available)) persons
-
-theCalendar = [((2013, 10, 14),
-                  [("Rebecca", Hosting),
-                   ("Kasey",   NotChosen),
-                   ("Neha",    NotChosen),
-                   ("Kate",    Chosen),
-                   ("Erica",   Chosen),
-                   ("Jenny",   Chosen)]),
-               ((2013, 10, 21), 
-                  [("Rebecca", Chosen),
-                   ("Kasey",   Chosen),
-                   ("Neha",    Chosen),
-                   ("Kate",    Hosting),
-                   ("Erica",   NotChosen),
-                   ("Jenny",   NotChosen)]),
-               ((2013, 10, 28), allAvailable),
-               ((2013, 11, 4),  allAvailable),
-               ((2013, 11, 11), allAvailable),
-               ((2013, 11, 18), allAvailable),
-               ((2013, 11, 25), allAvailable)]
 
 {-
 Rules:
