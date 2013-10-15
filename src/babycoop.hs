@@ -1,6 +1,6 @@
 module Main where
 
-import Data.List (sortBy, partition)
+import Data.List
 import Data.Function (on)
 
 
@@ -84,7 +84,23 @@ setStatus Chosen slot  = slot
 setStatus NotChosen slot  = slot
 setStatus newStatus (person, status)  = (person, newStatus)
 
-main = do print $ updateCalendar theCalendar
+showStatus :: Status -> String
+showStatus status = case status of
+  Chosen    -> "Out"
+  NotChosen -> "Babysitting"
+  Hosting   -> "Babysitting (Hosting)"
+  Requested -> "Out (Requested)"
+  Rejected  -> "Babysitting (Requested)"
+
+printSlot :: Slot -> IO ()
+printSlot slot@(person, status) = do putStrLn (person ++ ":" ++ (showStatus status))
+
+printWeek :: Week -> IO ()
+printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++ (show day))
+                                                mapM_ printSlot slots
+                                                putStrLn ""
+
+main = do mapM_ printWeek $ updateCalendar theCalendar
 
 
 
