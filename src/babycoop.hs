@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List
+import Debug.Trace
 import Data.Function (on)
 
 data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving (Eq, Show)
@@ -11,7 +12,7 @@ type Week = (Date, [Slot])
 type Calendar = [Week]
 
 maxChosen = 3
-maxOuts   = 1
+maxOuts   = 2
 historyCount = 2
 persons = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
 allAvailable = map (\x -> (x, Available)) persons
@@ -32,7 +33,9 @@ theCalendar = [((2013, 10, 14),
                    ("Jenny",   NotChosen)]),
                ((2013, 10, 28), allAvailable),
                ((2013, 11, 4),  allAvailable),
-               ((2013, 11, 11), allAvailable)]
+               ((2013, 11, 11), allAvailable),
+               ((2013, 11, 18), allAvailable),
+               ((2013, 11, 25), allAvailable)]
 
 {-
 Rules:
@@ -40,6 +43,7 @@ Rules:
 # If still more than 3 persons are available, remove whomever went out 2 weeks prior
 # If still more than 3 persons are available, randomly choose 3
 # Only 2 can reserve a week
+# Never babysit more than 2 weeks in a row
 # Hosted never chosen
 # Rotate who hosts
 -}
