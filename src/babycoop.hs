@@ -3,8 +3,10 @@ module Main where
 import Data.List
 import Debug.Trace
 import Data.Function (on)
+import System.Random
+import Shuffle
 
-data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving Eq
+data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving (Eq, Ord)
 type Date = (Int, Int, Int) -- year, month, date
 type Person = String
 type Slot = (Person, Status)
@@ -49,27 +51,29 @@ Rules:
 # Rotate who hosts
 -}
 
-updateCalendar :: Calendar -> Calendar
-updateCalendar calendar = let emptyDate = (0, 0, 0)
-                              emptySlot = (emptyDate, [])
-                              emptyHistory =  take historyCount $ repeat emptySlot
-                          in updateCalendar' emptyHistory calendar
+updateCalendar :: StdGen -> Calendar -> Calendar
+updateCalendar randGen calendar = let emptyDate = (0, 0, 0)
+                                      emptySlot = (emptyDate, [])
+                                      emptyHistory =  take historyCount $ repeat emptySlot
+                                   in updateCalendar' emptyHistory randGen calendar
 
-updateCalendar' :: [Week] -> Calendar -> Calendar
-updateCalendar' history [] = []
-updateCalendar' history (week:remainingWeeks) = let updatedWeek = updateWeek history week
-                                                    updatedHistory = (drop 1 history) ++ [updatedWeek]
-                                                in  updatedWeek : updateCalendar' updatedHistory remainingWeeks
+updateCalendar' :: [Week] -> StdGen -> Calendar -> Calendar
+updateCalendar' history randGen [] = []
+updateCalendar' history randGen (week:remainingWeeks) = let (updatedWeek, updatedRandGen) = updateWeek history randGen week
+                                                            updatedHistory = (drop 1 history) ++ [updatedWeek]
+                                                        in  updatedWeek : updateCalendar' updatedHistory updatedRandGen remainingWeeks
 
-updateWeek :: [Week] -> Week -> Week
-updateWeek history (date, slots) = let  (available, unavailable) = partition (\(person, status) -> status == Available) slots
-                                        isFavored (person, _) = let counts = inOutCount history person
-                                                                in (fst counts) > maxIns || (snd counts) < maxOuts
-                                        (favored, unfavored) = partition isFavored (shuffle available)
-                                        (eligible, notEligible) = partitionEligible favored unfavored
-                                        chosen = map (setStatus Chosen) eligible
-                                        notChosen = map (setStatus NotChosen) (notEligible ++ unavailable)
-                                    in  (date, chosen ++ notChosen)
+updateWeek :: [Week] -> StdGen -> Week -> (Week, StdGen)
+updateWeek history randGen (date, slots) = let  (available, unavailable) = partition (\(person, status) -> status == Available) slots
+                                                isFavored (person, _) = let counts = inOutCount history person
+                                                                        in (fst counts) > maxIns || (snd counts) < maxOuts
+                                                (shuffledAvailable, updatedRandGen) = shuffle available randGen
+                                                (favored, unfavored) = partition isFavored shuffledAvailable
+                                                (eligible, notEligible) = partitionEligible favored unfavored
+                                                chosen = map (setStatus Chosen) eligible
+                                                notChosen = map (setStatus NotChosen) (notEligible ++ unavailable)
+                                                sortedSlots = sortBy (compare `on` snd) (chosen ++ notChosen)
+                                            in  ((date, sortedSlots), updatedRandGen)
 
 partitionEligible :: [Slot] -> [Slot] -> ([Slot], [Slot])
 partitionEligible favored unfavored = let (eligibleFavored, ineligibleFavored) = splitAt maxChosen favored
@@ -84,9 +88,6 @@ inOutCount history person = let statusHistory = map (lookupStatus person) histor
                                 testStatus acc status  = (if wasIn status then fst acc + 1 else fst acc,
                                                           if wasOut status then snd acc + 1 else snd acc)
                             in  foldl testStatus (0, 0) statusHistory
-
-shuffle :: [a] -> [a]
-shuffle = id -- TODO
 
 lookupStatus :: Person -> Week -> Status
 lookupStatus person (_, slots) =  let s = lookup person slots
@@ -118,4 +119,5 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-main = do mapM_ printWeek $ updateCalendar theCalendar
+main = do randGen <- newStdGen
+          mapM_ printWeek $ updateCalendar randGen theCalendar
