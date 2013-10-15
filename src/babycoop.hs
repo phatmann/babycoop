@@ -4,7 +4,7 @@ import Data.List
 import Debug.Trace
 import Data.Function (on)
 
-data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving (Eq, Show)
+data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving Eq
 type Date = (Int, Int, Int) -- year, month, date
 type Person = String
 type Slot = (Person, Status)
@@ -101,16 +101,17 @@ setStatus Chosen slot  = slot
 setStatus NotChosen slot  = slot
 setStatus newStatus (person, status) = (person, newStatus)
 
-showStatus :: Status -> String
-showStatus status = case status of
-  Chosen    -> "Out"
-  NotChosen -> "Babysitting"
-  Hosting   -> "Babysitting (Hosting)"
-  Requested -> "Out (Requested)"
-  Rejected  -> "Babysitting (Requested)"
+instance Show Status where
+  show Available   = "Available"
+  show Unavailable = "Unavailable"
+  show Chosen      = "Out"
+  show NotChosen   = "Babysitting"
+  show Hosting     = "Babysitting (Hosting)"
+  show Requested   = "Out (Requested)"
+  show Rejected    = "Babysitting (Requested)"
 
 printSlot :: Slot -> IO ()
-printSlot slot@(person, status) = do putStrLn (person ++ ":" ++ (showStatus status))
+printSlot slot@(person, status) = do putStrLn (person ++ ":" ++ (show status))
 
 printWeek :: Week -> IO ()
 printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++ (show day))
@@ -118,7 +119,3 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 putStrLn ""
 
 main = do mapM_ printWeek $ updateCalendar theCalendar
-
-
-
---          mapM_ print_week $ zip [1..] $ randPerm gen $ split_into_groupings 3 moms
