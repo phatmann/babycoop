@@ -3,8 +3,6 @@ module Main where
 import Data.List
 import Data.Function (on)
 
-
-
 data Status = Available | Unavailable | Hosting | Requested | Rejected | Chosen | NotChosen deriving (Eq, Show)
 type Date = (Int, Int, Int) -- year, month, date
 type Person = String
@@ -16,12 +14,25 @@ maxChosen = 3
 maxOuts   = 1
 historyCount = 2
 persons = ["Rebecca", "Jenny", "Kate", "Kasey", "Neha", "Erica"]
-initialSlots = map (\x -> (x, Available)) persons
+allAvailable = map (\x -> (x, Available)) persons
 
--- Kasey, Neha, *Rebecca NotChosen 10/14
--- *Kate, Erica, Jenny NotChosen 10/21
-
-theCalendar = [((2013, 10, 14), initialSlots), ((2013, 10, 21), initialSlots), ((2013, 10, 28), initialSlots)]
+theCalendar = [((2013, 10, 14),
+                  [("Rebecca", Hosting),
+                   ("Kasey",   NotChosen),
+                   ("Neha",    NotChosen),
+                   ("Kate",    Chosen),
+                   ("Erica",   Chosen),
+                   ("Jenny",   Chosen)]),
+               ((2013, 10, 21), 
+                  [("Rebecca", Chosen),
+                   ("Kasey",   Chosen),
+                   ("Neha",    Chosen),
+                   ("Kate",    Hosting),
+                   ("Erica",   NotChosen),
+                   ("Jenny",   NotChosen)]),
+               ((2013, 10, 28), allAvailable),
+               ((2013, 11, 4),  allAvailable),
+               ((2013, 11, 11), allAvailable)]
 
 {-
 Rules:
@@ -32,9 +43,6 @@ Rules:
 # Hosted never chosen
 # Rotate who hosts
 -}
-
-
-
 
 emptyDate = (0, 0, 0)
 emptySlot = (emptyDate, [])
