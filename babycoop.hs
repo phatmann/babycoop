@@ -1,4 +1,4 @@
-module Main where
+module BabyCoop where
 
 import Data.List
 import Debug.Trace
@@ -91,5 +91,5 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-main = do randGen <- newStdGen
-          mapM_ printWeek $ updateCalendar randGen theCalendar
+--main = do randGen <- newStdGen
+--          mapM_ printWeek $ updateCalendar randGen theCalendar
