@@ -71,11 +71,9 @@ lookupAttendance targetPerson (date,slots) =  let s = find (\slot -> (person slo
 
 setAttendance :: Attendance -> Slot -> Slot
 setAttendance newAttendance slot
-  | newAttendance == Out && (attendance slot)  == TBD  = slot {attendance=Out}
-  | newAttendance == In  && (attendance slot)  == TBD  = slot {attendance=In}
-  | newAttendance == Out && (attendance slot)  /= TBD  = slot
-  | newAttendance == In  && (attendance slot)  /= TBD  = slot
-  | otherwise                                          = slot {attendance=newAttendance}
+  | (requested slot) == Requested = slot 
+  | (locked slot)    == Locked    = slot
+  | otherwise                     = slot {attendance=newAttendance}
 
 printSlot :: Slot -> IO ()
 printSlot slot = do putStrLn ((show $ person slot) ++ ":" ++ (show $ attendance slot))
