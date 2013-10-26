@@ -58,7 +58,7 @@ week =
             h2 $ toHtml $ (show month) ++ "/" ++ (show day)
             let Just slots = lookup date theCalendar
                 date = (year, month, day)
-                showSlot (person, status)  = person ++ ": " ++ (show status)
+                showSlot slot  = (show $ person slot) ++ ": " ++ (show $ attendance slot)
             ul $ forM_ slots (li . toHtml . showSlot)
 
 --homePage :: ServerPart Response
@@ -70,13 +70,6 @@ week =
 --           H.p $ a ! href "/echo/secret%20message"  $ "echo"
 --           H.p $ a ! href "/query?foo=bar" $ "query parameters"
 --           H.p $ a ! href "/form"          $ "form processing"
-
---echo :: ServerPart Response
---echo =
---    path $ \(msg :: String) ->
---        ok $ template "echo" $ do
---          p $ "echo says: " >> toHtml msg
---          p "Change the url to echo something else."
 
 --queryParams :: ServerPart Response
 --queryParams =
