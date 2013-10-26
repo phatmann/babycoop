@@ -51,13 +51,13 @@ homePage =
 
 week :: ServerPart Response
 week =
-    path $ \(yearString :: String) ->
-      path $ \(monthString :: String) ->
-        path $ \(dayString :: String) ->
+    path $ \(year :: Int) ->
+      path $ \(month :: Int) ->
+        path $ \(day :: Int) ->
           ok $ template "Week" $ do
-            h2 $ toHtml $ monthString ++ "/" ++ dayString
+            h2 $ toHtml $ (show month) ++ "/" ++ (show day)
             let Just slots = lookup date theCalendar
-                date = ((read yearString), (read monthString), (read dayString))
+                date = (year, month, day)
                 showSlot (person, status)  = person ++ ": " ++ (show status)
             ul $ forM_ slots (li . toHtml . showSlot)
 
