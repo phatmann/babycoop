@@ -8,9 +8,11 @@ import Shuffle
 import Calendar
 
 maxInsPerWeek      = 3
+
 maxInsPerPerson    = 2
 maxOutsPerPerson   = 2
 maxHostsPerPerson  = 1
+
 historyCount       = 6
 
 type History = [Week]
@@ -64,9 +66,10 @@ updateWeek history randGen (date, slots) =
                                        isFavored slot       = let (inCount, outCount, _) = inOutHostCount history (person slot)
                                                               in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
 
-      newlyOut    = map (\slot -> slot {attendance=Out}) eligible
-      newlyIn     = map (\slot -> slot {attendance=In}) notEligible
-      newlyHost   = map (\slot -> slot {attendance=Host}) hosts
+      newlyOut  = map (\slot -> slot {attendance=Out}) eligible
+      newlyIn   = map (\slot -> slot {attendance=In}) notEligible
+      newlyHost = map (\slot -> slot {attendance=Host}) hosts
+
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` attendance) newSlots
   in  ((date, sortedSlots), updatedRandGen)
