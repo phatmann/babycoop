@@ -20,19 +20,10 @@ main :: IO ()
 main = serve Nothing myApp
 
 myApp :: ServerPart Response
-myApp = msum
-  [ 
-    dir "week"    $ week
-    , homePage
+myApp = msum [ 
+  dir "week"    $ week
+  , homePage
   ]
-
---myApp :: ServerPart Response
---myApp = msum
---  [ dir "echo"    $ echo
---  , dir "query"   $ queryParams
---  , dir "form"    $ formPage
---  , homePage
---  ]
 
 template :: Text -> Html -> Response
 template title body = toResponse $

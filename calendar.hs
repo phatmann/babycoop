@@ -1,7 +1,5 @@
 module Calendar where
 
--- data Status = Available | Unavailable | Hosting | Requested | Rejected | Out | In 
-
 data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq)
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
 data Status = Proposed | Confirmed | Requested deriving Eq
@@ -43,7 +41,7 @@ theCalendar =
                      ,Slot Erica Out Confirmed
                      ,Slot Jenny Out Confirmed])
   ,((2013, 11, 4),   [Slot Rebecca TBD Proposed
-                     ,Slot Kasey Host Confirmed
+                     ,Slot Kasey TBD Proposed
                      ,Slot Neha Absent Confirmed
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
@@ -52,15 +50,15 @@ theCalendar =
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
-                     ,Slot Erica Host Confirmed
+                     ,Slot Erica TBD Proposed
                      ,Slot Jenny TBD Proposed])
   ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
-                     ,Slot Jenny Host Confirmed])
-  ,((2013, 11, 25),   [Slot Rebecca Host Confirmed
+                     ,Slot Jenny TBD Proposed])
+  ,((2013, 11, 25),   [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
@@ -69,7 +67,7 @@ theCalendar =
   ,((2013, 12, 2),   [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
-                     ,Slot Kate Host Confirmed
+                     ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
                      ,Slot Jenny Absent Confirmed])
   ]

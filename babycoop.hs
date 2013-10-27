@@ -10,6 +10,7 @@ import Calendar
 maxInsPerWeek      = 3
 maxInsPerPerson    = 2
 maxOutsPerPerson   = 2
+maxHostsPerPerson  = 1
 historyCount       = 6
 
 type History = [Week]
@@ -33,44 +34,67 @@ updateCalendar randGen calendar = let emptyDate = (0, 0, 0)
 
 updateCalendar' :: History -> StdGen -> Calendar -> Calendar
 updateCalendar' history randGen [] = []
-updateCalendar' history randGen (week:remainingWeeks) = let (updatedWeek, updatedRandGen) = updateWeek history randGen week
-                                                            updatedHistory = (drop 1 history) ++ [updatedWeek]
-                                                        in  updatedWeek : updateCalendar' updatedHistory updatedRandGen remainingWeeks
+updateCalendar' history randGen (week:remainingWeeks) =
+  let (updatedWeek, updatedRandGen) = updateWeek history randGen week
+      updatedHistory                = (drop 1 history) ++ [updatedWeek]
+  in  updatedWeek : updateCalendar' updatedHistory updatedRandGen remainingWeeks
 
 updateWeek :: History -> StdGen -> Week -> (Week, StdGen)
-updateWeek history randGen (date, slots) = let  (present, absent) = partition isPresent slots
-                                                (available, confirmed) = partition isAvailable present
-                                                neededIn = maxInsPerWeek - (length $ filter isIn confirmed)
-                                                (shuffledAvailable, updatedRandGen) = shuffle available randGen
-                                                (favored, unfavored) = partition isFavored shuffledAvailable
-                                                (eligible, notEligible) = partitionEligible neededIn favored unfavored
-                                                newlyOut = map (\slot -> slot {attendance=Out}) eligible
-                                                newlyIn = map (\slot -> slot {attendance=In}) notEligible
-                                                sortedSlots = sortBy (compare `on` attendance) (confirmed ++ absent ++ newlyIn ++ newlyOut)
-                                                isPresent slot = attendance slot /= Absent
-                                                isAvailable slot = status slot == Proposed
-                                                isIn slot = attendance slot /= Out
-                                                isFavored slot = let (inCount, outCount) = inOutCount history (person slot)
-                                                                 in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
-                                            in  ((date, sortedSlots), updatedRandGen)
+updateWeek history randGen (date, slots) =
+  let (present, absent)                   = partition isPresent slots
+      (available, confirmed)              = partition isAvailable present
+      (shuffledAvailable, updatedRandGen) = shuffle available randGen
+
+      (hosts, guests)                     = if needHost then partitionEligible 1 favoredHosts unfavoredHosts else ([], shuffledAvailable)
+                                              where needHost = not $ any isHost confirmed
+                                                    (favoredHosts, unfavoredHosts) = partition isFavoredToHost shuffledAvailable
+
+      (eligible, notEligible)             = partitionEligible numberEligibleNeeded favored unfavored
+                                              where numberEligibleNeeded = max 0 $ maxInsPerWeek - (length $ filter isIn confirmed)
+                                                    (favored, unfavored) = partition isFavored guests
+
+      newlyOut                            = map (\slot -> slot {attendance=Out}) eligible
+      newlyIn                             = map (\slot -> slot {attendance=In}) notEligible
+      newlyHost                           = map (\slot -> slot {attendance=Host}) hosts
+
+      sortedSlots                         = sortBy (compare `on` attendance) (confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost)
+
+      isPresent slot                      = attendance slot /= Absent
+      isAvailable slot                    = status slot == Proposed
+      isIn slot                           = attendance slot == In || attendance slot == Host
+      isHost slot                         = attendance slot == Host
+      isFavoredToHost slot                = let (_, _, hostCount) = inOutHostCount history (person slot)
+                                            in hostCount < maxHostsPerPerson
+      isFavored slot                      = let (inCount, outCount, _) = inOutHostCount history (person slot)
+                                            in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
+  in  ((date, sortedSlots), updatedRandGen)
 
 partitionEligible :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
-partitionEligible neededIn favored unfavored =  let (eligibleFavored, ineligibleFavored) = splitAt neededIn favored
-                                                    numberUnfavoredEligibleNeeded = neededIn - length eligibleFavored
-                                                    (eligibleUnfavored, ineligibleUnfavored) = splitAt numberUnfavoredEligibleNeeded unfavored
-                                                in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
+partitionEligible numberEligibleNeeded favored unfavored =
+  let (eligibleFavored, ineligibleFavored)      = splitAt numberEligibleNeeded favored
+      numberUnfavoredEligibleNeeded             = numberEligibleNeeded - length eligibleFavored
+      (eligibleUnfavored, ineligibleUnfavored)  = splitAt numberUnfavoredEligibleNeeded unfavored
+  in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
-inOutCount :: [Week] -> Person -> (Int, Int)
-inOutCount history person = let attendanceHistory = map (lookupAttendance person) history
-                                outCount = length $ filter (\attendance -> attendance == Out) attendanceHistory
-                                inCount  = length $ filter (\attendance -> attendance `elem` [In, Host]) attendanceHistory
-                            in  (inCount, outCount)
+-- TODO: do one pass through attendance history to gather all stats
+
+inOutHostCount :: [Week] -> Person -> (Int, Int, Int)
+inOutHostCount history person =
+  let attendanceHistory = map (lookupAttendance person) history
+      inCount           = length $ filter (\attendance -> attendance `elem` [In, Host]) attendanceHistory
+      outCount          = length $ filter (\attendance -> attendance == Out) attendanceHistory
+      hostCount         = length $ filter (\attendance -> attendance == Host) attendanceHistory
+  in  (inCount, outCount, hostCount)
 
 lookupAttendance :: Person -> Week -> Attendance
-lookupAttendance targetPerson (date,slots) =  let result = find (\slot -> (person slot) == targetPerson) slots 
-                                              in case result of
-                                                Nothing   -> Absent
-                                                Just slot -> attendance slot
+lookupAttendance targetPerson (date,slots) =
+  let result = find (\slot -> (person slot) == targetPerson) slots 
+  in case result of
+    Nothing   -> Absent
+    Just slot -> attendance slot
+
+------------------
+
 printSlot :: Slot -> IO ()
 printSlot slot = do putStrLn ((show $ person slot) ++ ":" ++ (show $ attendance slot))
 
