@@ -41,32 +41,34 @@ updateCalendar' history randGen (week:remainingWeeks) =
 
 updateWeek :: History -> StdGen -> Week -> (Week, StdGen)
 updateWeek history randGen (date, slots) =
-  let (present, absent)                   = partition isPresent slots
-      (available, confirmed)              = partition isAvailable present
+  let (present, absent) = partition isPresent slots
+                          where isPresent slot = attendance slot /= Absent
+
+      (available, confirmed) = partition isAvailable present
+                               where isAvailable slot = status slot == Proposed
+
       (shuffledAvailable, updatedRandGen) = shuffle available randGen
 
-      (hosts, guests)                     = if needHost then partitionEligible 1 favoredHosts unfavoredHosts else ([], shuffledAvailable)
-                                              where needHost = not $ any isHost confirmed
-                                                    (favoredHosts, unfavoredHosts) = partition isFavoredToHost shuffledAvailable
+      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
+                        where needHost                         = not $ any isHost confirmed
+                              isHost slot                      = attendance slot == Host
+                              (eligibleHosts, ineligibleHosts) = partitionEligible 1 favoredHosts unfavoredHosts
+                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
+                              isFavoredToHost slot             = let (_, _, hostCount) = inOutHostCount history (person slot)
+                                                                 in hostCount < maxHostsPerPerson
 
-      (eligible, notEligible)             = partitionEligible numberEligibleNeeded favored unfavored
-                                              where numberEligibleNeeded = max 0 $ maxInsPerWeek - (length $ filter isIn confirmed)
-                                                    (favored, unfavored) = partition isFavored guests
+      (eligible, notEligible)  = partitionEligible numberEligibleNeeded favored unfavored
+                                 where numberEligibleNeeded = max 0 $ maxInsPerWeek - (length $ filter isIn confirmed)
+                                       (favored, unfavored) = partition isFavored guests
+                                       isIn slot            = attendance slot == In || attendance slot == Host
+                                       isFavored slot       = let (inCount, outCount, _) = inOutHostCount history (person slot)
+                                                              in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
 
-      newlyOut                            = map (\slot -> slot {attendance=Out}) eligible
-      newlyIn                             = map (\slot -> slot {attendance=In}) notEligible
-      newlyHost                           = map (\slot -> slot {attendance=Host}) hosts
-
-      sortedSlots                         = sortBy (compare `on` attendance) (confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost)
-
-      isPresent slot                      = attendance slot /= Absent
-      isAvailable slot                    = status slot == Proposed
-      isIn slot                           = attendance slot == In || attendance slot == Host
-      isHost slot                         = attendance slot == Host
-      isFavoredToHost slot                = let (_, _, hostCount) = inOutHostCount history (person slot)
-                                            in hostCount < maxHostsPerPerson
-      isFavored slot                      = let (inCount, outCount, _) = inOutHostCount history (person slot)
-                                            in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
+      newlyOut    = map (\slot -> slot {attendance=Out}) eligible
+      newlyIn     = map (\slot -> slot {attendance=In}) notEligible
+      newlyHost   = map (\slot -> slot {attendance=Host}) hosts
+      newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
+      sortedSlots = sortBy (compare `on` attendance) newSlots
   in  ((date, sortedSlots), updatedRandGen)
 
 partitionEligible :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
@@ -103,5 +105,5 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-main' = do randGen <- newStdGen
-           mapM_ printWeek $ updateCalendar randGen theCalendar
+maix = do randGen <- newStdGen
+          mapM_ printWeek $ updateCalendar randGen theCalendar
