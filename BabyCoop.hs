@@ -108,5 +108,9 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-maix = do randGen <- newStdGen
-          mapM_ printWeek $ updateCalendar randGen theCalendar
+main' = do randGen <- newStdGen
+           mapM_ printWeek $ updateCalendar randGen theCalendar
+
+s :: IO ()
+s = do randGen <- newStdGen
+       mapM_ print $ updateCalendar randGen theCalendar

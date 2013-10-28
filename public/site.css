@@ -1,0 +1,11 @@
+.proposed {
+  font-style: italic;
+}
+
+.confirmed {
+  font-weight: normal;
+}
+
+.requested {
+  font-weight: bold;
+}

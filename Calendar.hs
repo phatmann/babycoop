@@ -2,7 +2,7 @@ module Calendar where
 
 data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq)
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
-data Status = Proposed | Confirmed | Requested deriving Eq
+data Status = Proposed | Confirmed | Requested deriving (Eq, Show)
 type Year = Int
 type Month = Int
 type Day = Int
@@ -10,7 +10,7 @@ type Date = (Year, Month, Day)
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
-                  }
+                  } deriving Show
 type Week = (Date, [Slot])
 type Calendar = [Week]
 
@@ -40,12 +40,12 @@ theCalendar =
                      ,Slot Kate In Confirmed
                      ,Slot Erica Out Confirmed
                      ,Slot Jenny Out Confirmed])
-  ,((2013, 11, 4),   [Slot Rebecca TBD Proposed
+  ,((2013, 11, 4),   [Slot Rebecca Out Confirmed
                      ,Slot Kasey Host Confirmed
-                     ,Slot Neha Absent Confirmed
-                     ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
-                     ,Slot Jenny Absent Confirmed])
+                     ,Slot Neha Absent Requested
+                     ,Slot Kate Out Confirmed
+                     ,Slot Erica In Confirmed
+                     ,Slot Jenny Absent Requested])
   ,((2013, 11, 11),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
@@ -69,7 +69,7 @@ theCalendar =
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
-                     ,Slot Jenny Absent Confirmed])
+                     ,Slot Jenny Absent Requested])
   ]
                --((2013, 11, 11), 
                --   [(Rebecca, Out),

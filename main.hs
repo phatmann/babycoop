@@ -2,14 +2,15 @@
 
 module Main where
 
+import Prelude hiding (head, id, div, span)
 import Control.Applicative ((<$>), optional)
 import Control.Monad (forM_)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text.Lazy (unpack)
 import Happstack.Lite
-import Text.Blaze.Html5 (Html, (!), a, form, input, p, toHtml, label, ul, li, h2)
-import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value)
+import Text.Blaze.Html5 (Html, (!), a, div, form, input, p, toHtml, label, ul, li, h2, span)
+import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -27,7 +28,8 @@ main = serve config myApp
 
 myApp :: ServerPart Response
 myApp = msum [ 
-  dir "week"    $ week
+    dir "week" $ week
+  , dir "static" $ serveDirectory DisableBrowsing [] "public"
   , homePage
   ]
 
@@ -35,10 +37,22 @@ template :: Text -> Html -> Response
 template title body = toResponse $
   H.html $ do
     H.head $ do
-      H.title (toHtml title)
+      H.meta ! name "viewport" ! content "width=device-width, initial-scale=1.0"
+      H.link ! rel "stylesheet" ! href "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+      H.link ! rel "stylesheet" ! href "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"
+      H.link ! rel "stylesheet" ! href "/static/site.css"
+      -- H.script ! H.src "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"
+      H.title $ toHtml title
+      --preEscapedString "<!--[if lt IE 9]>"
+      --preEscapedString "<script src=\"../../assets/js/html5shiv.js\"></script>"
+      --preEscapedString "<script src=\"../../assets/js/respond.min.js\"></script>"
+      --preEscapedString "<![endif]-->"
     H.body $ do
-      body
-      p $ a ! href "/" $ "back home"
+      div ! class_ "container" $ do
+        body
+        div ! class_ "well" $ do
+          "If you cannot make it or want to reserve a spot, email Tony Mann at "
+          a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com"
 
 homePage :: ServerPart Response
 homePage =
@@ -57,8 +71,17 @@ week =
             h2 $ toHtml $ (show month) ++ "/" ++ (show day)
             let Just slots = lookup date theCalendar
                 date = (year, month, day)
-                showSlot slot  = (show $ person slot) ++ ": " ++ (show $ attendance slot)
-            ul $ forM_ slots (li . toHtml . showSlot)
+                slotClass :: Slot -> H.AttributeValue
+                slotClass slot =  case status slot of
+                  Proposed  -> "proposed"
+                  Confirmed -> "confirmed"
+                  Requested -> "requested"
+                showSlot slot = do
+                  toHtml $ show $ person slot
+                  ": "
+                  span ! class_ (slotClass slot) $ toHtml $ show $ attendance slot
+            p $ a ! href "/" $ "Back to calendar"
+            ul $ forM_ slots (\slot -> li $ showSlot slot)
 
 --homePage :: ServerPart Response
 --homePage =
