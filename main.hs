@@ -17,7 +17,13 @@ import Calendar
 import BabyCoop
 
 main :: IO ()
-main = serve Nothing myApp
+main = serve config myApp
+  where config = Just ServerConfig {
+                port      = 8000
+              , ramQuota  = 1 * 10^6
+              , diskQuota = 20 * 10^6
+              , tmpDir    = "/tmp/"
+              }
 
 myApp :: ServerPart Response
 myApp = msum [ 
