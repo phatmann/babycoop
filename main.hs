@@ -42,7 +42,9 @@ template title body = toResponse $
 
 homePage :: ServerPart Response
 homePage =
-    ok $ template "Home" $ ul $ forM_ theCalendar weekLink
+    ok $ template "South Seattle Playsit - Home" $ do
+      h2 "South Seattle Playsit"
+      ul $ forM_ theCalendar weekLink
     where weekLink (date@(year, month, day), _) = li $ a ! href (weekHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
           weekHref (year, month, day) = H.toValue $ "/week/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
 
@@ -51,7 +53,7 @@ week =
     path $ \(year :: Int) ->
       path $ \(month :: Int) ->
         path $ \(day :: Int) ->
-          ok $ template "Week" $ do
+          ok $ template "South Seattle Playsit - Week" $ do
             h2 $ toHtml $ (show month) ++ "/" ++ (show day)
             let Just slots = lookup date theCalendar
                 date = (year, month, day)
