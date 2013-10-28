@@ -53,9 +53,9 @@ updateWeek history randGen (date, slots) =
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
                         where needHost                         = not $ any isHost confirmed
-                              isHost slot                      = attendance slot == Host
                               (eligibleHosts, ineligibleHosts) = partitionEligible 1 favoredHosts unfavoredHosts
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
+                              isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = let (_, _, hostCount) = inOutHostCount history (person slot)
                                                                  in hostCount < maxHostsPerPerson
 
@@ -108,5 +108,5 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-maix = do randGen <- newStdGen
+main = do randGen <- newStdGen
           mapM_ printWeek $ updateCalendar randGen theCalendar
