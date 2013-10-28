@@ -41,7 +41,7 @@ theCalendar =
                      ,Slot Erica Out Confirmed
                      ,Slot Jenny Out Confirmed])
   ,((2013, 11, 4),   [Slot Rebecca TBD Proposed
-                     ,Slot Kasey TBD Proposed
+                     ,Slot Kasey Host Confirmed
                      ,Slot Neha Absent Confirmed
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
@@ -50,15 +50,15 @@ theCalendar =
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
+                     ,Slot Erica Host Confirmed
                      ,Slot Jenny TBD Proposed])
   ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
-                     ,Slot Jenny TBD Proposed])
-  ,((2013, 11, 25),   [Slot Rebecca TBD Proposed
+                     ,Slot Jenny Host Confirmed])
+  ,((2013, 11, 25),   [Slot Rebecca Host Confirmed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
