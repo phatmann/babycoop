@@ -40,7 +40,7 @@ theCalendar =
                      ,Slot Kate In Confirmed
                      ,Slot Erica Out Confirmed
                      ,Slot Jenny Out Confirmed])
-  ,((2013, 11, 4),   [Slot Rebecca Out Confirmed
+  ,((2013, 11, 4),   [Slot Rebecca In Requested
                      ,Slot Kasey Host Confirmed
                      ,Slot Neha Absent Requested
                      ,Slot Kate Out Confirmed
