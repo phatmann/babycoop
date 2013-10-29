@@ -7,13 +7,7 @@ import System.Random
 import Shuffle
 import Calendar
 
-maxInsPerWeek      = 3
-
-maxInsPerPerson    = 2
-maxOutsPerPerson   = 2
-maxHostsPerPerson  = 1
-
-historyCount       = 6
+personCount = (+1) $ fromEnum $ (maxBound :: Person) 
 
 type History = [Week]
 
@@ -31,7 +25,7 @@ Rules:
 updateCalendar :: StdGen -> Calendar -> Calendar
 updateCalendar randGen calendar = let emptyDate = (0, 0, 0)
                                       emptyWeek = (emptyDate, [])
-                                      emptyHistory = take historyCount $ repeat emptyWeek
+                                      emptyHistory = take personCount $ repeat emptyWeek
                                    in updateCalendar' emptyHistory randGen calendar
 
 updateCalendar' :: History -> StdGen -> Calendar -> Calendar
@@ -56,15 +50,16 @@ updateWeek history randGen (date, slots) =
                               (eligibleHosts, ineligibleHosts) = partitionEligible 1 favoredHosts unfavoredHosts
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
                               isHost slot                      = attendance slot == Host
-                              isFavoredToHost slot             = let (_, _, hostCount) = inOutHostCount history (person slot)
-                                                                 in hostCount < maxHostsPerPerson
+                              isFavoredToHost slot             = let (_, inCount, hostCount) = inOutHostCount history (person slot)
+                                                                 in hostCount == 0 && inCount <= (personCount `div` 2)
 
       (eligible, notEligible)  = partitionEligible numberEligibleNeeded favored unfavored
-                                 where numberEligibleNeeded = max 0 $ maxInsPerWeek - (length $ filter isIn confirmed)
-                                       (favored, unfavored) = partition isFavored guests
+                                 where numberEligibleNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
+                                       (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
-                                       isFavored slot       = let (inCount, outCount, _) = inOutHostCount history (person slot)
-                                                              in inCount > maxInsPerPerson || outCount < maxOutsPerPerson
+                                       historyCount         = length history
+                                       isFavoredForOut slot = let (inCount, outCount, _) = inOutHostCount history (person slot)
+                                                              in inCount >= (historyCount `div` 2) || outCount < (historyCount `div` 2)
 
       newlyOut  = map (\slot -> slot {attendance=Out}) eligible
       newlyIn   = map (\slot -> slot {attendance=In}) notEligible
@@ -108,8 +103,8 @@ printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++
                                                 mapM_ printSlot slots
                                                 putStrLn ""
 
-main' = do randGen <- newStdGen
-           mapM_ printWeek $ updateCalendar randGen theCalendar
+main = do randGen <- newStdGen
+          mapM_ printWeek $ updateCalendar randGen theCalendar
 
 s :: IO ()
 s = do randGen <- newStdGen

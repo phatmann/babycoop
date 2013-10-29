@@ -1,6 +1,6 @@
 module Calendar where
 
-data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq)
+data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded)
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show)
 type Year = Int
@@ -44,21 +44,21 @@ theCalendar =
                      ,Slot Kasey Host Confirmed
                      ,Slot Neha Absent Requested
                      ,Slot Kate Out Confirmed
-                     ,Slot Erica In Confirmed
+                     ,Slot Erica Absent Requested
                      ,Slot Jenny Absent Requested])
   ,((2013, 11, 11),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
-                     ,Slot Erica Host Confirmed
+                     ,Slot Erica Host Proposed
                      ,Slot Jenny TBD Proposed])
   ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
-                     ,Slot Kate TBD Proposed
+                     ,Slot Kate Absent Requested
                      ,Slot Erica TBD Proposed
-                     ,Slot Jenny Host Confirmed])
-  ,((2013, 11, 25),   [Slot Rebecca Host Confirmed
+                     ,Slot Jenny Host Proposed])
+  ,((2013, 11, 25),   [Slot Rebecca Host Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
@@ -70,6 +70,12 @@ theCalendar =
                      ,Slot Kate TBD Proposed
                      ,Slot Erica TBD Proposed
                      ,Slot Jenny Absent Requested])
+  ,((2013, 12, 9),   [Slot Rebecca TBD Proposed
+                     ,Slot Kasey TBD Proposed
+                     ,Slot Neha TBD Proposed
+                     ,Slot Kate TBD Proposed
+                     ,Slot Erica TBD Proposed
+                     ,Slot Jenny TBD Proposed])
   ]
                --((2013, 11, 11), 
                --   [(Rebecca, Out),
