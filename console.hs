@@ -25,7 +25,7 @@ printStats stats = do mapM printStat $ Map.toAscList stats
 
 main :: IO ()
 main = do randGen <- newStdGen
-          let date = (2013, 11, 11)
+          let date = (2013, 11, 18)
               (stats, historyCount) = gatherStats date theCalendar
               Just week = lookup date theCalendar
               (updatedWeek, _) = updateWeek randGen stats historyCount (date, week)
