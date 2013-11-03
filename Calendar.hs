@@ -97,7 +97,7 @@ partitionEligible numberEligibleNeeded favored unfavored =
       (eligibleUnfavored, ineligibleUnfavored)  = splitAt numberUnfavoredEligibleNeeded unfavored
   in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
--- TODO: do one pass through attendance history to gather all stats
+-- BUG: should not gather stats from the date itself
 
 gatherStats :: Date -> [Week] -> (Stats, Int)
 gatherStats date calendar = 
@@ -123,24 +123,6 @@ gatherStats date calendar =
                     in Map.alter (\_ -> Just newStat) key stats
       stats = foldl gatherWeekStats emptyStats history
       in (stats, length history)
-
---inOutHostCount :: [Week] -> Person -> (Int, Int, Int)
---inOutHostCount history person =
---  let attendanceHistory = map (lookupAttendance person) history
---      inCount           = length $ filter (\attendance -> attendance `elem` [In, Host]) attendanceHistory
---      outCount          = length $ filter (\attendance -> attendance == Out) attendanceHistory
---      hostCount         = length $ filter (\attendance -> attendance == Host) attendanceHistory
---  in  (inCount, outCount, hostCount)
-
---lookupAttendance :: Person -> Week -> Attendance
---lookupAttendance targetPerson week@(date, slots) =
---  let result = find (\slot -> (person slot) == targetPerson) slots 
---  in case result of
---    Nothing   -> Absent
---    Just slot -> attendance slot
-
-
-
 
 theCalendar :: [Week]
 theCalendar =
