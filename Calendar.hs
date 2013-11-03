@@ -80,7 +80,7 @@ updateWeek randGen stats historyCount  (date, slots) =
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
                                        isFavoredForOut slot = let stat = personStat slot
-                                                              in (inCount stat) >= (historyCount `div` 2) || (outCount stat) < (historyCount `div` 2)
+                                                              in (inCount stat) > (historyCount `div` 2) || (outCount stat) < (historyCount `div` 2)
 
       newlyOut  = map (\slot -> slot {attendance=Out}) eligible
       newlyIn   = map (\slot -> slot {attendance=In}) notEligible
