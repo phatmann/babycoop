@@ -97,16 +97,15 @@ partitionEligible numberEligibleNeeded favored unfavored =
       (eligibleUnfavored, ineligibleUnfavored)  = splitAt numberUnfavoredEligibleNeeded unfavored
   in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
--- BUG: should not gather stats from the date itself
-
 gatherStats :: Date -> [Week] -> (Stats, Int)
 gatherStats date calendar = 
   let dateIndex = case findIndex (\(d, _) -> d == date) calendar of
         Just n -> n
         Nothing -> error "Date not in calendar"
-      historyIndex = dateIndex - personCount
+      historyIndex = max 0 (dateIndex - personCount)
+      historyCount = dateIndex - historyIndex
       history :: [Week]
-      history = take personCount $ if historyIndex <= 0 then calendar else drop historyIndex calendar
+      history = take historyCount $ drop historyIndex calendar
       emptyStats = Map.empty :: Stats
       gatherWeekStats :: Stats -> Week -> Stats
       gatherWeekStats stats (_, slots) = foldl incrementSlotStat stats slots
@@ -122,7 +121,7 @@ gatherStats date calendar =
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
       stats = foldl gatherWeekStats emptyStats history
-      in (stats, length history)
+      in (stats, historyCount)
 
 theCalendar :: [Week]
 theCalendar =
@@ -160,7 +159,7 @@ theCalendar =
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
+                     ,Slot Erica Host Proposed
                      ,Slot Jenny TBD Proposed])
   ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed

@@ -29,6 +29,6 @@ main = do randGen <- newStdGen
               (stats, historyCount) = gatherStats date theCalendar
               Just week = lookup date theCalendar
               (updatedWeek, _) = updateWeek randGen stats historyCount (date, week)
-          printWeek updatedWeek
           putStrLn $ "Stats for " ++ (show historyCount) ++ " weeks:"
           printStats stats
+          printWeek updatedWeek
