@@ -5,32 +5,25 @@ import System.Random
 import qualified Data.Map as Map
 
 printSlot :: Slot -> IO ()
-printSlot slot = do putStrLn ((show $ person slot) ++ ":" ++ (show $ attendance slot))
+printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
 
 printWeek :: Week -> IO ()
 printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++ (show day))
                                                 mapM_ printSlot slots
-                                                putStrLn ""
-
-printStat :: (Person, Stat) -> IO ()
-printStat (person, stat) =  do 
+                                                
+showStat :: Stat -> String
+showStat stat =  
   let inStr   = show $ inCount stat
       outStr  = show $ outCount stat
       lastHosted = show $ lastHostDate stat
-  putStrLn $ (show person) ++ ": in=" ++ inStr ++ ", out=" ++ outStr ++ ", lastHosted=" ++ lastHosted
-
-printStats :: Stats -> IO ()
-printStats stats = do
-  mapM printStat $ Map.toAscList stats
-  putStrLn ""
+  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", lastHosted=" ++ lastHosted ++ ")"
 
 printDate :: StdGen -> History -> Date -> IO (StdGen, Week)
 printDate randGen history date = do
-  let (stats, week, randGen') = updateWeek randGen history date
+  let (week, randGen') = updateWeek randGen history date
   printWeek week
   putStrLn $ "Using random seed: " ++ (show randGen)
-  putStrLn $ "Stats for " ++ (show $ length history) ++ " weeks:"
-  printStats stats
+  putStrLn ""
   return (randGen', week)
 
 printDates :: StdGen -> [Date] -> IO ()
@@ -49,5 +42,5 @@ printDates randGen dates@(date:_) = do
 main :: IO ()
 main = do
   randGen <- newStdGen
-  printDates randGen [(2013, 11, 11), (2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
+  printDates randGen [(2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
   return ()

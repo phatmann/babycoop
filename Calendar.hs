@@ -25,6 +25,7 @@ type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
+                  , stat :: Stat
                   } deriving Show
 type Week = (Date, [Slot])
 type History = [Week]
@@ -34,16 +35,20 @@ personCount = (+1) $ fromEnum $ (maxBound :: Person)
 
 emptyDate :: Date
 emptyDate = (0, 0, 0)
+
+slot :: Person -> Attendance -> Status -> Slot
+slot person attendance status = Slot person attendance status emptyStat
       
-updateWeek :: StdGen -> History -> Date -> (Stats, Week, StdGen)
+updateWeek :: StdGen -> History -> Date -> (Week, StdGen)
 updateWeek randGen history date =
   let stats = historyStats history
-      Just week = lookup date theCalendar
-      (week', randGen') = calcWeek randGen stats (length history) (date, week)
-  in (stats, week', randGen')
+      Just slots = lookup date theCalendar
+      (week, randGen') = calcWeek randGen (length history) (date, map statify slots)
+      statify slot = slot {stat = findStat (person slot) stats}
+  in (week, randGen')
 
-calcWeek :: StdGen -> Stats -> Int -> Week -> (Week, StdGen)
-calcWeek randGen stats historyCount  (date, slots) =
+calcWeek :: StdGen -> Int -> Week -> (Week, StdGen)
+calcWeek randGen historyCount  (date, slots) =
   let (present, absent) = partition isPresent slots
                           where isPresent slot = attendance slot /= Absent
 
@@ -52,24 +57,21 @@ calcWeek randGen stats historyCount  (date, slots) =
 
       (shuffledAvailable, updatedRandGen) = shuffle available randGen
 
-      personStat slot = findStat (person slot) stats
-      lastSlotHostDate slot = lastHostDate $ personStat slot
-
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
                         where needHost                         = not $ any isHost confirmed
                               (eligibleHosts, ineligibleHosts) = choose 1 favoredHosts rankedUnfavoredHosts
-                              rankedUnfavoredHosts             = sortBy (compare `on` lastSlotHostDate) unfavoredHosts
+                              rankedUnfavoredHosts             = sortBy (compare `on` lastHostDate . stat ) unfavoredHosts
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
                               isHost slot                      = attendance slot == Host
-                              isFavoredToHost slot             = let stat = personStat slot
-                                                                 in (hostCount stat) == 0 && (inCount stat) <= (personCount `div` 2)
+                              isFavoredToHost slot             = let personStat = stat slot
+                                                                 in (hostCount personStat) == 0 && (inCount personStat) <= (personCount `div` 2)
 
       (eligible, notEligible)  = choose numberNeeded favored unfavored
                                  where numberNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
-                                       isFavoredForOut slot = let stat = personStat slot
-                                                              in (inCount stat) > (historyCount `div` 2) || (outCount stat) < (historyCount `div` 2)
+                                       isFavoredForOut slot = let personStat = stat slot
+                                                              in (inCount personStat) > (historyCount `div` 2) || (outCount personStat) < (historyCount `div` 2)
 
       newlyOut  = map (\slot -> slot {attendance=Out}) eligible
       newlyIn   = map (\slot -> slot {attendance=In}) notEligible
@@ -136,66 +138,66 @@ historyStats history =
 
 theCalendar :: [Week]
 theCalendar =
-  [((2013, 10, 07),  [Slot Rebecca Out Confirmed
-                     ,Slot Kasey Absent Confirmed
-                     ,Slot Neha Absent Confirmed
-                     ,Slot Kate In Confirmed
-                     ,Slot Erica In Confirmed
-                     ,Slot Jenny Host Confirmed])
-  ,((2013, 10, 14),  [Slot Rebecca Host Confirmed
-                     ,Slot Kasey In Confirmed
-                     ,Slot Neha In Confirmed
-                     ,Slot Kate Out Confirmed
-                     ,Slot Erica Out Confirmed
-                     ,Slot Jenny Out Confirmed])
-  ,((2013, 10, 21),  [Slot Rebecca Out Confirmed
-                     ,Slot Kasey Out Confirmed
-                     ,Slot Neha Out Confirmed
-                     ,Slot Kate Host Confirmed
-                     ,Slot Erica In Confirmed
-                     ,Slot Jenny In Confirmed])
-  ,((2013, 10, 28),  [Slot Rebecca In Confirmed
-                     ,Slot Kasey Out Confirmed
-                     ,Slot Neha Host Confirmed
-                     ,Slot Kate In Confirmed
-                     ,Slot Erica Out Confirmed
-                     ,Slot Jenny Out Confirmed])
-  ,((2013, 11, 4),   [Slot Rebecca In Requested
-                     ,Slot Kasey Host Confirmed
-                     ,Slot Neha Absent Requested
-                     ,Slot Kate Out Confirmed
-                     ,Slot Erica Absent Requested
-                     ,Slot Jenny Absent Requested])
-  ,((2013, 11, 11),  [Slot Rebecca Out Confirmed
-                     ,Slot Kasey In Confirmed
-                     ,Slot Neha Out Confirmed
-                     ,Slot Kate Out Confirmed
-                     ,Slot Erica Host Confirmed
-                     ,Slot Jenny In Confirmed])
-  ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
-                     ,Slot Kasey TBD Proposed
-                     ,Slot Neha TBD Proposed
-                     ,Slot Kate Absent Requested
-                     ,Slot Erica TBD Proposed
-                     ,Slot Jenny TBD Proposed])
-  ,((2013, 11, 25),  [Slot Rebecca TBD Proposed
-                     ,Slot Kasey TBD Proposed
-                     ,Slot Neha TBD Proposed
-                     ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
-                     ,Slot Jenny TBD Proposed])
-  ,((2013, 12, 2),   [Slot Rebecca TBD Proposed
-                     ,Slot Kasey TBD Proposed
-                     ,Slot Neha TBD Proposed
-                     ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
-                     ,Slot Jenny Absent Requested])
-  ,((2013, 12, 9),   [Slot Rebecca TBD Proposed
-                     ,Slot Kasey TBD Proposed
-                     ,Slot Neha TBD Proposed
-                     ,Slot Kate TBD Proposed
-                     ,Slot Erica TBD Proposed
-                     ,Slot Jenny TBD Proposed])
+  [((2013, 10, 07),  [slot Rebecca Out Confirmed
+                     ,slot Kasey Absent Confirmed
+                     ,slot Neha Absent Confirmed
+                     ,slot Kate In Confirmed
+                     ,slot Erica In Confirmed
+                     ,slot Jenny Host Confirmed])
+  ,((2013, 10, 14),  [slot Rebecca Host Confirmed
+                     ,slot Kasey In Confirmed
+                     ,slot Neha In Confirmed
+                     ,slot Kate Out Confirmed
+                     ,slot Erica Out Confirmed
+                     ,slot Jenny Out Confirmed])
+  ,((2013, 10, 21),  [slot Rebecca Out Confirmed
+                     ,slot Kasey Out Confirmed
+                     ,slot Neha Out Confirmed
+                     ,slot Kate Host Confirmed
+                     ,slot Erica In Confirmed
+                     ,slot Jenny In Confirmed])
+  ,((2013, 10, 28),  [slot Rebecca In Confirmed
+                     ,slot Kasey Out Confirmed
+                     ,slot Neha Host Confirmed
+                     ,slot Kate In Confirmed
+                     ,slot Erica Out Confirmed
+                     ,slot Jenny Out Confirmed])
+  ,((2013, 11, 4),   [slot Rebecca In Requested
+                     ,slot Kasey Host Confirmed
+                     ,slot Neha Absent Requested
+                     ,slot Kate Out Confirmed
+                     ,slot Erica Absent Requested
+                     ,slot Jenny Absent Requested])
+  ,((2013, 11, 11),  [slot Rebecca Out Confirmed
+                     ,slot Kasey In Confirmed
+                     ,slot Neha Out Confirmed
+                     ,slot Kate Out Confirmed
+                     ,slot Erica Host Confirmed
+                     ,slot Jenny In Confirmed])
+  ,((2013, 11, 18),  [slot Rebecca TBD Proposed
+                     ,slot Kasey TBD Proposed
+                     ,slot Neha TBD Proposed
+                     ,slot Kate Absent Requested
+                     ,slot Erica TBD Proposed
+                     ,slot Jenny TBD Proposed])
+  ,((2013, 11, 25),  [slot Rebecca TBD Proposed
+                     ,slot Kasey TBD Proposed
+                     ,slot Neha TBD Proposed
+                     ,slot Kate TBD Proposed
+                     ,slot Erica TBD Proposed
+                     ,slot Jenny TBD Proposed])
+  ,((2013, 12, 2),   [slot Rebecca TBD Proposed
+                     ,slot Kasey TBD Proposed
+                     ,slot Neha TBD Proposed
+                     ,slot Kate TBD Proposed
+                     ,slot Erica TBD Proposed
+                     ,slot Jenny Absent Requested])
+  ,((2013, 12, 9),   [slot Rebecca TBD Proposed
+                     ,slot Kasey TBD Proposed
+                     ,slot Neha TBD Proposed
+                     ,slot Kate TBD Proposed
+                     ,slot Erica TBD Proposed
+                     ,slot Jenny TBD Proposed])
   ]
                --((2013, 11, 11), 
                --   [(Rebecca, Out),
