@@ -59,12 +59,13 @@ calcWeek randGen historyCount  (date, slots) =
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
                         where needHost                         = not $ any isHost confirmed
-                              (eligibleHosts, ineligibleHosts) = choose 1 favoredHosts rankedUnfavoredHosts
+                              (eligibleHosts, ineligibleHosts) = choose 1 rankedFavoredHosts rankedUnfavoredHosts
+                              rankedFavoredHosts               = sortBy (compare `on` lastHostDate . stat ) favoredHosts
                               rankedUnfavoredHosts             = sortBy (compare `on` lastHostDate . stat ) unfavoredHosts
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
                               isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = let personStat = stat slot
-                                                                 in (hostCount personStat) == 0 && (inCount personStat) <= (personCount `div` 2)
+                                                                 in (inCount personStat) <= (personCount `div` 2)
 
       (eligible, notEligible)  = choose numberNeeded favored unfavored
                                  where numberNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
