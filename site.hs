@@ -15,7 +15,6 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
 import Calendar
-import BabyCoop
 
 main :: IO ()
 main = serve config myApp
