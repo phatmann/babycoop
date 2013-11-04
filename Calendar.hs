@@ -55,6 +55,8 @@ Rules:
 --      updatedHistory                = (drop 1 history) ++ [updatedWeek]
 --  in  updatedWeek : updateCalendar' updatedHistory updatedRandGen remainingWeeks
 
+-- BUG: should not allow same person to host several times in a row; should rotate
+
 updateWeek :: StdGen -> Stats -> Int -> Week -> (Week, StdGen)
 updateWeek randGen stats historyCount  (date, slots) =
   let (present, absent) = partition isPresent slots
@@ -166,8 +168,8 @@ theCalendar =
                      ,Slot Neha TBD Proposed
                      ,Slot Kate Absent Requested
                      ,Slot Erica TBD Proposed
-                     ,Slot Jenny Host Proposed])
-  ,((2013, 11, 25),   [Slot Rebecca Host Proposed
+                     ,Slot Jenny TBD Proposed])
+  ,((2013, 11, 25),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed
                      ,Slot Kate TBD Proposed
