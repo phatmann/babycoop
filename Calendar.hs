@@ -27,27 +27,23 @@ data Slot = Slot  { person :: Person
                   , status :: Status
                   } deriving Show
 type Week = (Date, [Slot])
+type History = [Week]
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
 
---updateCalendar :: StdGen -> [Week] -> [Week]
---updateCalendar randGen calendar = let emptyDate = (0, 0, 0)
---                                      emptyWeek = (emptyDate, [])
---                                      emptyHistory = take personCount $ repeat emptyWeek
---                                   in updateCalendar' emptyHistory randGen calendar
+emptyDate :: Date
+emptyDate = (0, 0, 0)
+      
+updateWeek :: StdGen -> History -> Date -> (Stats, Week, StdGen)
+updateWeek randGen history date =
+  let stats = historyStats history
+      Just week = lookup date theCalendar
+      (week', randGen') = calcWeek randGen stats (length history) (date, week)
+  in (stats, week', randGen')
 
---updateCalendar' :: [Week] -> StdGen -> [Week] -> [Week]
---updateCalendar' history randGen [] = []
---updateCalendar' history randGen (week:remainingWeeks) =
---  let (updatedWeek, updatedRandGen) = updateWeek history randGen week
---      updatedHistory                = (drop 1 history) ++ [updatedWeek]
---  in  updatedWeek : updateCalendar' updatedHistory updatedRandGen remainingWeeks
-
--- BUG: should not allow same person to host several times in a row; should rotate
-
-updateWeek :: StdGen -> Stats -> Int -> Week -> (Week, StdGen)
-updateWeek randGen stats historyCount  (date, slots) =
+calcWeek :: StdGen -> Stats -> Int -> Week -> (Week, StdGen)
+calcWeek randGen stats historyCount  (date, slots) =
   let (present, absent) = partition isPresent slots
                           where isPresent slot = attendance slot /= Absent
 
@@ -57,17 +53,19 @@ updateWeek randGen stats historyCount  (date, slots) =
       (shuffledAvailable, updatedRandGen) = shuffle available randGen
 
       personStat slot = findStat (person slot) stats
+      lastSlotHostDate slot = lastHostDate $ personStat slot
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
                         where needHost                         = not $ any isHost confirmed
-                              (eligibleHosts, ineligibleHosts) = partitionEligible 1 favoredHosts unfavoredHosts
+                              (eligibleHosts, ineligibleHosts) = choose 1 favoredHosts rankedUnfavoredHosts
+                              rankedUnfavoredHosts             = sortBy (compare `on` lastSlotHostDate) unfavoredHosts
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
                               isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = let stat = personStat slot
                                                                  in (hostCount stat) == 0 && (inCount stat) <= (personCount `div` 2)
 
-      (eligible, notEligible)  = partitionEligible numberEligibleNeeded favored unfavored
-                                 where numberEligibleNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
+      (eligible, notEligible)  = choose numberNeeded favored unfavored
+                                 where numberNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
                                        isFavoredForOut slot = let stat = personStat slot
@@ -81,12 +79,14 @@ updateWeek randGen stats historyCount  (date, slots) =
       sortedSlots = sortBy (compare `on` attendance) newSlots
   in  ((date, sortedSlots), updatedRandGen)
 
-partitionEligible :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
-partitionEligible numberEligibleNeeded favored unfavored =
-  let (eligibleFavored, ineligibleFavored)      = splitAt numberEligibleNeeded favored
-      numberUnfavoredEligibleNeeded             = numberEligibleNeeded - length eligibleFavored
-      (eligibleUnfavored, ineligibleUnfavored)  = splitAt numberUnfavoredEligibleNeeded unfavored
-  in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
+choose :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
+choose numberNeeded favored unfavored =
+  let (chosenFavored, rejectedFavored) = splitAt numberNeeded favored
+      numberUnfavoredNeeded = numberNeeded - length chosenFavored
+      (chosenUnfavored, rejectedUnfavored) = splitAt numberUnfavoredNeeded unfavored
+      chosen = chosenFavored ++ chosenUnfavored
+      rejected = rejectedFavored ++ rejectedUnfavored
+  in  (chosen, rejected)
 
 emptyStat :: Stat
 emptyStat = Stat [] [] []
@@ -103,16 +103,21 @@ outCount stat = length $ outDates stat
 hostCount :: Stat -> Int
 hostCount stat = length $ hostDates stat
 
-gatherStats :: Date -> [Week] -> (Stats, Int)
-gatherStats date calendar = 
-  let dateIndex = case findIndex (\(d, _) -> d == date) calendar of
-        Just n -> n
-        Nothing -> error "Date not in calendar"
+lastHostDate :: Stat -> Date
+lastHostDate stat = case hostDates stat of
+                      []  -> emptyDate
+                      ds  -> last ds
+
+gatherHistory :: Date -> [Week] -> History
+gatherHistory date calendar = 
+  let Just dateIndex = findIndex (\(d, _) -> d == date) calendar
       historyIndex = max 0 (dateIndex - personCount)
       historyCount = dateIndex - historyIndex
-      history :: [Week]
-      history = take historyCount $ drop historyIndex calendar
-      emptyStats = Map.empty :: Stats
+  in take historyCount $ drop historyIndex calendar
+
+historyStats :: History -> Stats
+historyStats history = 
+  let emptyStats = Map.empty :: Stats
       gatherWeekStats :: Stats -> Week -> Stats
       gatherWeekStats stats (slotDate, slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
@@ -127,7 +132,7 @@ gatherStats date calendar =
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
       stats = foldl gatherWeekStats emptyStats history
-      in (stats, historyCount)
+      in stats
 
 theCalendar :: [Week]
 theCalendar =
@@ -161,12 +166,12 @@ theCalendar =
                      ,Slot Kate Out Confirmed
                      ,Slot Erica Absent Requested
                      ,Slot Jenny Absent Requested])
-  ,((2013, 11, 11),  [Slot Rebecca Out Confirmed
-                     ,Slot Kasey In Confirmed
-                     ,Slot Neha Out Confirmed
-                     ,Slot Kate Out Confirmed
-                     ,Slot Erica Host Confirmed
-                     ,Slot Jenny In Confirmed])
+  ,((2013, 11, 11),  [Slot Rebecca TBD Proposed
+                     ,Slot Kasey TBD Proposed
+                     ,Slot Neha TBD Proposed
+                     ,Slot Kate TBD Proposed
+                     ,Slot Erica TBD Proposed
+                     ,Slot Jenny TBD Proposed])
   ,((2013, 11, 18),  [Slot Rebecca TBD Proposed
                      ,Slot Kasey TBD Proposed
                      ,Slot Neha TBD Proposed

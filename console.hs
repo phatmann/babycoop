@@ -16,34 +16,38 @@ printStat :: (Person, Stat) -> IO ()
 printStat (person, stat) =  do 
   let inStr   = show $ inCount stat
       outStr  = show $ outCount stat
-      hostStr = show $ hostCount stat
-  putStrLn $ (show person) ++ ": in=" ++ inStr ++ ", out=" ++ outStr ++ ", host=" ++ hostStr
+      lastHosted = show $ lastHostDate stat
+  putStrLn $ (show person) ++ ": in=" ++ inStr ++ ", out=" ++ outStr ++ ", lastHosted=" ++ lastHosted
 
 printStats :: Stats -> IO ()
 printStats stats = do
   mapM printStat $ Map.toAscList stats
   putStrLn ""
 
-printDate :: StdGen -> Date -> IO StdGen
-printDate randGen date = do
-  let (stats, historyCount) = gatherStats date theCalendar
-      Just week = lookup date theCalendar
-      (updatedWeek, updatedRandGen) = updateWeek randGen stats historyCount (date, week)
+printDate :: StdGen -> History -> Date -> IO (StdGen, Week)
+printDate randGen history date = do
+  let (stats, week, randGen') = updateWeek randGen history date
+  printWeek week
   putStrLn $ "Using random seed: " ++ (show randGen)
-  putStrLn $ "Stats for " ++ (show historyCount) ++ " weeks:"
+  putStrLn $ "Stats for " ++ (show $ length history) ++ " weeks:"
   printStats stats
-  printWeek updatedWeek
-  return updatedRandGen
+  return (randGen', week)
 
 printDates :: StdGen -> [Date] -> IO ()
-printDates randGen [] = return ()
-printDates randGen (date:dates) = do
-  randGen' <- printDate randGen date
-  printDates randGen' dates
-  return ()
+printDates randGen dates@(date:_) = do
+  let printDates' :: StdGen -> History -> [Date] -> IO ()
+      printDates' randGen history [] = return ()
+      printDates' randGen history (date:dates) = do
+        (randGen', week) <- printDate randGen history date
+        let history' = (drop extra history) ++ [week]
+            extra = if length history == personCount then 1 else 0
+        printDates' randGen' history' dates
+        return ()
+      history = gatherHistory date theCalendar
+  printDates' randGen history dates
 
 main :: IO ()
 main = do
   randGen <- newStdGen
-  printDates randGen [(2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
+  printDates randGen [(2013, 11, 11), (2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
   return ()

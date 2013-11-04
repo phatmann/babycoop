@@ -1,0 +1,86 @@
+11/11
+Jenny:In
+Kasey:In
+Rebecca:Out
+Kate:Out
+Neha:Out
+Erica:Host
+
+Using random seed: 1042763661 2147483398
+Stats for 5 weeks:
+Rebecca: in=3, out=2, lastHosted=(2013,10,14)
+Jenny: in=2, out=2, lastHosted=(2013,10,7)
+Kate: in=3, out=2, lastHosted=(2013,10,21)
+Kasey: in=2, out=2, lastHosted=(2013,11,4)
+Neha: in=2, out=1, lastHosted=(2013,10,28)
+Erica: in=2, out=2, lastHosted=(0,0,0)
+
+11/18
+Rebecca:In
+Neha:Out
+Kasey:Out
+Erica:Out
+Jenny:Host
+Kate:Absent
+
+Using random seed: 359657836 367188984
+Stats for 6 weeks:
+Rebecca: in=3, out=3, lastHosted=(2013,10,14)
+Jenny: in=3, out=2, lastHosted=(2013,10,7)
+Kate: in=3, out=3, lastHosted=(2013,10,21)
+Kasey: in=3, out=2, lastHosted=(2013,11,4)
+Neha: in=2, out=2, lastHosted=(2013,10,28)
+Erica: in=3, out=2, lastHosted=(2013,11,11)
+
+11/25
+Kasey:In
+Erica:In
+Jenny:Out
+Kate:Out
+Neha:Out
+Rebecca:Host
+
+Using random seed: 1664638085 1649143122
+Stats for 6 weeks:
+Rebecca: in=4, out=2, lastHosted=(2013,10,14)
+Jenny: in=3, out=2, lastHosted=(2013,11,18)
+Kate: in=2, out=3, lastHosted=(2013,10,21)
+Kasey: in=3, out=3, lastHosted=(2013,11,4)
+Neha: in=2, out=3, lastHosted=(2013,10,28)
+Erica: in=2, out=3, lastHosted=(2013,11,11)
+
+12/2
+Kasey:In
+Erica:Out
+Rebecca:Out
+Neha:Out
+Kate:Host
+Jenny:Absent
+
+Using random seed: 897971811 1023646436
+Stats for 6 weeks:
+Rebecca: in=4, out=2, lastHosted=(2013,11,25)
+Jenny: in=3, out=2, lastHosted=(2013,11,18)
+Kate: in=2, out=3, lastHosted=(2013,10,21)
+Kasey: in=3, out=3, lastHosted=(2013,11,4)
+Neha: in=1, out=4, lastHosted=(2013,10,28)
+Erica: in=3, out=2, lastHosted=(2013,11,11)
+
+12/9
+Erica:In
+Kate:In
+Kasey:Out
+Jenny:Out
+Rebecca:Out
+Neha:Host
+
+Using random seed: 1623580371 1642669521
+Stats for 6 weeks:
+Rebecca: in=4, out=2, lastHosted=(2013,11,25)
+Jenny: in=2, out=2, lastHosted=(2013,11,18)
+Kate: in=2, out=3, lastHosted=(2013,12,2)
+Kasey: in=4, out=2, lastHosted=(2013,11,4)
+Neha: in=1, out=4, lastHosted=(2013,10,28)
+Erica: in=2, out=3, lastHosted=(2013,11,11)
+
+[Finished in 0.5s]
