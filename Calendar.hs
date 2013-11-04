@@ -17,9 +17,9 @@ type Year = Int
 type Month = Int
 type Day = Int
 type Date = (Year, Month, Day)
-data Stat = Stat   { inCount :: Int
-                   , outCount :: Int
-                   , hostCount :: Int
+data Stat = Stat   { inDates :: [Date]
+                   , outDates :: [Date]
+                   , hostDates :: [Date]
                    } deriving Show
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
@@ -30,17 +30,6 @@ type Week = (Date, [Slot])
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
-
-{-
-Rules:
-# If more than 3 persons are available, remove whomever went out the week prior
-# If still more than 3 persons are available, remove whomever went out 2 weeks prior
-# If still more than 3 persons are available, randomly choose 3
-# Only 2 can reserve a week
-# Never babysit more than 2 weeks in a row
-# Hosted never chosen
-# Rotate who hosts
--}
 
 --updateCalendar :: StdGen -> [Week] -> [Week]
 --updateCalendar randGen calendar = let emptyDate = (0, 0, 0)
@@ -67,7 +56,7 @@ updateWeek randGen stats historyCount  (date, slots) =
 
       (shuffledAvailable, updatedRandGen) = shuffle available randGen
 
-      personStat slot = Map.findWithDefault (Stat 0 0 0) (person slot) stats
+      personStat slot = findStat (person slot) stats
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
                         where needHost                         = not $ any isHost confirmed
@@ -99,6 +88,21 @@ partitionEligible numberEligibleNeeded favored unfavored =
       (eligibleUnfavored, ineligibleUnfavored)  = splitAt numberUnfavoredEligibleNeeded unfavored
   in  (eligibleFavored ++ eligibleUnfavored, ineligibleFavored ++ ineligibleUnfavored)
 
+emptyStat :: Stat
+emptyStat = Stat [] [] []
+
+findStat :: Person -> Stats -> Stat
+findStat = Map.findWithDefault emptyStat
+
+inCount :: Stat -> Int
+inCount stat = length $ inDates stat
+
+outCount :: Stat -> Int
+outCount stat = length $ outDates stat
+
+hostCount :: Stat -> Int
+hostCount stat = length $ hostDates stat
+
 gatherStats :: Date -> [Week] -> (Stats, Int)
 gatherStats date calendar = 
   let dateIndex = case findIndex (\(d, _) -> d == date) calendar of
@@ -110,15 +114,15 @@ gatherStats date calendar =
       history = take historyCount $ drop historyIndex calendar
       emptyStats = Map.empty :: Stats
       gatherWeekStats :: Stats -> Week -> Stats
-      gatherWeekStats stats (_, slots) = foldl incrementSlotStat stats slots
+      gatherWeekStats stats (slotDate, slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
                 let key = person slot
-                    oldStat = Map.findWithDefault (Stat 0 0 0) key stats
+                    oldStat = findStat key stats
                     newStat = case attendance slot of
-                      In     -> oldStat {inCount = (inCount oldStat) + 1}
-                      Out    -> oldStat {outCount = (outCount oldStat) + 1}
-                      Host   -> oldStat {inCount = (inCount oldStat) + 1, hostCount = (hostCount oldStat) + 1}
+                      In     -> oldStat {inDates = (inDates oldStat) ++ [slotDate]}
+                      Out    -> oldStat {outDates = (outDates oldStat) ++ [slotDate]}
+                      Host   -> oldStat {inDates = (inDates oldStat) ++ [slotDate], hostDates = (hostDates oldStat) ++ [slotDate]}
                       Absent -> oldStat
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
