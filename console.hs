@@ -2,45 +2,31 @@ module Console where
 
 import Calendar
 import System.Random
+import Text.PrettyPrint.GenericPretty
 import qualified Data.Map as Map
+
+showDate :: Date -> String
+showDate (0, 0, 0) = "never"
+showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
 
 printSlot :: Slot -> IO ()
 printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
 
 printWeek :: Week -> IO ()
-printWeek (date@(year, month, day), slots) = do putStrLn ((show month) ++ "/" ++ (show day))
-                                                mapM_ printSlot slots
+printWeek (date, slots) = do putStrLn $ showDate date
+                             mapM_ printSlot slots
+                             putStrLn ""
                                                 
 showStat :: Stat -> String
 showStat stat =  
   let inStr   = show $ inCount stat
       outStr  = show $ outCount stat
-      lastHosted = show $ lastHostDate stat
+      lastHosted = showDate $ lastHostDate stat
   in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", lastHosted=" ++ lastHosted ++ ")"
-
-printDate :: StdGen -> History -> Date -> IO (StdGen, Week)
-printDate randGen history date = do
-  let (week, randGen') = updateWeek randGen history date
-  printWeek week
-  putStrLn $ "Using random seed: " ++ (show randGen)
-  putStrLn ""
-  return (randGen', week)
-
-printDates :: StdGen -> [Date] -> IO ()
-printDates randGen dates@(date:_) = do
-  let printDates' :: StdGen -> History -> [Date] -> IO ()
-      printDates' randGen history [] = return ()
-      printDates' randGen history (date:dates) = do
-        (randGen', week) <- printDate randGen history date
-        let history' = (drop extra history) ++ [week]
-            extra = if length history == personCount then 1 else 0
-        printDates' randGen' history' dates
-        return ()
-      history = gatherHistory date theCalendar
-  printDates' randGen history dates
 
 main :: IO ()
 main = do
   randGen <- newStdGen
-  printDates randGen [(2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
-  return ()
+  let weeks = updateWeeks randGen [(2013, 11, 18), (2013, 11, 25), (2013, 12, 2), (2013, 12, 9)]
+  mapM_ printWeek weeks
+  mapM_ pp weeks

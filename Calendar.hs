@@ -46,6 +46,18 @@ emptyDate = (0, 0, 0)
 
 slot :: Person -> Attendance -> Status -> Slot
 slot person attendance status = Slot person attendance status emptyStat
+
+updateWeeks :: StdGen -> [Date] -> [Week]
+updateWeeks randGen dates@(firstDate:_) =
+  let updateWeeks' :: StdGen -> History -> [Date] -> [Week] -> [Week]
+      updateWeeks' randGen history [] accum = accum
+      updateWeeks' randGen history (d:ds) accum  =
+        let (week, randGen') = updateWeek randGen history d
+            history' = (drop extra history) ++ [week]
+            extra = if length history == personCount then 1 else 0
+        in accum ++ [week] ++ updateWeeks' randGen' history' ds accum
+      history = gatherHistory firstDate theCalendar
+      in updateWeeks' randGen history dates []
       
 updateWeek :: StdGen -> History -> Date -> (Week, StdGen)
 updateWeek randGen history date =
