@@ -1,4 +1,5 @@
 -- {-# OPTIONS -Wall #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Calendar where
 
@@ -9,10 +10,11 @@ import System.Random
 import Shuffle
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Text.PrettyPrint.GenericPretty
 
-data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord)
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
-data Status = Proposed | Confirmed | Requested deriving (Eq, Show)
+data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord, Generic)
+data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generic)
+data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
 type Day = Int
@@ -20,15 +22,21 @@ type Date = (Year, Month, Day)
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
-                   } deriving Show
+                   } deriving (Show, Generic)
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
-                  } deriving Show
+                  } deriving (Show, Generic)
 type Week = (Date, [Slot])
 type History = [Week]
+
+instance Out Person
+instance Out Attendance
+instance Out Status
+instance Out Stat
+instance Out Slot
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
