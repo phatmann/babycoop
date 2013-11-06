@@ -8,6 +8,7 @@ import Data.Function (on)
 import System.Random
 import Shuffle
 import Data.Map (Map)
+import Data.Time
 import Text.PrettyPrint.GenericPretty
 import qualified Data.Map as Map
 
@@ -16,8 +17,8 @@ data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generi
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
-type Day = Int
-type Date = (Year, Month, Day)
+type MDay = Int
+type Date = (Year, Month, MDay)
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
@@ -46,17 +47,25 @@ emptyDate = (0, 0, 0)
 slot :: Person -> Attendance -> Status -> Slot
 slot person attendance status = Slot person attendance status emptyStat
 
+dateRange :: Date -> Integer -> [Date]
+dateRange _ 0 = []
+dateRange date@(year, month, mday) numWeeks = 
+  let numDays = 7 * signum numWeeks 
+      (y,m,d) = toGregorian $ addDays numDays $ fromGregorian (toInteger year) month mday
+      nextWeek = (fromIntegral y, m, d) :: Date
+  in date : dateRange nextWeek (numWeeks - signum numWeeks)
+
 updateWeeks :: StdGen -> [Date] -> [Week] -> [Week]
 updateWeeks randGen dates@(firstDate:_) calendar =
-  let updateWeeks' :: StdGen -> History -> [Date] -> [Week] -> [Week]
-      updateWeeks' randGen history [] accum = accum
-      updateWeeks' randGen history (d:ds) accum  =
+  let updateWeeks' :: StdGen -> History -> [Date] -> [Week]
+      updateWeeks' randGen history [] = []
+      updateWeeks' randGen history (d:ds) =
         let (week, randGen') = updateWeek randGen history calendar d
             history' = (drop extra history) ++ [week]
             extra = if length history == personCount then 1 else 0
-        in accum ++ [week] ++ updateWeeks' randGen' history' ds accum
+        in week : updateWeeks' randGen' history' ds
       history = gatherHistory firstDate calendar
-      in updateWeeks' randGen history dates []
+      in updateWeeks' randGen history dates
       
 updateWeek :: StdGen -> History -> [Week] -> Date -> (Week, StdGen)
 updateWeek randGen history calendar date =
