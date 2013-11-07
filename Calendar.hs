@@ -35,9 +35,9 @@ theCalendar =
                      ,slot Erica Absent Requested
                      ,slot Jenny Absent Requested])
   ,((2013, 11, 11),  [slot Rebecca Out Confirmed
-                     ,slot Kasey In Confirmed
+                     ,slot Kasey Out Requested
                      ,slot Neha Out Confirmed
-                     ,slot Kate Out Confirmed
+                     ,slot Kate In Requested
                      ,slot Erica Host Confirmed
                      ,slot Jenny In Confirmed])
   ,((2013, 11, 18),  [])
