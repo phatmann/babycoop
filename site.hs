@@ -14,12 +14,13 @@ import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, va
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
+import Scheduler
 import Calendar
 
 main :: IO ()
 main = serve config myApp
   where config = Just ServerConfig {
-                port      = 8000
+                port      = 8001
               , ramQuota  = 1 * 10^6
               , diskQuota = 20 * 10^6
               , tmpDir    = "/tmp/"
