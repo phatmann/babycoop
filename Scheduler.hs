@@ -47,24 +47,30 @@ emptyDate = (0, 0, 0)
 slot :: Person -> Attendance -> Status -> Slot
 slot person attendance status = Slot person attendance status emptyStat
 
-dateRange :: Date -> Integer -> [Date]
+dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
 dateRange date@(year, month, mday) numWeeks = 
   let numDays = 7 * signum numWeeks 
-      (y,m,d) = toGregorian $ addDays numDays $ fromGregorian (toInteger year) month mday
+      (y,m,d) = toGregorian $ addDays (toInteger numDays) $ fromGregorian (toInteger year) month mday
       nextWeek = (fromIntegral y, m, d) :: Date
   in date : dateRange nextWeek (numWeeks - signum numWeeks)
 
-updateWeeks :: StdGen -> [Date] -> [Week] -> [Week]
-updateWeeks randGen dates@(firstDate:_) calendar =
+updateWeeks :: StdGen -> Date -> Int -> [Week] -> [Week]
+updateWeeks randGen startDate numWeeks calendar =
   let updateWeeks' :: StdGen -> History -> [Date] -> [Week]
+      historyBackCount = -(personCount + 1)
+      dates@(firstDate:_) = dateRange startDate numWeeks
+      backDates = dateRange startDate historyBackCount
+      fillerCalendar = map (\d -> (d, [])) $ union backDates dates
+      weeksHaveSameDate (date1, _) (date2, _) = date1 == date2
+      fullCalendar = sortBy (compare `on` fst) $ unionBy weeksHaveSameDate calendar fillerCalendar
+      history = gatherHistory firstDate fullCalendar
       updateWeeks' randGen history [] = []
       updateWeeks' randGen history (d:ds) =
-        let (week, randGen') = updateWeek randGen history calendar d
+        let (week, randGen') = updateWeek randGen history fullCalendar d
             history' = (drop extra history) ++ [week]
             extra = if length history == personCount then 1 else 0
         in week : updateWeeks' randGen' history' ds
-      history = gatherHistory firstDate calendar
       in updateWeeks' randGen history dates
       
 updateWeek :: StdGen -> History -> [Week] -> Date -> (Week, StdGen)
