@@ -13,10 +13,10 @@ showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show 
 printSlot :: Slot -> IO ()
 printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
 
-printWeek :: Week -> IO ()
-printWeek (date, slots) = do putStrLn $ showDate date
-                             mapM_ printSlot slots
-                             putStrLn ""
+printMeeting :: (Date, Meeting) -> IO ()
+printMeeting (_, Meeting date slots) = do putStrLn $ showDate date
+                                          mapM_ printSlot slots
+                                          putStrLn ""
                                                 
 showStat :: Stat -> String
 showStat stat =  
@@ -28,6 +28,7 @@ showStat stat =
 main :: IO ()
 main = do
   randGen <- newStdGen
-  let weeks = updateWeeks randGen (2013, 11, 18) 4 theCalendar
-  mapM_ printWeek weeks
-  mapM_ pp weeks
+  let theCalendar = map (\m -> ((date m), m)) theMeetings
+      newCalendar = updateMeetings randGen (2013, 11, 18) 4 theCalendar
+  mapM_ printMeeting newCalendar
+  mapM_ pp newCalendar

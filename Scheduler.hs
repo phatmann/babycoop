@@ -29,14 +29,15 @@ data Slot = Slot  { person :: Person
                   , status :: Status
                   , stat :: Stat
                   } deriving (Show, Generic)
-type Week = (Date, [Slot])
-type History = [Week]
+data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Generic
+type Calendar = [(Date, Meeting)]
 
 instance Out Person
 instance Out Attendance
 instance Out Status
 instance Out Stat
 instance Out Slot
+instance Out Meeting
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
@@ -49,46 +50,47 @@ slot person attendance status = Slot person attendance status emptyStat
 
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
-dateRange date@(year, month, mday) numWeeks = 
-  let numDays = 7 * signum numWeeks 
+dateRange date@(year, month, mday) numMeetings = 
+  let numDays = 7 * signum numMeetings 
       (y,m,d) = toGregorian $ addDays (toInteger numDays) $ fromGregorian (toInteger year) month mday
-      nextWeek = (fromIntegral y, m, d) :: Date
-  in date : dateRange nextWeek (numWeeks - signum numWeeks)
+      nextMeeting = (fromIntegral y, m, d) :: Date
+  in date : dateRange nextMeeting (numMeetings - signum numMeetings)
 
-mergeCalendars :: [Week] -> [Week] -> [Week]
+mergeCalendars :: Calendar -> Calendar -> Calendar
 mergeCalendars calendar1 calendar2 = 
-  let weeksHaveSameDate (date1, _) (date2, _) = date1 == date2
-  in sortBy (compare `on` fst) $ unionBy weeksHaveSameDate calendar1 calendar2
+  let meetingsHaveSameDate (date1, _) (date2, _) = date1 == date2
+  in sortBy (compare `on` fst) $ unionBy meetingsHaveSameDate calendar1 calendar2
 
-updateWeeks :: StdGen -> Date -> Int -> [Week] -> [Week]
-updateWeeks randGen startDate numWeeks calendar =
-  let updateWeeks' :: StdGen -> History -> [Date] -> [Week]
-      historyBackCount = -(personCount + 1)
+updateMeetings :: StdGen -> Date -> Int -> Calendar -> Calendar
+updateMeetings randGen startDate numMeetings calendar =
+  let historyBackCount = -(personCount + 1)
       backDates = dateRange startDate historyBackCount
-      fillerCalendar = map (\d -> (d, [])) $ union backDates dates
+      fillerCalendar = map (\d -> (d, Meeting {date=d, slots=[]})) $ union backDates dates
       fullCalendar = mergeCalendars calendar fillerCalendar
 
-      dates@(firstDate:_) = dateRange startDate numWeeks
+      dates@(firstDate:_) = dateRange startDate numMeetings
       history = gatherHistory firstDate fullCalendar
-      
-      updateWeeks' randGen history [] = []
-      updateWeeks' randGen history (d:ds) =
-        let (week, randGen') = updateWeek randGen history fullCalendar d
-            history' = (drop extra history) ++ [week]
-            extra = if length history == personCount then 1 else 0
-        in week : updateWeeks' randGen' history' ds
-      in updateWeeks' randGen history dates
-      
-updateWeek :: StdGen -> History -> [Week] -> Date -> (Week, StdGen)
-updateWeek randGen history calendar date =
-  let stats = historyStats history
-      slots = findSlots date calendar
-      (week, randGen') = calcWeek randGen (length history) (date, map statify slots)
-      statify slot = slot {stat = findStat (person slot) stats}
-  in (week, randGen')
 
-calcWeek :: StdGen -> Int -> Week -> (Week, StdGen)
-calcWeek randGen historyCount  (date, slots) =
+      updateMeetings' :: StdGen -> Calendar -> [Date] -> Calendar
+      updateMeetings' randGen history [] = []
+      updateMeetings' randGen history (d:ds) =
+        let (meeting, randGen') = updateMeeting randGen history fullCalendar d
+            history' = (drop extra history) ++ [(d, meeting)]
+            extra = if length history == personCount then 1 else 0
+        in (d, meeting) : updateMeetings' randGen' history' ds
+      in updateMeetings' randGen history dates
+      
+updateMeeting :: StdGen -> Calendar -> Calendar -> Date -> (Meeting, StdGen)
+updateMeeting randGen history calendar date =
+  let stats = historyStats history
+      meeting = findMeeting date calendar
+      (meeting', randGen') = calcMeeting randGen (length history) $ statifyMeeting meeting
+      statifySlot slot = slot {stat = findStat (person slot) stats}
+      statifyMeeting m = m {slots = map statifySlot (slots m)}
+  in (meeting', randGen')
+
+calcMeeting :: StdGen -> Int -> Meeting -> (Meeting, StdGen)
+calcMeeting randGen historyCount  (Meeting date slots) =
   let (present, absent) = partition isPresent slots
                           where isPresent slot = attendance slot /= Absent
 
@@ -120,7 +122,7 @@ calcWeek randGen historyCount  (date, slots) =
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` attendance) newSlots
-  in  ((date, sortedSlots), updatedRandGen)
+  in  (Meeting date sortedSlots, updatedRandGen)
 
 choose :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
 choose numberNeeded favored unfavored =
@@ -131,15 +133,16 @@ choose numberNeeded favored unfavored =
       rejected = rejectedFavored ++ rejectedUnfavored
   in  (chosen, rejected)
 
-findSlots :: Date -> [Week] -> [Slot]
-findSlots date calendar =
-  let dateSlots = case lookup date calendar of
-        Just ss -> ss
-        Nothing -> []
+findMeeting :: Date -> Calendar -> Meeting
+findMeeting date calendar =
+  let meeting = case lookup date calendar of
+        Just m -> m
+        Nothing -> Meeting date []
       allPeople = [minBound .. maxBound] :: [Person]
       allPeopleSlots = map (\p -> slot p TBD Proposed) allPeople
       slotsHaveSamePerson slot1 slot2 = (person slot1) == (person slot2)
-  in unionBy slotsHaveSamePerson dateSlots allPeopleSlots
+      mergedSlots = unionBy slotsHaveSamePerson (slots meeting) allPeopleSlots
+  in meeting {slots = mergedSlots }
 
 emptyStat :: Stat
 emptyStat = Stat [] [] []
@@ -161,18 +164,18 @@ lastHostDate stat = case hostDates stat of
                       []  -> emptyDate
                       ds  -> last ds
 
-gatherHistory :: Date -> [Week] -> History
+gatherHistory :: Date -> Calendar -> Calendar
 gatherHistory date calendar = 
   let Just dateIndex = findIndex (\(d, _) -> d == date) calendar
       historyIndex = max 0 (dateIndex - personCount)
       historyCount = dateIndex - historyIndex
   in take historyCount $ drop historyIndex calendar
 
-historyStats :: History -> Stats
+historyStats :: Calendar -> Stats
 historyStats history = 
   let emptyStats = Map.empty :: Stats
-      gatherWeekStats :: Stats -> Week -> Stats
-      gatherWeekStats stats (slotDate, slots) = foldl incrementSlotStat stats slots
+      gatherMeetingStats :: Stats -> (Date, Meeting) -> Stats
+      gatherMeetingStats stats (_, Meeting slotDate slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
                 let key = person slot
@@ -184,5 +187,5 @@ historyStats history =
                       Absent -> oldStat
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
-      stats = foldl gatherWeekStats emptyStats history
+      stats = foldl gatherMeetingStats emptyStats history
       in stats
