@@ -29,8 +29,7 @@ data Slot = Slot  { person :: Person
                   , stat :: Stat
                   } deriving Show
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Show
-type CalendarEntry = (Date, Meeting)
-type Calendar = [CalendarEntry]
+type Calendar = [Meeting]
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
@@ -51,14 +50,14 @@ dateRange date@(year, month, mday) numMeetings =
 
 mergeCalendars :: Calendar -> Calendar -> Calendar
 mergeCalendars calendar1 calendar2 = 
-  let meetingsHaveSameDate (date1, _) (date2, _) = date1 == date2
-  in sortBy (compare `on` fst) $ unionBy meetingsHaveSameDate calendar1 calendar2
+  let meetingsHaveSameDate (Meeting date1 _) (Meeting date2 _) = date1 == date2
+  in sortBy (compare `on` date) $ unionBy meetingsHaveSameDate calendar1 calendar2
 
 updateMeetings :: StdGen -> Date -> Int -> Calendar -> Calendar
 updateMeetings randGen startDate numMeetings calendar =
   let historyBackCount = -(personCount + 1)
       backDates = dateRange startDate historyBackCount
-      fillerCalendar = map (\d -> (d, Meeting {date=d, slots=[]})) $ union backDates dates
+      fillerCalendar = map (\d -> Meeting d []) $ union backDates dates
       fullCalendar = mergeCalendars calendar fillerCalendar
 
       dates@(firstDate:_) = dateRange startDate numMeetings
@@ -68,9 +67,9 @@ updateMeetings randGen startDate numMeetings calendar =
       updateMeetings' randGen history [] = []
       updateMeetings' randGen history (d:ds) =
         let (meeting, randGen') = updateMeeting randGen history fullCalendar d
-            history' = (drop extra history) ++ [(d, meeting)]
+            history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
-        in (d, meeting) : updateMeetings' randGen' history' ds
+        in meeting : updateMeetings' randGen' history' ds
       in updateMeetings' randGen history dates
       
 updateMeeting :: StdGen -> Calendar -> Calendar -> Date -> (Meeting, StdGen)
@@ -127,10 +126,10 @@ choose numberNeeded favored unfavored =
   in  (chosen, rejected)
 
 findMeeting :: Date -> Calendar -> Meeting
-findMeeting date calendar =
-  let meeting = case lookup date calendar of
+findMeeting d calendar =
+  let meeting = case find (\m -> (date m == d)) calendar of
         Just m -> m
-        Nothing -> Meeting date []
+        Nothing -> Meeting d []
       allPeople = [minBound .. maxBound] :: [Person]
       allPeopleSlots = map (\p -> slot p TBD Proposed) allPeople
       slotsHaveSamePerson slot1 slot2 = (person slot1) == (person slot2)
@@ -158,8 +157,8 @@ lastHostDate stat = case hostDates stat of
                       ds  -> last ds
 
 gatherHistory :: Date -> Calendar -> Calendar
-gatherHistory date calendar = 
-  let Just dateIndex = findIndex (\(d, _) -> d == date) calendar
+gatherHistory d calendar = 
+  let Just dateIndex = findIndex (\m -> date m == d) calendar
       historyIndex = max 0 (dateIndex - personCount)
       historyCount = dateIndex - historyIndex
   in take historyCount $ drop historyIndex calendar
@@ -167,8 +166,8 @@ gatherHistory date calendar =
 historyStats :: Calendar -> Stats
 historyStats history = 
   let emptyStats = Map.empty :: Stats
-      gatherMeetingStats :: Stats -> CalendarEntry -> Stats
-      gatherMeetingStats stats (_, Meeting slotDate slots) = foldl incrementSlotStat stats slots
+      gatherMeetingStats :: Stats -> Meeting -> Stats
+      gatherMeetingStats stats (Meeting slotDate slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
                 let key = person slot

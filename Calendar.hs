@@ -2,8 +2,8 @@ module Calendar where
 
 import Scheduler
 
-theMeetings :: [Meeting]
-theMeetings =
+theCalendar :: Calendar
+theCalendar =
   [Meeting (2013, 10, 07) [slot Rebecca Out Confirmed
                      ,slot Kasey Absent Confirmed
                      ,slot Neha Absent Confirmed
