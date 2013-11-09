@@ -9,12 +9,11 @@ import System.Random
 import Shuffle
 import Data.Map (Map)
 import Data.Time
-import Text.PrettyPrint.GenericPretty
 import qualified Data.Map as Map
 
-data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord, Generic)
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generic)
-data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
+data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord)
+data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
+data Status = Proposed | Confirmed | Requested deriving (Eq, Show)
 type Year = Int
 type Month = Int
 type MDay = Int
@@ -22,23 +21,16 @@ type Date = (Year, Month, MDay)
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
-                   } deriving (Show, Generic)
+                   } deriving Show
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
-                  } deriving (Show, Generic)
-data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Generic
+                  } deriving Show
+data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Show
 type CalendarEntry = (Date, Meeting)
 type Calendar = [CalendarEntry]
-
-instance Out Person
-instance Out Attendance
-instance Out Status
-instance Out Stat
-instance Out Slot
-instance Out Meeting
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 

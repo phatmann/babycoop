@@ -3,7 +3,7 @@ module Console where
 import Scheduler
 import Calendar
 import System.Random
-import Text.PrettyPrint.GenericPretty
+import Text.Show.Pretty
 import qualified Data.Map as Map
 
 showDate :: Date -> String
@@ -31,4 +31,4 @@ main = do
   let theCalendar = map (\m -> ((date m), m)) theMeetings
       newCalendar = updateMeetings randGen (2013, 11, 18) 4 theCalendar
   mapM_ printMeeting newCalendar
-  mapM_ pp newCalendar
+  mapM_ (\x -> putStrLn $ ppShow x) newCalendar
