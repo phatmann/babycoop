@@ -30,7 +30,8 @@ data Slot = Slot  { person :: Person
                   , stat :: Stat
                   } deriving (Show, Generic)
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Generic
-type Calendar = [(Date, Meeting)]
+type CalendarEntry = (Date, Meeting)
+type Calendar = [CalendarEntry]
 
 instance Out Person
 instance Out Attendance
@@ -174,7 +175,7 @@ gatherHistory date calendar =
 historyStats :: Calendar -> Stats
 historyStats history = 
   let emptyStats = Map.empty :: Stats
-      gatherMeetingStats :: Stats -> (Date, Meeting) -> Stats
+      gatherMeetingStats :: Stats -> CalendarEntry -> Stats
       gatherMeetingStats stats (_, Meeting slotDate slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =

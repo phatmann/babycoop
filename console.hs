@@ -13,7 +13,7 @@ showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show 
 printSlot :: Slot -> IO ()
 printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
 
-printMeeting :: (Date, Meeting) -> IO ()
+printMeeting :: CalendarEntry -> IO ()
 printMeeting (_, Meeting date slots) = do putStrLn $ showDate date
                                           mapM_ printSlot slots
                                           putStrLn ""
