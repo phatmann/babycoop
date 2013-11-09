@@ -55,16 +55,22 @@ dateRange date@(year, month, mday) numWeeks =
       nextWeek = (fromIntegral y, m, d) :: Date
   in date : dateRange nextWeek (numWeeks - signum numWeeks)
 
+mergeCalendars :: [Week] -> [Week] -> [Week]
+mergeCalendars calendar1 calendar2 = 
+  let weeksHaveSameDate (date1, _) (date2, _) = date1 == date2
+  in sortBy (compare `on` fst) $ unionBy weeksHaveSameDate calendar1 calendar2
+
 updateWeeks :: StdGen -> Date -> Int -> [Week] -> [Week]
 updateWeeks randGen startDate numWeeks calendar =
   let updateWeeks' :: StdGen -> History -> [Date] -> [Week]
       historyBackCount = -(personCount + 1)
-      dates@(firstDate:_) = dateRange startDate numWeeks
       backDates = dateRange startDate historyBackCount
       fillerCalendar = map (\d -> (d, [])) $ union backDates dates
-      weeksHaveSameDate (date1, _) (date2, _) = date1 == date2
-      fullCalendar = sortBy (compare `on` fst) $ unionBy weeksHaveSameDate calendar fillerCalendar
+      fullCalendar = mergeCalendars calendar fillerCalendar
+
+      dates@(firstDate:_) = dateRange startDate numWeeks
       history = gatherHistory firstDate fullCalendar
+      
       updateWeeks' randGen history [] = []
       updateWeeks' randGen history (d:ds) =
         let (week, randGen') = updateWeek randGen history fullCalendar d
