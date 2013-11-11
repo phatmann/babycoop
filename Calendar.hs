@@ -40,5 +40,4 @@ theCalendar =
                      ,slot Kate In Requested
                      ,slot Erica Host Confirmed
                      ,slot Jenny In Confirmed]
-  ,Meeting (2013, 12, 2)  [slot Jenny Absent Requested]
   ]

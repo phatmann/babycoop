@@ -2,6 +2,7 @@ module Console where
 
 import Scheduler
 import Calendar
+import Requests
 import System.Random
 import Text.Show.Pretty
 import qualified Data.Map as Map
@@ -28,6 +29,7 @@ showStat stat =
 main :: IO ()
 main = do
   randGen <- newStdGen
-  let newCalendar = updateMeetings randGen (2013, 11, 18) 4 theCalendar
+  let calendar = mergeRequestCalendar theCalendar theRequests
+      newCalendar = updateMeetings (2013, 11, 18) 4 calendar
   mapM_ printMeeting newCalendar
   mapM_ (\x -> putStrLn $ ppShow x) newCalendar
