@@ -29,7 +29,10 @@ showStat stat =
 main :: IO ()
 main = do
   randGen <- newStdGen
-  let calendar = mergeRequestCalendar theCalendar theRequests
-      newCalendar = updateMeetings (2013, 11, 18) 4 calendar
+  let startDate = (2013, 10, 7)
+      numWeeks = 6
+      fullCalendar = fillInCalendar startDate numWeeks theCalendar
+      calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
+      newCalendar = updateMeetings startDate numWeeks calendarWithRequests
   mapM_ printMeeting newCalendar
-  mapM_ (\x -> putStrLn $ ppShow x) newCalendar
+  putStrLn $ ppShow newCalendar

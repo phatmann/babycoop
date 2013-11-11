@@ -51,10 +51,6 @@ dateRange date@(year, month, mday) numMeetings =
 sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 
-mergeCalendars :: Calendar -> Calendar -> Calendar
-mergeCalendars calendar1 calendar2 = 
-  sortBy (compare `on` date) $ unionBy sameMeeting calendar1 calendar2
-
 honorRequests :: Meeting -> Meeting -> Meeting
 honorRequests meeting requests =
   let sortByPerson = sortBy (compare `on` person)
@@ -67,32 +63,39 @@ honorRequests meeting requests =
 
 mergeRequestCalendar :: Calendar -> Calendar -> Calendar
 mergeRequestCalendar calendar requestCalendar = 
-  let findRequest meeting = findMeeting (date meeting) requestCalendar
+  let findMeetingAlways aDate aCalendar = case findMeeting aDate aCalendar of
+                            Just m -> m
+                            Nothing -> fullySlotifyMeeting $ Meeting aDate []
+      findRequest meeting = findMeetingAlways (date meeting) requestCalendar
   in map (\meeting -> honorRequests meeting (findRequest meeting)) calendar
+
+fillInCalendar :: Date -> Int -> Calendar -> Calendar
+fillInCalendar startDate numMeetings calendar = 
+  let historyBackCount = -(personCount + 1)
+      dates = dateRange startDate numMeetings
+      backDates = dateRange startDate historyBackCount
+      newMeetingIfMissing aDate = case findMeeting aDate calendar of
+        Just m -> m
+        Nothing -> fullySlotifyMeeting $ Meeting aDate []
+      calendar' = map newMeetingIfMissing $ union backDates dates
+  in sortBy (compare `on` date) calendar'
 
 updateMeetings :: Date -> Int -> Calendar -> Calendar
 updateMeetings startDate numMeetings calendar =
-  let historyBackCount = -(personCount + 1)
-      backDates = dateRange startDate historyBackCount
-      fillerCalendar = map (\d -> Meeting d []) $ union backDates dates
-      fullCalendar = mergeCalendars calendar fillerCalendar
-
-      dates@(firstDate:_) = dateRange startDate numMeetings
-      history = gatherHistory firstDate fullCalendar
-
+  let history = gatherHistory startDate calendar
       updateMeetings' :: Calendar -> [Date] -> Calendar
       updateMeetings' history [] = []
       updateMeetings' history (d:ds) =
-        let meeting = updateMeeting history fullCalendar d
+        let meeting = updateMeeting history calendar d
             history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
         in meeting : updateMeetings' history' ds
-      in updateMeetings' history dates
+      in updateMeetings' history $ dateRange startDate numMeetings
       
 updateMeeting :: Calendar -> Calendar -> Date -> Meeting
-updateMeeting history calendar date =
+updateMeeting history calendar aDate =
   let stats = historyStats history
-      meeting = findMeeting date calendar
+      Just meeting = findMeeting aDate calendar
       meeting' = calcMeeting (length history) $ statifyMeeting meeting
       statifySlot slot = slot {stat = findStat (person slot) stats}
       statifyMeeting m = m {slots = map statifySlot (slots m)}
@@ -148,11 +151,8 @@ fullySlotifyMeeting meeting =
       mergedSlots = unionBy slotsHaveSamePerson (slots meeting) allPeopleSlots
   in meeting { slots = mergedSlots }
 
-findMeeting :: Date -> Calendar -> Meeting
-findMeeting d calendar =
-  fullySlotifyMeeting $ case find (\m -> (date m == d)) calendar of
-    Just m -> m
-    Nothing -> Meeting d []
+findMeeting :: Date -> Calendar -> Maybe Meeting
+findMeeting aDate calendar = find (\m -> (date m == aDate)) calendar
 
 emptyStat :: Stat
 emptyStat = Stat [] [] []
