@@ -8,6 +8,7 @@ import Data.Function (on)
 import Shuffle
 import Data.Map (Map)
 import Data.Time
+import Control.Monad.Random
 import qualified Data.Map as Map
 
 data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord)
@@ -17,6 +18,7 @@ type Year = Int
 type Month = Int
 type MDay = Int
 type Date = (Year, Month, MDay)
+type Rank = Int
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
@@ -26,7 +28,7 @@ data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
-                  , rank :: Int
+                  , rank :: Rank
                   } deriving Show
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Show
 type Calendar = [Meeting]
@@ -69,16 +71,26 @@ mergeRequestCalendar calendar requestCalendar =
       findRequest meeting = findMeetingAlways (date meeting) requestCalendar
   in map (\meeting -> honorRequests meeting (findRequest meeting)) calendar
 
-fillInCalendar :: Date -> Int -> Calendar -> Calendar
-fillInCalendar startDate numMeetings calendar = 
+rankifyMeeting :: (RandomGen g) => Meeting -> Rand g Meeting
+rankifyMeeting meeting = do
+  rs <- getRandomRs (1, 100)
+  let rankedSlots = map (\(s, r) -> s{rank = r}) $ zip (slots meeting) rs
+  return meeting { slots = rankedSlots }
+
+fillInCalendar :: (RandomGen g) => Date -> Int -> Calendar -> Rand g Calendar
+fillInCalendar startDate numMeetings calendar = do
   let historyBackCount = -(personCount + 1)
       dates = dateRange startDate numMeetings
       backDates = dateRange startDate historyBackCount
-      newMeetingIfMissing aDate = case findMeeting aDate calendar of
-        Just m -> m
-        Nothing -> fullySlotifyMeeting $ Meeting aDate []
-      calendar' = map newMeetingIfMissing $ union backDates dates
-  in sortBy (compare `on` date) calendar'
+
+      newMeetingIfMissing :: (RandomGen g) => Date -> Rand g Meeting
+      newMeetingIfMissing aDate = do
+        case findMeeting aDate calendar of
+          Just m -> return m
+          Nothing -> rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
+  calendar' <- mapM newMeetingIfMissing $ union backDates dates
+  let sortedCalendar' = sortBy (compare `on` date) calendar'
+  return sortedCalendar'
 
 updateMeetings :: Date -> Int -> Calendar -> Calendar
 updateMeetings startDate numMeetings calendar =
@@ -108,13 +120,15 @@ calcMeeting historyCount  (Meeting date slots) =
 
       (available, confirmed) = partition isAvailable present
                                where isAvailable slot = status slot == Proposed
+      rankedAvailable = sortByRank available
 
-      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
+      sortByRank       = sortBy (compare `on` rank)
+      sortByLastHosted = sortBy (compare `on` lastHostDate . stat )
+
+      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], rankedAvailable)
                         where needHost                         = not $ any isHost confirmed
-                              (eligibleHosts, ineligibleHosts) = choose 1 rankedFavoredHosts rankedUnfavoredHosts
-                              rankedFavoredHosts               = sortBy (compare `on` lastHostDate . stat ) favoredHosts
-                              rankedUnfavoredHosts             = sortBy (compare `on` lastHostDate . stat ) unfavoredHosts
-                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
+                              (eligibleHosts, ineligibleHosts) = choose 1 (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
+                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost rankedAvailable
                               isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = let personStat = stat slot
                                                                  in (inCount personStat) <= (personCount `div` 2)
