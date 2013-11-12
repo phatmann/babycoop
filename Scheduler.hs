@@ -22,6 +22,7 @@ type Rank = Int
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
+                   , absentDates :: [Date]
                    } deriving Show
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
@@ -137,7 +138,10 @@ calcMeeting historyCount  (Meeting date slots) =
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
                                        isFavoredForOut slot = let personStat = stat slot
-                                                              in (inCount personStat) > (historyCount `div` 2) || (outCount personStat) < (historyCount `div` 2)
+                                                                  presentCount = historyCount - (absentCount personStat)
+                                                                  pctIn = ((inCount personStat) * 100) `div` presentCount
+                                                                  pctOut = ((outCount personStat) * 100) `div` presentCount
+                                                              in pctOut <= 30 || pctIn >= 60
 
       newlyOut  = map (\slot -> slot {attendance=Out}) eligible
       newlyIn   = map (\slot -> slot {attendance=In}) notEligible
@@ -168,19 +172,22 @@ findMeeting :: Date -> Calendar -> Maybe Meeting
 findMeeting aDate calendar = find (\m -> (date m == aDate)) calendar
 
 emptyStat :: Stat
-emptyStat = Stat [] [] []
+emptyStat = Stat [] [] [] []
 
 findStat :: Person -> Stats -> Stat
 findStat = Map.findWithDefault emptyStat
 
 inCount :: Stat -> Int
-inCount stat = length $ inDates stat
+inCount = length . inDates
 
 outCount :: Stat -> Int
-outCount stat = length $ outDates stat
+outCount = length . outDates
 
 hostCount :: Stat -> Int
-hostCount stat = length $ hostDates stat
+hostCount = length . hostDates
+
+absentCount :: Stat -> Int
+absentCount = length . absentDates
 
 lastHostDate :: Stat -> Date
 lastHostDate stat = case hostDates stat of
@@ -206,7 +213,7 @@ historyStats history =
                       In     -> oldStat {inDates = (inDates oldStat) ++ [slotDate]}
                       Out    -> oldStat {outDates = (outDates oldStat) ++ [slotDate]}
                       Host   -> oldStat {inDates = (inDates oldStat) ++ [slotDate], hostDates = (hostDates oldStat) ++ [slotDate]}
-                      Absent -> oldStat
+                      Absent -> oldStat {absentDates = (absentDates oldStat) ++ [slotDate]}
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
       emptyStats = Map.empty :: Stats

@@ -21,15 +21,16 @@ printMeeting (Meeting d slots) = do putStrLn $ showDate d
                                                 
 showStat :: Stat -> String
 showStat stat =  
-  let inStr   = show $ inCount stat
-      outStr  = show $ outCount stat
+  let inStr      = show $ inCount stat
+      outStr     = show $ outCount stat
+      absentStr  = show $ absentCount stat
       lastHosted = showDate $ lastHostDate stat
-  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", lastHosted=" ++ lastHosted ++ ")"
+  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", absent=" ++ absentStr ++ ", lastHosted=" ++ lastHosted ++ ")"
 
 main :: IO ()
 main = do
-  let startDate = (2013, 11, 11)
-      numWeeks = 2
+  let startDate = (2013, 11, 18)
+      numWeeks = 1
   fullCalendar <- evalRandIO(fillInCalendar startDate numWeeks theCalendar)
   let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
       newCalendar = updateMeetings startDate numWeeks calendarWithRequests
