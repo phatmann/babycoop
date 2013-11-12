@@ -117,7 +117,7 @@ calcMeeting :: Int -> Meeting -> Meeting
 calcMeeting historyCount  (Meeting date slots) =
   let (present, absent) = partition isPresent slots
                           where isPresent slot = attendance slot /= Absent
-
+      
       (available, confirmed) = partition isAvailable present
                                where isAvailable slot = status slot == Proposed
       rankedAvailable = sortByRank available
@@ -133,10 +133,16 @@ calcMeeting historyCount  (Meeting date slots) =
                               isFavoredToHost slot             = let personStat = stat slot
                                                                  in (inCount personStat) <= (personCount `div` 2)
 
-      (eligible, notEligible)  = choose numberNeeded favored unfavored
-                                 where numberNeeded = max 0 $ (personCount `div` 2) - (length $ filter isIn confirmed)
+      (eligible, notEligible)  = choose numberNeededOut favored unfavored
+                                 where numberPresent        = length present
+                                       numberConfirmedIn    = length $ filter isIn confirmed
+                                       numberConfirmedOut   = length $ filter isOut confirmed
+                                       minNumberNeededIn    = ceiling $ (toRational numberPresent) / 2.0
+                                       numberNeededIn       = minNumberNeededIn - numberConfirmedIn
+                                       numberNeededOut      = max 0 $ numberPresent - numberNeededIn - numberConfirmedOut
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
+                                       isOut slot           = attendance slot == Out
                                        isFavoredForOut slot = let personStat = stat slot
                                                                   presentCount = historyCount - (absentCount personStat)
                                                                   pctIn = ((inCount personStat) * 100) `div` presentCount

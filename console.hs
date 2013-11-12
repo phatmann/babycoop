@@ -35,4 +35,5 @@ main = do
   let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
       newCalendar = updateMeetings startDate numWeeks calendarWithRequests
   mapM_ printMeeting newCalendar
-  putStrLn $ ppShow newCalendar
+  -- let calendarText = "module Calendar where\n" ++ "import Scheduler\n" ++ "theCalendar :: Calendar\n" ++ "theCalendar=\n" ++ ppShow newCalendar
+  -- putStrLn calendarText
