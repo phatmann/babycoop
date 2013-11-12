@@ -5,10 +5,10 @@ module Scheduler where
 import Data.List
 import Debug.Trace
 import Data.Function (on)
-import System.Random
 import Shuffle
 import Data.Map (Map)
 import Data.Time
+import Control.Monad.Random
 import qualified Data.Map as Map
 
 data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord)
@@ -18,6 +18,7 @@ type Year = Int
 type Month = Int
 type MDay = Int
 type Date = (Year, Month, MDay)
+type Rank = Int
 data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
@@ -27,6 +28,7 @@ data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
+                  , rank :: Rank
                   } deriving Show
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Show
 type Calendar = [Meeting]
@@ -38,7 +40,7 @@ emptyDate :: Date
 emptyDate = (0, 0, 0)
 
 slot :: Person -> Attendance -> Status -> Slot
-slot person attendance status = Slot person attendance status emptyStat
+slot person attendance status = Slot person attendance status emptyStat 0
 
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
@@ -48,55 +50,84 @@ dateRange date@(year, month, mday) numMeetings =
       nextMeeting = (fromIntegral y, m, d) :: Date
   in date : dateRange nextMeeting (numMeetings - signum numMeetings)
 
-mergeCalendars :: Calendar -> Calendar -> Calendar
-mergeCalendars calendar1 calendar2 = 
-  let meetingsHaveSameDate (Meeting date1 _) (Meeting date2 _) = date1 == date2
-  in sortBy (compare `on` date) $ unionBy meetingsHaveSameDate calendar1 calendar2
+sameMeeting :: Meeting -> Meeting -> Bool
+sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 
-updateMeetings :: StdGen -> Date -> Int -> Calendar -> Calendar
-updateMeetings randGen startDate numMeetings calendar =
+honorRequests :: Meeting -> Meeting -> Meeting
+honorRequests meeting requests =
+  let sortByPerson = sortBy (compare `on` person)
+      mergeRequest slot requestSlot = slot {status=(status requestSlot), attendance=(attendance requestSlot)}
+      mergeSlots (slot1, slot2) = if (status slot2 == Requested)
+                                  then mergeRequest slot1 slot2
+                                  else slot1
+      slots' = map mergeSlots $ zip (sortByPerson $ slots meeting) (sortByPerson $ slots requests)
+  in meeting {slots = slots'}
+
+mergeRequestCalendar :: Calendar -> Calendar -> Calendar
+mergeRequestCalendar calendar requestCalendar = 
+  let findMeetingAlways aDate = case findMeeting aDate requestCalendar of
+                            Just m -> m
+                            Nothing -> Meeting aDate []
+      findRequests meeting = fullySlotifyMeeting $ findMeetingAlways (date meeting)
+  in map (\meeting -> honorRequests meeting (findRequests meeting)) calendar
+
+rankifyMeeting :: (RandomGen g) => Meeting -> Rand g Meeting
+rankifyMeeting meeting = do
+  rs <- getRandomRs (1, 100)
+  let rankedSlots = map (\(s, r) -> s{rank = r}) $ zip (slots meeting) rs
+  return meeting { slots = rankedSlots }
+
+fillInCalendar :: (RandomGen g) => Date -> Int -> Calendar -> Rand g Calendar
+fillInCalendar startDate numMeetings calendar = do
   let historyBackCount = -(personCount + 1)
+      dates = dateRange startDate numMeetings
       backDates = dateRange startDate historyBackCount
-      fillerCalendar = map (\d -> Meeting d []) $ union backDates dates
-      fullCalendar = mergeCalendars calendar fillerCalendar
 
-      dates@(firstDate:_) = dateRange startDate numMeetings
-      history = gatherHistory firstDate fullCalendar
+      newMeetingIfMissing :: (RandomGen g) => Date -> Rand g Meeting
+      newMeetingIfMissing aDate = do
+        case findMeeting aDate calendar of
+          Just m -> return m
+          Nothing -> rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
+  calendar' <- mapM newMeetingIfMissing $ union backDates dates
+  return $ sortBy (compare `on` date) calendar'
 
-      updateMeetings' :: StdGen -> Calendar -> [Date] -> Calendar
-      updateMeetings' randGen history [] = []
-      updateMeetings' randGen history (d:ds) =
-        let (meeting, randGen') = updateMeeting randGen history fullCalendar d
+updateMeetings :: Date -> Int -> Calendar -> Calendar
+updateMeetings startDate numMeetings calendar =
+  let updateMeetings' :: Calendar -> [Date] -> Calendar
+      updateMeetings' history [] = []
+      updateMeetings' history (d:ds) =
+        let meeting = updateMeeting history calendar d
             history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
-        in meeting : updateMeetings' randGen' history' ds
-      in updateMeetings' randGen history dates
+        in meeting : updateMeetings' history' ds
+      initialHistory = gatherHistory startDate calendar
+  in updateMeetings' initialHistory $ dateRange startDate numMeetings
       
-updateMeeting :: StdGen -> Calendar -> Calendar -> Date -> (Meeting, StdGen)
-updateMeeting randGen history calendar date =
+updateMeeting :: Calendar -> Calendar -> Date -> Meeting
+updateMeeting history calendar aDate =
   let stats = historyStats history
-      meeting = findMeeting date calendar
-      (meeting', randGen') = calcMeeting randGen (length history) $ statifyMeeting meeting
+      Just meeting = findMeeting aDate calendar
+      meeting' = calcMeeting (length history) $ statifyMeeting meeting
       statifySlot slot = slot {stat = findStat (person slot) stats}
       statifyMeeting m = m {slots = map statifySlot (slots m)}
-  in (meeting', randGen')
+  in meeting'
 
-calcMeeting :: StdGen -> Int -> Meeting -> (Meeting, StdGen)
-calcMeeting randGen historyCount  (Meeting date slots) =
+calcMeeting :: Int -> Meeting -> Meeting
+calcMeeting historyCount  (Meeting date slots) =
   let (present, absent) = partition isPresent slots
                           where isPresent slot = attendance slot /= Absent
 
       (available, confirmed) = partition isAvailable present
                                where isAvailable slot = status slot == Proposed
+      rankedAvailable = sortByRank available
 
-      (shuffledAvailable, updatedRandGen) = shuffle available randGen
+      sortByRank       = sortBy (compare `on` rank)
+      sortByLastHosted = sortBy (compare `on` lastHostDate . stat )
 
-      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], shuffledAvailable)
+      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], rankedAvailable)
                         where needHost                         = not $ any isHost confirmed
-                              (eligibleHosts, ineligibleHosts) = choose 1 rankedFavoredHosts rankedUnfavoredHosts
-                              rankedFavoredHosts               = sortBy (compare `on` lastHostDate . stat ) favoredHosts
-                              rankedUnfavoredHosts             = sortBy (compare `on` lastHostDate . stat ) unfavoredHosts
-                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost shuffledAvailable
+                              (eligibleHosts, ineligibleHosts) = choose 1 (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
+                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost rankedAvailable
                               isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = let personStat = stat slot
                                                                  in (inCount personStat) <= (personCount `div` 2)
@@ -114,7 +145,7 @@ calcMeeting randGen historyCount  (Meeting date slots) =
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` attendance) newSlots
-  in  (Meeting date sortedSlots, updatedRandGen)
+  in  Meeting date sortedSlots
 
 choose :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
 choose numberNeeded favored unfavored =
@@ -125,16 +156,16 @@ choose numberNeeded favored unfavored =
       rejected = rejectedFavored ++ rejectedUnfavored
   in  (chosen, rejected)
 
-findMeeting :: Date -> Calendar -> Meeting
-findMeeting d calendar =
-  let meeting = case find (\m -> (date m == d)) calendar of
-        Just m -> m
-        Nothing -> Meeting d []
-      allPeople = [minBound .. maxBound] :: [Person]
+fullySlotifyMeeting :: Meeting -> Meeting
+fullySlotifyMeeting meeting =
+  let allPeople = [minBound .. maxBound] :: [Person]
       allPeopleSlots = map (\p -> slot p TBD Proposed) allPeople
       slotsHaveSamePerson slot1 slot2 = (person slot1) == (person slot2)
       mergedSlots = unionBy slotsHaveSamePerson (slots meeting) allPeopleSlots
-  in meeting {slots = mergedSlots }
+  in meeting { slots = mergedSlots }
+
+findMeeting :: Date -> Calendar -> Maybe Meeting
+findMeeting aDate calendar = find (\m -> (date m == aDate)) calendar
 
 emptyStat :: Stat
 emptyStat = Stat [] [] []
@@ -165,8 +196,7 @@ gatherHistory d calendar =
 
 historyStats :: Calendar -> Stats
 historyStats history = 
-  let emptyStats = Map.empty :: Stats
-      gatherMeetingStats :: Stats -> Meeting -> Stats
+  let gatherMeetingStats :: Stats -> Meeting -> Stats
       gatherMeetingStats stats (Meeting slotDate slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
@@ -179,5 +209,5 @@ historyStats history =
                       Absent -> oldStat
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
-      stats = foldl gatherMeetingStats emptyStats history
-      in stats
+      emptyStats = Map.empty :: Stats
+  in foldl gatherMeetingStats emptyStats history

@@ -4,41 +4,429 @@ import Scheduler
 
 theCalendar :: Calendar
 theCalendar =
-  [Meeting (2013, 10, 07) [slot Rebecca Out Confirmed
-                     ,slot Kasey Absent Confirmed
-                     ,slot Neha Absent Confirmed
-                     ,slot Kate In Confirmed
-                     ,slot Erica In Confirmed
-                     ,slot Jenny Host Confirmed]
-  ,Meeting (2013, 10, 14)  [slot Rebecca Host Confirmed
-                     ,slot Kasey In Confirmed
-                     ,slot Neha In Confirmed
-                     ,slot Kate Out Confirmed
-                     ,slot Erica Out Confirmed
-                     ,slot Jenny Out Confirmed]
-  ,Meeting (2013, 10, 21)  [slot Rebecca Out Confirmed
-                     ,slot Kasey Out Confirmed
-                     ,slot Neha Out Confirmed
-                     ,slot Kate Host Confirmed
-                     ,slot Erica In Confirmed
-                     ,slot Jenny In Confirmed]
-  ,Meeting (2013, 10, 28)  [slot Rebecca In Confirmed
-                     ,slot Kasey Out Confirmed
-                     ,slot Neha Host Confirmed
-                     ,slot Kate In Confirmed
-                     ,slot Erica Out Confirmed
-                     ,slot Jenny Out Confirmed]
-  ,Meeting (2013, 11, 4)  [slot Rebecca In Requested
-                     ,slot Kasey Host Confirmed
-                     ,slot Neha Absent Requested
-                     ,slot Kate Out Confirmed
-                     ,slot Erica Absent Requested
-                     ,slot Jenny Absent Requested]
-  ,Meeting (2013, 11, 11)  [slot Rebecca Out Confirmed
-                     ,slot Kasey Out Requested
-                     ,slot Neha Out Confirmed
-                     ,slot Kate In Requested
-                     ,slot Erica Host Confirmed
-                     ,slot Jenny In Confirmed]
-  ,Meeting (2013, 12, 2)  [slot Jenny Absent Requested]
+  [ Meeting
+      { date = ( 2013 , 10 , 7 )
+      , slots =
+          [ Slot
+              { person = Kate
+              , attendance = In
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = In
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Rebecca
+              , attendance = Out
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Jenny
+              , attendance = Host
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Kasey
+              , attendance = Absent
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = Absent
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          ]
+      }
+  , Meeting
+      { date = ( 2013 , 10 , 14 )
+      , slots =
+          [ Slot
+              { person = Kasey
+              , attendance = In
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = In
+              , status = Confirmed
+              , stat = Stat { inDates = [] , outDates = [] , hostDates = [] }
+              , rank = 0
+              }
+          , Slot
+              { person = Jenny
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = []
+                    , hostDates = [ ( 2013 , 10 , 7 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kate
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = []
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = []
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Rebecca
+              , attendance = Host
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = []
+                    , outDates = [ ( 2013 , 10 , 7 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          ]
+      }
+  , Meeting
+      { date = ( 2013 , 10 , 21 )
+      , slots =
+          [ Slot
+              { person = Jenny
+              , attendance = In
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = [ ( 2013 , 10 , 7 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = In
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Rebecca
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = [ ( 2013 , 10 , 7 ) ]
+                    , hostDates = [ ( 2013 , 10 , 14 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kasey
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = []
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = []
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kate
+              , attendance = Host
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          ]
+      }
+  , Meeting
+      { date = ( 2013 , 10 , 28 )
+      , slots =
+          [ Slot
+              { person = Rebecca
+              , attendance = In
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , hostDates = [ ( 2013 , 10 , 14 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kate
+              , attendance = In
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = [ ( 2013 , 10 , 21 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Jenny
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = [ ( 2013 , 10 , 7 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kasey
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = Host
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          ]
+      }
+  , Meeting
+      { date = ( 2013 , 11 , 4 )
+      , slots =
+          [ Slot
+              { person = Rebecca
+              , attendance = In
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , outDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , hostDates = [ ( 2013 , 10 , 14 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kate
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates =
+                        [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) , ( 2013 , 10 , 28 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) ]
+                    , hostDates = [ ( 2013 , 10 , 21 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kasey
+              , attendance = Host
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Jenny
+              , attendance = Absent
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = [ ( 2013 , 10 , 7 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = Absent
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) ]
+                    , hostDates = [ ( 2013 , 10 , 28 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = Absent
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          ]
+      }
+  , Meeting
+      { date = ( 2013 , 11 , 11 )
+      , slots =
+          [ Slot
+              { person = Jenny
+              , attendance = In
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = [ ( 2013 , 10 , 7 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kate
+              , attendance = In
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates =
+                        [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) , ( 2013 , 10 , 28 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 11 , 4 ) ]
+                    , hostDates = [ ( 2013 , 10 , 21 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Rebecca
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates =
+                        [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) , ( 2013 , 11 , 4 ) ]
+                    , outDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , hostDates = [ ( 2013 , 10 , 14 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Kasey
+              , attendance = Out
+              , status = Requested
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 11 , 4 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = [ ( 2013 , 11 , 4 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Neha
+              , attendance = Out
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , outDates = [ ( 2013 , 10 , 21 ) ]
+                    , hostDates = [ ( 2013 , 10 , 28 ) ]
+                    }
+              , rank = 0
+              }
+          , Slot
+              { person = Erica
+              , attendance = Host
+              , status = Confirmed
+              , stat =
+                  Stat
+                    { inDates = [ ( 2013 , 10 , 7 ) , ( 2013 , 10 , 21 ) ]
+                    , outDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
+                    , hostDates = []
+                    }
+              , rank = 0
+              }
+          ]
+      }
   ]

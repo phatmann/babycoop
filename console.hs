@@ -2,12 +2,13 @@ module Console where
 
 import Scheduler
 import Calendar
-import System.Random
+import Requests
+import Control.Monad.Random
 import Text.Show.Pretty
 import qualified Data.Map as Map
 
 showDate :: Date -> String
-showDate (0, 0, 0) = "never"
+showDate (0, 0, 0) = "not recently"
 showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
 
 printSlot :: Slot -> IO ()
@@ -27,7 +28,10 @@ showStat stat =
 
 main :: IO ()
 main = do
-  randGen <- newStdGen
-  let newCalendar = updateMeetings randGen (2013, 11, 18) 4 theCalendar
+  let startDate = (2013, 11, 11)
+      numWeeks = 2
+  fullCalendar <- evalRandIO(fillInCalendar startDate numWeeks theCalendar)
+  let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
+      newCalendar = updateMeetings startDate numWeeks calendarWithRequests
   mapM_ printMeeting newCalendar
-  mapM_ (\x -> putStrLn $ ppShow x) newCalendar
+  putStrLn $ ppShow newCalendar
