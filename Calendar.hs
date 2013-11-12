@@ -510,7 +510,7 @@ theCalendar =
       , slots =
           [ Slot
               { person = Neha
-              , attendance = In
+              , attendance = Out
               , status = Confirmed
               , stat =
                   Stat
