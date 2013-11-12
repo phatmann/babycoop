@@ -8,6 +8,7 @@ import Data.Function (on)
 import Shuffle
 import Data.Map (Map)
 import Data.Time
+import Data.Ratio
 import Control.Monad.Random
 import qualified Data.Map as Map
 
@@ -137,7 +138,7 @@ calcMeeting historyCount  (Meeting date slots) =
                                  where numberPresent        = length present
                                        numberConfirmedIn    = length $ filter isIn confirmed
                                        numberConfirmedOut   = length $ filter isOut confirmed
-                                       minNumberNeededIn    = ceiling $ (toRational numberPresent) / 2.0
+                                       minNumberNeededIn    = ceiling $ numberPresent % 2
                                        numberNeededIn       = minNumberNeededIn - numberConfirmedIn
                                        numberNeededOut      = max 0 $ numberPresent - numberNeededIn - numberConfirmedOut
                                        (favored, unfavored) = partition isFavoredForOut guests
