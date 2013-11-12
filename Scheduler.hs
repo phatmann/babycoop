@@ -65,11 +65,11 @@ honorRequests meeting requests =
 
 mergeRequestCalendar :: Calendar -> Calendar -> Calendar
 mergeRequestCalendar calendar requestCalendar = 
-  let findMeetingAlways aDate aCalendar = case findMeeting aDate aCalendar of
+  let findMeetingAlways aDate = case findMeeting aDate requestCalendar of
                             Just m -> m
-                            Nothing -> fullySlotifyMeeting $ Meeting aDate []
-      findRequest meeting = findMeetingAlways (date meeting) requestCalendar
-  in map (\meeting -> honorRequests meeting (findRequest meeting)) calendar
+                            Nothing -> Meeting aDate []
+      findRequests meeting = fullySlotifyMeeting $ findMeetingAlways (date meeting)
+  in map (\meeting -> honorRequests meeting (findRequests meeting)) calendar
 
 rankifyMeeting :: (RandomGen g) => Meeting -> Rand g Meeting
 rankifyMeeting meeting = do
@@ -89,20 +89,19 @@ fillInCalendar startDate numMeetings calendar = do
           Just m -> return m
           Nothing -> rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
   calendar' <- mapM newMeetingIfMissing $ union backDates dates
-  let sortedCalendar' = sortBy (compare `on` date) calendar'
-  return sortedCalendar'
+  return $ sortBy (compare `on` date) calendar'
 
 updateMeetings :: Date -> Int -> Calendar -> Calendar
 updateMeetings startDate numMeetings calendar =
-  let history = gatherHistory startDate calendar
-      updateMeetings' :: Calendar -> [Date] -> Calendar
+  let updateMeetings' :: Calendar -> [Date] -> Calendar
       updateMeetings' history [] = []
       updateMeetings' history (d:ds) =
         let meeting = updateMeeting history calendar d
             history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
         in meeting : updateMeetings' history' ds
-      in updateMeetings' history $ dateRange startDate numMeetings
+      initialHistory = gatherHistory startDate calendar
+  in updateMeetings' initialHistory $ dateRange startDate numMeetings
       
 updateMeeting :: Calendar -> Calendar -> Date -> Meeting
 updateMeeting history calendar aDate =
@@ -197,8 +196,7 @@ gatherHistory d calendar =
 
 historyStats :: Calendar -> Stats
 historyStats history = 
-  let emptyStats = Map.empty :: Stats
-      gatherMeetingStats :: Stats -> Meeting -> Stats
+  let gatherMeetingStats :: Stats -> Meeting -> Stats
       gatherMeetingStats stats (Meeting slotDate slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
@@ -211,5 +209,5 @@ historyStats history =
                       Absent -> oldStat
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
-      stats = foldl gatherMeetingStats emptyStats history
-      in stats
+      emptyStats = Map.empty :: Stats
+  in foldl gatherMeetingStats emptyStats history

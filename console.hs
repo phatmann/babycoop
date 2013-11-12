@@ -28,7 +28,7 @@ showStat stat =
 
 main :: IO ()
 main = do
-  let startDate = (2013, 11, 18)
+  let startDate = (2013, 11, 11)
       numWeeks = 2
   fullCalendar <- evalRandIO(fillInCalendar startDate numWeeks theCalendar)
   let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
