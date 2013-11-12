@@ -59,7 +59,7 @@ homePage =
     ok $ template "Seattle League of Awesome Moms Baby Co-op (SLAM)" $ do
       h2 "Seattle League of Awesome Moms Baby Co-op (SLAM)"
       ul $ forM_ theCalendar weekLink
-    where weekLink (date@(year, month, day), _) = li $ a ! href (weekHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
+    where weekLink (Meeting date@(year, month, day) _) = li $ a ! href (weekHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
           weekHref (year, month, day) = H.toValue $ "/week/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
 
 week :: ServerPart Response
@@ -69,7 +69,7 @@ week =
         path $ \(day :: Int) ->
           ok $ template "SLAM - Week" $ do
             h2 $ toHtml $ (show month) ++ "/" ++ (show day)
-            let Just slots = lookup date theCalendar
+            let Just (Meeting _ slots) = findMeeting date theCalendar
                 date = (year, month, day)
                 slotClass :: Slot -> H.AttributeValue
                 slotClass slot =  case status slot of

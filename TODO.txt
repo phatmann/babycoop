@@ -1,1 +1,1 @@
-* Absences should count against "outs" needed
+* If someone absent, cannot have more out than in

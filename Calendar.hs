@@ -511,7 +511,7 @@ theCalendar =
           [ Slot
               { person = Neha
               , attendance = In
-              , status = Proposed
+              , status = Confirmed
               , stat =
                   Stat
                     { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 10 , 28 ) ]
@@ -524,7 +524,7 @@ theCalendar =
           , Slot
               { person = Kasey
               , attendance = In
-              , status = Proposed
+              , status = Confirmed
               , stat =
                   Stat
                     { inDates = [ ( 2013 , 10 , 14 ) , ( 2013 , 11 , 4 ) ]
@@ -538,7 +538,7 @@ theCalendar =
           , Slot
               { person = Erica
               , attendance = Out
-              , status = Proposed
+              , status = Confirmed
               , stat =
                   Stat
                     { inDates =
@@ -551,8 +551,8 @@ theCalendar =
               }
           , Slot
               { person = Kate
-              , attendance = Out
-              , status = Proposed
+              , attendance = Absent
+              , status = Requested
               , stat =
                   Stat
                     { inDates =
@@ -569,8 +569,8 @@ theCalendar =
               }
           , Slot
               { person = Rebecca
-              , attendance = Out
-              , status = Proposed
+              , attendance = Absent
+              , status = Requested
               , stat =
                   Stat
                     { inDates =
@@ -585,7 +585,7 @@ theCalendar =
           , Slot
               { person = Jenny
               , attendance = Host
-              , status = Proposed
+              , status = Confirmed
               , stat =
                   Stat
                     { inDates =
