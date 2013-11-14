@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 
 module Scheduler where
 
@@ -10,11 +10,13 @@ import Data.Map (Map)
 import Data.Time
 import Data.Ratio
 import Control.Monad.Random
+import Data.Aeson
+import GHC.Generics
 import qualified Data.Map as Map
 
-data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord)
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord)
-data Status = Proposed | Confirmed | Requested deriving (Eq, Show)
+data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord, Generic)
+data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generic)
+data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
 type MDay = Int
@@ -24,16 +26,30 @@ data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
                    , absentDates :: [Date]
-                   } deriving Show
+                   } deriving (Show, Generic)
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
                   , rank :: Rank
-                  } deriving Show
-data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving Show
+                  } deriving (Show, Generic)
+data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic)
 type Calendar = [Meeting]
+
+instance FromJSON Person
+instance FromJSON Attendance
+instance FromJSON Status
+instance FromJSON Stat
+instance FromJSON Slot
+instance FromJSON Meeting
+
+instance ToJSON Person
+instance ToJSON Attendance
+instance ToJSON Status
+instance ToJSON Stat
+instance ToJSON Slot
+instance ToJSON Meeting
 
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 

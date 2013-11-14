@@ -5,6 +5,7 @@ import Calendar
 import Requests
 import Control.Monad.Random
 import Text.Show.Pretty
+import Data.Aeson
 import qualified Data.Map as Map
 
 showDate :: Date -> String
@@ -35,5 +36,5 @@ main = do
   let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
       newCalendar = updateMeetings startDate numWeeks calendarWithRequests
   mapM_ printMeeting newCalendar
-  -- let calendarText = "module Calendar where\n" ++ "import Scheduler\n" ++ "theCalendar :: Calendar\n" ++ "theCalendar=\n" ++ ppShow newCalendar
-  -- putStrLn calendarText
+  let s = encode newCalendar
+  putStrLn (show s)
