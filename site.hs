@@ -87,12 +87,6 @@ week = do
             p $ a ! href "/" $ "Back to calendar"
             ul $ forM_ slots (\slot -> li $ showSlot slot)
 
-readCalendar :: IO Calendar
-readCalendar = do
-  calendarJSON <- B.readFile "calendar.json"
-  let Just calendar = decode calendarJSON :: Maybe Calendar
-  return calendar
-
 --homePage :: ServerPart Response
 --homePage =
 --    ok $ template "home page" $ do

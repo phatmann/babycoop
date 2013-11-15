@@ -1718,567 +1718,116 @@
         "slots": [
             {
                 "status": "Proposed",
-                "rank": 99,
-                "attendance": "In",
-                "person": "Neha",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 80,
-                "attendance": "In",
-                "person": "Kasey",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": []
-                }
-            },
-            {
-                "status": "Proposed",
                 "rank": 47,
                 "attendance": "Out",
                 "person": "Erica",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
                 }
             },
             {
                 "status": "Proposed",
-                "rank": 70,
-                "attendance": "Out",
-                "person": "Rebecca",
+                "rank": 84,
+                "attendance": "In",
+                "person": "Jenny",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 20,
+                "attendance": "Host",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 68,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
                 }
             },
             {
                 "status": "Proposed",
                 "rank": 53,
-                "attendance": "Host",
-                "person": "Kate",
+                "attendance": "Out",
+                "person": "Neha",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
                 }
             },
             {
-                "status": "Requested",
-                "rank": 49,
-                "attendance": "Absent",
-                "person": "Jenny",
+                "status": "Proposed",
+                "rank": 84,
+                "attendance": "In",
+                "person": "Rebecca",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            21
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
+                    "hostDates": [],
+                    "outDates": [],
+                    "inDates": [],
+                    "absentDates": []
                 }
             }
         ],
         "date": [
             2013,
             12,
-            2
+            3
         ]
     },
     {
         "slots": [
             {
                 "status": "Proposed",
-                "rank": 30,
+                "rank": 91,
                 "attendance": "In",
                 "person": "Erica",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
+                    "hostDates": [],
                     "outDates": [
                         [
                             2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
                             12,
-                            2
+                            3
                         ]
                     ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
+                    "inDates": [],
+                    "absentDates": []
                 }
             },
             {
                 "status": "Proposed",
-                "rank": 48,
-                "attendance": "In",
+                "rank": 60,
+                "attendance": "Out",
                 "person": "Jenny",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
+                    "hostDates": [],
+                    "outDates": [],
                     "inDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
                             12,
-                            2
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 2,
-                "attendance": "Out",
-                "person": "Rebecca",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 66,
-                "attendance": "Out",
-                "person": "Kate",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 1,
-                "attendance": "Out",
-                "person": "Kasey",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
+                            3
                         ]
                     ],
                     "absentDates": []
@@ -2286,262 +1835,23 @@
             },
             {
                 "status": "Proposed",
-                "rank": 94,
-                "attendance": "Host",
-                "person": "Neha",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            10,
-                            28
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
-                }
-            }
-        ],
-        "date": [
-            2013,
-            12,
-            9
-        ]
-    },
-    {
-        "slots": [
-            {
-                "status": "Proposed",
-                "rank": 83,
+                "rank": 8,
                 "attendance": "In",
-                "person": "Kate",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 80,
-                "attendance": "In",
-                "person": "Neha",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            12,
-                            2
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 72,
-                "attendance": "Out",
-                "person": "Jenny",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 37,
-                "attendance": "Out",
                 "person": "Kasey",
                 "stat": {
                     "hostDates": [
                         [
                             2013,
-                            11,
-                            4
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
                             12,
-                            9
+                            3
                         ]
                     ],
+                    "outDates": [],
                     "inDates": [
                         [
                             2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
                             12,
-                            2
+                            3
                         ]
                     ],
                     "absentDates": []
@@ -2549,211 +1859,86 @@
             },
             {
                 "status": "Proposed",
-                "rank": 2,
-                "attendance": "Out",
-                "person": "Rebecca",
+                "rank": 16,
+                "attendance": "Host",
+                "person": "Kate",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
+                    "hostDates": [],
                     "outDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
                             12,
-                            2
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
+                            3
                         ]
                     ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
+                    "inDates": [],
+                    "absentDates": []
                 }
             },
             {
                 "status": "Proposed",
-                "rank": 64,
-                "attendance": "Host",
-                "person": "Erica",
+                "rank": 67,
+                "attendance": "Out",
+                "person": "Neha",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ]
-                    ],
+                    "hostDates": [],
                     "outDates": [
                         [
                             2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
                             12,
-                            2
+                            3
                         ]
                     ],
+                    "inDates": [],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 75,
+                "attendance": "Out",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [],
                     "inDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
                             12,
-                            9
+                            3
                         ]
                     ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            4
-                        ]
-                    ]
+                    "absentDates": []
                 }
             }
         ],
         "date": [
             2013,
             12,
-            16
+            10
         ]
     },
     {
         "slots": [
             {
                 "status": "Proposed",
-                "rank": 89,
-                "attendance": "In",
-                "person": "Rebecca",
+                "rank": 23,
+                "attendance": "Host",
+                "person": "Erica",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
+                    "hostDates": [],
                     "outDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
                             12,
-                            2
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 53,
-                "attendance": "In",
-                "person": "Neha",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
+                            3
                         ]
                     ],
                     "inDates": [
                         [
                             2013,
                             12,
-                            2
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
+                            10
                         ]
                     ],
                     "absentDates": []
@@ -2765,152 +1950,19 @@
                 "attendance": "Out",
                 "person": "Jenny",
                 "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ],
+                    "hostDates": [],
                     "outDates": [
                         [
                             2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
                             12,
-                            16
+                            10
                         ]
                     ],
                     "inDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
                             12,
-                            9
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 77,
-                "attendance": "Out",
-                "person": "Kate",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
-                        ]
-                    ],
-                    "absentDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ]
-                    ]
-                }
-            },
-            {
-                "status": "Proposed",
-                "rank": 64,
-                "attendance": "Out",
-                "person": "Erica",
-                "stat": {
-                    "hostDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
-                        ]
-                    ],
-                    "outDates": [
-                        [
-                            2013,
-                            11,
-                            18
-                        ],
-                        [
-                            2013,
-                            12,
-                            2
-                        ]
-                    ],
-                    "inDates": [
-                        [
-                            2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
-                            11,
-                            25
-                        ],
-                        [
-                            2013,
-                            12,
-                            9
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
+                            3
                         ]
                     ],
                     "absentDates": []
@@ -2918,43 +1970,105 @@
             },
             {
                 "status": "Proposed",
-                "rank": 2,
-                "attendance": "Host",
+                "rank": 27,
+                "attendance": "Out",
                 "person": "Kasey",
                 "stat": {
-                    "hostDates": [],
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "outDates": [],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 98,
+                "attendance": "In",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
                     "outDates": [
                         [
                             2013,
-                            11,
-                            11
-                        ],
-                        [
-                            2013,
                             12,
-                            9
-                        ],
-                        [
-                            2013,
-                            12,
-                            16
+                            3
                         ]
                     ],
                     "inDates": [
                         [
                             2013,
-                            11,
-                            18
-                        ],
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 38,
+                "attendance": "In",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
                         [
                             2013,
-                            11,
-                            25
+                            12,
+                            3
                         ],
                         [
                             2013,
                             12,
-                            2
+                            10
+                        ]
+                    ],
+                    "inDates": [],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 49,
+                "attendance": "Out",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
                         ]
                     ],
                     "absentDates": []
@@ -2964,7 +2078,2572 @@
         "date": [
             2013,
             12,
-            23
+            17
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 8,
+                "attendance": "Out",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 93,
+                "attendance": "In",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 2,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 14,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 70,
+                "attendance": "In",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 52,
+                "attendance": "Host",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2013,
+            12,
+            24
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 14,
+                "attendance": "In",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 20,
+                "attendance": "Host",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 13,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 83,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 58,
+                "attendance": "Out",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 47,
+                "attendance": "In",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2013,
+            12,
+            31
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 63,
+                "attendance": "Out",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 38,
+                "attendance": "In",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 80,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 91,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 2,
+                "attendance": "Host",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 75,
+                "attendance": "In",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            1,
+            7
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 54,
+                "attendance": "In",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 69,
+                "attendance": "Out",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 51,
+                "attendance": "Host",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 17,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 93,
+                "attendance": "In",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 44,
+                "attendance": "Out",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            3
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            1,
+            14
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 100,
+                "attendance": "Out",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 27,
+                "attendance": "In",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 74,
+                "attendance": "In",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 46,
+                "attendance": "Host",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 98,
+                "attendance": "Out",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 20,
+                "attendance": "Out",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            10
+                        ],
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            1,
+            21
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 84,
+                "attendance": "Host",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 30,
+                "attendance": "Out",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 58,
+                "attendance": "In",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 65,
+                "attendance": "In",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 46,
+                "attendance": "Out",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 79,
+                "attendance": "Out",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            17
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            1,
+            28
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 28,
+                "attendance": "In",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 60,
+                "attendance": "Out",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 48,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 45,
+                "attendance": "In",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 70,
+                "attendance": "Out",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 83,
+                "attendance": "Host",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            24
+                        ],
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            2,
+            4
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 84,
+                "attendance": "Out",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 51,
+                "attendance": "Host",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 13,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 30,
+                "attendance": "In",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 78,
+                "attendance": "Out",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 13,
+                "attendance": "In",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2013,
+                            12,
+                            31
+                        ],
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            2,
+            11
+        ]
+    },
+    {
+        "slots": [
+            {
+                "status": "Proposed",
+                "rank": 91,
+                "attendance": "Out",
+                "person": "Erica",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 47,
+                "attendance": "In",
+                "person": "Jenny",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 62,
+                "attendance": "Out",
+                "person": "Kasey",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 52,
+                "attendance": "Out",
+                "person": "Kate",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 35,
+                "attendance": "Host",
+                "person": "Neha",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            1,
+                            14
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            },
+            {
+                "status": "Proposed",
+                "rank": 6,
+                "attendance": "In",
+                "person": "Rebecca",
+                "stat": {
+                    "hostDates": [
+                        [
+                            2014,
+                            2,
+                            4
+                        ]
+                    ],
+                    "outDates": [
+                        [
+                            2014,
+                            1,
+                            14
+                        ],
+                        [
+                            2014,
+                            1,
+                            21
+                        ],
+                        [
+                            2014,
+                            1,
+                            28
+                        ]
+                    ],
+                    "inDates": [
+                        [
+                            2014,
+                            1,
+                            7
+                        ],
+                        [
+                            2014,
+                            2,
+                            4
+                        ],
+                        [
+                            2014,
+                            2,
+                            11
+                        ]
+                    ],
+                    "absentDates": []
+                }
+            }
+        ],
+        "date": [
+            2014,
+            2,
+            18
         ]
     }
 ]

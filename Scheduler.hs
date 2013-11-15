@@ -9,11 +9,13 @@ import Data.Map (Map)
 import Data.Time
 import Data.Ratio
 import Control.Monad.Random
+import Data.ByteString.Lazy as B (writeFile, readFile)
+import Data.Aeson.Encode.Pretty
 import Data.Aeson
 import GHC.Generics
 import qualified Data.Map as Map
 
-data Person = Rebecca | Jenny | Kate | Kasey | Neha | Erica deriving (Show, Eq, Enum, Bounded, Ord, Generic)
+data Person = Erica | Jenny | Kasey | Kate | Neha | Rebecca  deriving (Show, Eq, Enum, Bounded, Ord, Generic)
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
@@ -50,6 +52,36 @@ instance ToJSON Stat
 instance ToJSON Slot
 instance ToJSON Meeting
 
+updateMeetings :: Date -> Int -> Calendar -> Calendar
+updateMeetings startDate numMeetings calendar =
+  let updateMeetings' :: Calendar -> [Date] -> Calendar
+      updateMeetings' history [] = []
+      updateMeetings' history (d:ds) =
+        let meeting = updateMeeting history calendar d
+            history' = (drop extra history) ++ [meeting]
+            extra = if length history == personCount then 1 else 0
+        in meeting : updateMeetings' history' ds
+      initialHistory = gatherHistory startDate calendar
+  in updateMeetings' initialHistory $ dateRange startDate numMeetings
+
+deleteMeetings :: Date -> Int -> Calendar -> Calendar
+deleteMeetings startDate numMeetings calendar =
+  let datesToDelete = dateRange startDate numMeetings
+      meetingNotinDatesToDelete meeting = not $ (date meeting) `elem` datesToDelete
+  in filter meetingNotinDatesToDelete calendar
+
+readCalendar :: IO Calendar
+readCalendar = do
+  calendarJSON <- B.readFile "calendar.json"
+  let Just calendar = decode calendarJSON :: Maybe Calendar
+  return calendar
+
+writeCalendar :: Calendar -> IO ()
+writeCalendar calendar = do
+  B.writeFile "calendar.json" $ encodePretty calendar
+
+-----------------------
+
 personCount :: Int
 personCount = (+1) $ fromEnum $ (maxBound :: Person) 
 
@@ -82,12 +114,7 @@ honorRequests meeting requests =
 
 
 applyUpdates :: Calendar -> Calendar -> Calendar
-applyUpdates calendar updates = 
-  let updateMeeting meeting@(Meeting aDate _) = case findUpdate aDate of
-                                                  Just updatedMeeting -> updatedMeeting
-                                                  Nothing -> meeting
-      findUpdate aDate = findMeeting aDate updates
-  in map updateMeeting calendar  
+applyUpdates calendar updates = sortBy (compare `on` date) $ unionBy sameMeeting updates calendar
 
 mergeRequestCalendar :: Calendar -> Calendar -> Calendar
 mergeRequestCalendar calendar requestCalendar = 
@@ -116,18 +143,6 @@ fillInCalendar startDate numMeetings calendar = do
           Nothing -> rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
   calendar' <- mapM newMeetingIfMissing $ union backDates dates
   return $ sortBy (compare `on` date) calendar'
-
-updateMeetings :: Date -> Int -> Calendar -> Calendar
-updateMeetings startDate numMeetings calendar =
-  let updateMeetings' :: Calendar -> [Date] -> Calendar
-      updateMeetings' history [] = []
-      updateMeetings' history (d:ds) =
-        let meeting = updateMeeting history calendar d
-            history' = (drop extra history) ++ [meeting]
-            extra = if length history == personCount then 1 else 0
-        in meeting : updateMeetings' history' ds
-      initialHistory = gatherHistory startDate calendar
-  in updateMeetings' initialHistory $ dateRange startDate numMeetings
       
 updateMeeting :: Calendar -> Calendar -> Date -> Meeting
 updateMeeting history calendar aDate =
@@ -179,7 +194,7 @@ calcMeeting historyCount  (Meeting date slots) =
       newlyHost = map (\slot -> slot {attendance=Host}) hosts
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
-      sortedSlots = sortBy (compare `on` attendance) newSlots
+      sortedSlots = sortBy (compare `on` person) newSlots
   in  Meeting date sortedSlots
 
 choose :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
