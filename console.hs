@@ -4,9 +4,9 @@ import Scheduler
 import Requests
 import Control.Monad.Random
 import Text.Show.Pretty
+import Data.ByteString.Lazy as B (writeFile, readFile)
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
-import Data.ByteString.Lazy as B (writeFile, readFile)
 import qualified Data.Map as Map
 
 showDate :: Date -> String
@@ -34,10 +34,10 @@ main = do
   calendarJSON <- B.readFile "calendar.json"
   let Just calendar = decode calendarJSON :: Maybe Calendar
   let startDate = (2013, 11, 18)
-      numWeeks = 1
+      numWeeks = 12
   fullCalendar <- evalRandIO(fillInCalendar startDate numWeeks calendar)
   let calendarWithRequests = mergeRequestCalendar fullCalendar theRequests
-      newCalendar = updateMeetings startDate numWeeks calendarWithRequests
-  mapM_ printMeeting newCalendar
-  B.writeFile "updates.json" $ encodePretty newCalendar
+      updates = updateMeetings startDate numWeeks calendarWithRequests
+  mapM_ printMeeting updates
+  B.writeFile "calendar.json" $ encodePretty $ applyUpdates calendar updates
   

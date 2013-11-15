@@ -5,7 +5,6 @@ module Scheduler where
 import Data.List
 import Debug.Trace
 import Data.Function (on)
-import Shuffle
 import Data.Map (Map)
 import Data.Time
 import Data.Ratio
@@ -80,6 +79,15 @@ honorRequests meeting requests =
                                   else slot1
       slots' = map mergeSlots $ zip (sortByPerson $ slots meeting) (sortByPerson $ slots requests)
   in meeting {slots = slots'}
+
+
+applyUpdates :: Calendar -> Calendar -> Calendar
+applyUpdates calendar updates = 
+  let updateMeeting meeting@(Meeting aDate _) = case findUpdate aDate of
+                                                  Just updatedMeeting -> updatedMeeting
+                                                  Nothing -> meeting
+      findUpdate aDate = findMeeting aDate updates
+  in map updateMeeting calendar  
 
 mergeRequestCalendar :: Calendar -> Calendar -> Calendar
 mergeRequestCalendar calendar requestCalendar = 
