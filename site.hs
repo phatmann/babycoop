@@ -22,7 +22,7 @@ import Scheduler
 main :: IO ()
 main = serve config myApp
   where config = Just ServerConfig {
-                port      = 8001
+                port      = 8000
               , ramQuota  = 1 * 10^6
               , diskQuota = 20 * 10^6
               , tmpDir    = "/tmp/"
