@@ -1,39 +1,30 @@
 module Console where
 
-import Scheduler
-import Requests
-import Control.Monad.Random
-import Text.Show.Pretty
-import qualified Data.Map as Map
+import Calendar
 
-showDate :: Date -> String
-showDate (0, 0, 0) = "not recently"
-showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
+-- import Text.Show.Pretty
+-- import qualified Data.Map as Map
 
-printSlot :: Slot -> IO ()
-printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
+--showDate :: Date -> String
+--showDate (0, 0, 0) = "not recently"
+--showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
 
-printMeeting :: Meeting -> IO ()
-printMeeting (Meeting d slots) = do putStrLn $ showDate d
-                                    mapM_ printSlot slots
-                                    putStrLn ""
+--printSlot :: Slot -> IO ()
+--printSlot slot = do putStrLn $ (show $ person slot) ++ ": " ++ (show $ attendance slot) ++ (showStat $ stat slot)
+
+--printMeeting :: Meeting -> IO ()
+--printMeeting (Meeting d slots) = do putStrLn $ showDate d
+--                                    mapM_ printSlot slots
+--                                    putStrLn ""
                                                 
-showStat :: Stat -> String
-showStat stat =  
-  let inStr      = show $ inCount stat
-      outStr     = show $ outCount stat
-      absentStr  = show $ absentCount stat
-      lastHosted = showDate $ lastHostDate stat
-  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", absent=" ++ absentStr ++ ", lastHosted=" ++ lastHosted ++ ")"
+--showStat :: Stat -> String
+--showStat stat =  
+--  let inStr      = show $ inCount stat
+--      outStr     = show $ outCount stat
+--      absentStr  = show $ absentCount stat
+--      lastHosted = showDate $ lastHostDate stat
+--  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", absent=" ++ absentStr ++ ", lastHosted=" ++ lastHosted ++ ")"
 
 main :: IO ()
-main = do
-  calendar <- readCalendar
-  let startDate = (2013, 12, 3)
-      numWeeks = 12
-  calendarExtendedWithNeededDates <- evalRandIO(fillInCalendar startDate numWeeks calendar)
-  let calendarWithRequests = mergeRequestCalendar calendarExtendedWithNeededDates theRequests
-      updates = updateMeetings startDate numWeeks calendarWithRequests
-  mapM_ printMeeting updates
-  writeCalendar $ applyUpdates calendar updates
+main = updateCalendar (2013, 12, 3) 12
   
