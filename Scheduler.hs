@@ -13,7 +13,7 @@ import GHC.Generics
 import qualified Data.Map as Map
 
 data Person = Erica | Jenny | Kasey | Kate | Neha | Rebecca  deriving (Show, Eq, Enum, Bounded, Ord, Generic)
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Generic)
+data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
