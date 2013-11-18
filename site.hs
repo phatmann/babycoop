@@ -14,8 +14,8 @@ import Data.Aeson
 import Happstack.Lite
 import Text.Blaze.Html5 (Html, (!), a, div, form, input, p, toHtml, label, ul, li, h2, span)
 import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_)
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
+import qualified Text.Blaze.Html5 as H hiding (map)
+import qualified Text.Blaze.Html5.Attributes as A hiding (title)
 
 import Calendar
 import Scheduler
@@ -88,11 +88,12 @@ weekPage = msum [ view, process ]
                     Confirmed -> "confirmed"
                     Requested -> "requested"
                   attendanceValues = [minBound .. maxBound] :: [Attendance]
-                  attendanceSelect slot = H.select $ toHtml options
-                                              where options = map selectOption attendanceValues
-                                                    selectOption a = if a == (attendance slot)
-                                                                     then H.option ! A.selected "selected" $ toHtml $ show a 
-                                                                     else H.option $ toHtml $ show a
+                  attendanceSelect slot = H.select ! name selectName $ toHtml options
+                                              where selectName = H.toValue  $ "attendance[" ++ (show $ person slot) ++ "]"
+                                                    options = map selectOption attendanceValues
+                                                    selectOption a =  (if a == (attendance slot)
+                                                                       then H.option ! A.selected "selected"
+                                                                       else H.option) $ toHtml $ show a
                   showSlot slot = do
                     toHtml $ show $ person slot
                     ": "
@@ -102,7 +103,9 @@ weekPage = msum [ view, process ]
               p $ a ! href "/" $ "Back to calendar"
               ul $ forM_ slots (\slot -> li $ showSlot slot)
     process :: ServerPart Response
-    process = undefined 
+    process = undefined
+      --do method POST 
+        
 
 --homePage :: ServerPart Response
 --homePage =
