@@ -13,7 +13,7 @@ import GHC.Generics
 import qualified Data.Map as Map
 
 data Person = Erica | Jenny | Kasey | Kate | Neha | Rebecca  deriving (Show, Eq, Enum, Bounded, Ord, Generic)
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Eq, Ord, Bounded, Enum, Generic)
+data Attendance = TBD | In | Out | Host | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
@@ -55,8 +55,11 @@ deleteMeetings startDate numMeetings calendar =
 
 -----------------------
 
+persons :: [Person]
+persons = [minBound .. maxBound]
+
 personCount :: Int
-personCount = (+1) $ fromEnum $ (maxBound :: Person) 
+personCount = length persons
 
 emptyDate :: Date
 emptyDate = (0, 0, 0)

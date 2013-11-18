@@ -31,7 +31,7 @@ main = serve config myApp
 
 myApp :: ServerPart Response
 myApp = msum [ 
-    dir "week" $ weekPage
+    dir "meeting" $ meetingPage
   , dir "static" $ serveDirectory DisableBrowsing [] "public"
   , homePage
   ]
@@ -57,17 +57,20 @@ template title body = toResponse $
           "If you cannot make it or want to reserve a spot, email Tony Mann at "
           a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com"
 
+meetingHref :: Date -> String
+meetingHref (year, month, day) = "/meeting/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
+
 homePage :: ServerPart Response
 homePage = do
     calendar <- liftIO readCalendar
     ok $ template "Seattle League of Awesome Moms Baby Co-op (SLAM)" $ do
       h2 "Seattle League of Awesome Moms Baby Co-op (SLAM)"
-      ul $ forM_ calendar weekLink
-    where weekLink (Meeting date@(year, month, day) _) = li $ a ! href (weekHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
-          weekHref (year, month, day) = H.toValue $ "/week/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
+      ul $ forM_ calendar meetingLink
+    where meetingLink (Meeting date@(year, month, day) _) = li $ a ! href (H.toValue $ meetingHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
+          
 
-weekPage :: ServerPart Response
-weekPage = msum [ view, process ]
+meetingPage :: ServerPart Response
+meetingPage = msum [ view, process ]
   where
     view :: ServerPart Response
     view = do 
@@ -82,6 +85,9 @@ weekPage = msum [ view, process ]
               h2 $ toHtml $ (show month) ++ "/" ++ (show day)
               let Just (Meeting _ slots) = findMeeting date calendar
                   date = (year, month, day)
+                  isEditing = case editParam of
+                      Nothing -> False
+                      otherwise -> True
                   slotClass :: Slot -> H.AttributeValue
                   slotClass slot =  case status slot of
                     Proposed  -> "proposed"
@@ -89,7 +95,7 @@ weekPage = msum [ view, process ]
                     Requested -> "requested"
                   attendanceValues = [minBound .. maxBound] :: [Attendance]
                   attendanceSelect slot = H.select ! name selectName $ toHtml options
-                                              where selectName = H.toValue  $ "attendance[" ++ (show $ person slot) ++ "]"
+                                              where selectName = H.toValue $ show $ person slot
                                                     options = map selectOption attendanceValues
                                                     selectOption a =  (if a == (attendance slot)
                                                                        then H.option ! A.selected "selected"
@@ -97,49 +103,23 @@ weekPage = msum [ view, process ]
                   showSlot slot = do
                     toHtml $ show $ person slot
                     ": "
-                    case editParam of
-                      Nothing -> span ! class_ (slotClass slot) $ toHtml $ show $ attendance slot
-                      otherwise -> attendanceSelect slot
+                    if isEditing then attendanceSelect slot
+                                 else span ! class_ (slotClass slot) $ toHtml $ show $ attendance slot
               p $ a ! href "/" $ "Back to calendar"
-              ul $ forM_ slots (\slot -> li $ showSlot slot)
+              form ! action (H.toValue $ meetingHref (year, month, day)) ! enctype "multipart/form-data" ! A.method "POST" $ do
+                ul $ forM_ slots (\slot -> li $ showSlot slot)
+                input ! type_ "hidden" ! value (H.toValue $ year) ! name "year"
+                input ! type_ "hidden" ! value (H.toValue $ month) ! name "month"
+                input ! type_ "hidden" ! value (H.toValue $ day) ! name "day"
+                if isEditing then input ! type_ "submit" ! value "Save Changes"
+                             else p $ a ! href (H.toValue $ (meetingHref (year, month, day) ++ "?edit")) $ "Edit"
     process :: ServerPart Response
-    process = undefined
-      --do method POST 
-        
-
---homePage :: ServerPart Response
---homePage =
---    ok $ template "home page" $ do
---           H.h1 "Hello!"
---           H.p "Writing applications with happstack-lite is fast and simple!"
---           H.p "Check out these killer apps."
---           H.p $ a ! href "/echo/secret%20message"  $ "echo"
---           H.p $ a ! href "/query?foo=bar" $ "query parameters"
---           H.p $ a ! href "/form"          $ "form processing"
-
---queryParams :: ServerPart Response
---queryParams =
---    do mFoo <- optional $ lookText "foo"
---       ok $ template "query params" $ do
---         p $ "foo is set to: " >> toHtml (show mFoo)
---         p $ "change the url to set it to something else."
-
---formPage :: ServerPart Response
---formPage = msum [ viewForm, processForm ]
---  where
---    viewForm :: ServerPart Response
---    viewForm =
---        do method GET
---           ok $ template "form" $
---              form ! action "/form" ! enctype "multipart/form-data" ! A.method "POST" $ do
---                label ! A.for "msg" $ "Say something clever"
---                input ! type_ "text" ! A.id "msg" ! name "msg"
---                input ! type_ "submit" ! value "Say it!"
-
---    processForm :: ServerPart Response
---    processForm =
---        do method POST
---           msg <- lookText "msg"
---           ok $ template "form" $ do
---             H.p "You said:"
---             H.p (toHtml msg)
+    process = do method POST
+                 yearText <- lookText "year"
+                 monthText <- lookText "month"
+                 dayText <- lookText "day"
+                 let attendanceUpdates   = mapM createUpdate persons
+                     createUpdate person = do attendanceText <- lookText $ show person
+                                              return (person, (read $ unpack attendanceText) :: Attendance)
+                     meetingURL = meetingHref (read $ unpack yearText, read $ unpack monthText, read $ unpack dayText) 
+                 seeOther (meetingURL :: String) (toResponse ())
