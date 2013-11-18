@@ -113,13 +113,16 @@ meetingPage = msum [ view, process ]
                 input ! type_ "hidden" ! value (H.toValue $ day) ! name "day"
                 if isEditing then input ! type_ "submit" ! value "Save Changes"
                              else p $ a ! href (H.toValue $ (meetingHref (year, month, day) ++ "?edit")) $ "Edit"
+
     process :: ServerPart Response
     process = do method POST
-                 yearText <- lookText "year"
+                 yearText  <- lookText "year"
                  monthText <- lookText "month"
-                 dayText <- lookText "day"
-                 let attendanceUpdates   = mapM createUpdate persons
-                     createUpdate person = do attendanceText <- lookText $ show person
+                 dayText   <- lookText "day"
+                 let createUpdate person = do attendanceText <- lookText $ show person
                                               return (person, (read $ unpack attendanceText) :: Attendance)
-                     meetingURL = meetingHref (read $ unpack yearText, read $ unpack monthText, read $ unpack dayText) 
+                     date = (read $ unpack yearText, read $ unpack monthText, read $ unpack dayText)
+                     meetingURL = meetingHref date 
+                 attendanceUpdates <- mapM createUpdate persons
+                 liftIO $ updateCalendar date attendanceUpdates
                  seeOther (meetingURL :: String) (toResponse ())

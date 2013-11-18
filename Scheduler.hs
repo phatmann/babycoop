@@ -78,16 +78,21 @@ dateRange date@(year, month, mday) numMeetings =
 sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 
+applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
+applyAttendanceUpdates calendar date [] = calendar
+applyAttendanceUpdates calendar date attendanceUpdates = 
+  let requestSlots = map (\x -> slot (fst x) (snd x) Requested) attendanceUpdates
+  in mergeRequestCalendar calendar [Meeting date requestSlots]
+
 honorRequests :: Meeting -> Meeting -> Meeting
 honorRequests meeting requests =
   let sortByPerson = sortBy (compare `on` person)
-      mergeRequest slot requestSlot = slot {status=(status requestSlot), attendance=(attendance requestSlot)}
+      mergeRequest slot requestSlot = slot {status=Requested, attendance=(attendance requestSlot)}
       mergeSlots (slot1, slot2) = if (status slot2 == Requested)
                                   then mergeRequest slot1 slot2
                                   else slot1
       slots' = map mergeSlots $ zip (sortByPerson $ slots meeting) (sortByPerson $ slots requests)
   in meeting {slots = slots'}
-
 
 applyUpdates :: Calendar -> Calendar -> Calendar
 applyUpdates calendar updates = sortBy (compare `on` date) $ unionBy sameMeeting updates calendar

@@ -24,13 +24,13 @@ instance ToJSON Meeting
 
 calendarFileName = "calendar.json"
 
-updateCalendar :: Date -> Int -> IO ()
-updateCalendar startDate numMeetings = do
+updateCalendar :: Date -> [(Person, Attendance)] -> IO ()
+updateCalendar date attendanceUpdates = do
+  let numMeetings = personCount * 2
   calendar <- readCalendar
-  calendarExtendedWithNeededDates <- evalRandIO(fillInCalendar startDate numMeetings calendar)
-  let calendarWithRequests = mergeRequestCalendar calendarExtendedWithNeededDates theRequests
-      updates = updateMeetings startDate numMeetings calendarWithRequests
-  -- mapM_ printMeeting updates
+  extendedCalendar <- evalRandIO(fillInCalendar date numMeetings calendar)
+  let calendarWithRequests = applyAttendanceUpdates extendedCalendar date attendanceUpdates
+      updates = updateMeetings date numMeetings calendarWithRequests
   outFileName <- writeCalendar $ applyUpdates calendar updates
   removeFile calendarFileName
   renameFile outFileName calendarFileName

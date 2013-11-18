@@ -26,5 +26,5 @@ import Calendar
 --  in " (in=" ++ inStr ++ ", out=" ++ outStr ++ ", absent=" ++ absentStr ++ ", lastHosted=" ++ lastHosted ++ ")"
 
 main :: IO ()
-main = updateCalendar (2013, 12, 3) 12
+main = updateCalendar (2013, 12, 3) []
   
