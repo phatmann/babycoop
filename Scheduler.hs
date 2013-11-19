@@ -12,7 +12,7 @@ import Control.Monad.Random
 import GHC.Generics
 import qualified Data.Map as Map
 
-data Person = Erica | Jenny | Kasey | Kate | Neha | Rebecca  deriving (Show, Eq, Enum, Bounded, Ord, Generic)
+data Person = Erica | Jenny | Kasey | Kate | Neha | Rebecca  deriving (Show, Read, Eq, Enum, Bounded, Ord, Generic)
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
@@ -81,7 +81,8 @@ sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
 applyAttendanceUpdates calendar date [] = calendar
 applyAttendanceUpdates calendar date attendanceUpdates = 
-  let requestSlots = map (\x -> slot (fst x) (snd x) Requested) attendanceUpdates
+  let newStatus (_, attendance) = if attendance == TBD then Proposed else Requested
+      requestSlots = map (\x -> slot (fst x) (snd x) (newStatus x)) attendanceUpdates
   in mergeRequestCalendar calendar [Meeting date requestSlots]
 
 honorRequests :: Meeting -> Meeting -> Meeting

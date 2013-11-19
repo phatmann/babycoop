@@ -85,44 +85,51 @@ meetingPage = msum [ view, process ]
               h2 $ toHtml $ (show month) ++ "/" ++ (show day)
               let Just (Meeting _ slots) = findMeeting date calendar
                   date = (year, month, day)
-                  isEditing = case editParam of
-                      Nothing -> False
-                      otherwise -> True
+                  editPerson :: Maybe Person
+                  editPerson = case editParam of
+                      Nothing -> Nothing
+                      Just personText -> Just (read $ unpack $ personText)
                   slotClass :: Slot -> H.AttributeValue
                   slotClass slot =  case status slot of
                     Proposed  -> "proposed"
                     Confirmed -> "confirmed"
                     Requested -> "requested"
                   attendanceValues = [minBound .. maxBound] :: [Attendance]
-                  attendanceSelect slot = H.select ! name selectName $ toHtml options
-                                              where selectName = H.toValue $ show $ person slot
-                                                    options = map selectOption attendanceValues
-                                                    selectOption a =  (if a == (attendance slot)
-                                                                       then H.option ! A.selected "selected"
-                                                                       else H.option) $ toHtml $ show a
+                  attendanceLink slot = span ! class_ (slotClass slot) $ a ! href (H.toValue $ (meetingHref (year, month, day) ++ "?edit=" ++ (show $ person slot))) $ toHtml $ show $ attendance slot
+                  attendanceSelect slot = H.select ! name "attendance" $ toHtml options
+                                          where options = map selectOption attendanceValues
+                                                selectOption a =  (if a == (attendance slot)
+                                                                   then H.option ! A.selected "selected"
+                                                                   else H.option) $ toHtml $ show a
                   showSlot slot = do
                     toHtml $ show $ person slot
                     ": "
-                    if isEditing then attendanceSelect slot
-                                 else span ! class_ (slotClass slot) $ toHtml $ show $ attendance slot
+                    case editPerson of
+                      Just p -> if p == (person slot) then attendanceSelect slot else attendanceLink slot
+                      Nothing -> attendanceLink slot
               p $ a ! href "/" $ "Back to calendar"
               form ! action (H.toValue $ meetingHref (year, month, day)) ! enctype "multipart/form-data" ! A.method "POST" $ do
                 ul $ forM_ slots (\slot -> li $ showSlot slot)
                 input ! type_ "hidden" ! value (H.toValue $ year) ! name "year"
                 input ! type_ "hidden" ! value (H.toValue $ month) ! name "month"
                 input ! type_ "hidden" ! value (H.toValue $ day) ! name "day"
-                if isEditing then input ! type_ "submit" ! value "Save Changes"
-                             else p $ a ! href (H.toValue $ (meetingHref (year, month, day) ++ "?edit")) $ "Edit"
+                case editPerson of
+                  Just p -> do 
+                    input ! type_ "submit" ! value "Save Changes"
+                    input ! type_ "hidden" ! value (H.toValue $ show p) ! name "person"
+                  Nothing -> ""
 
     process :: ServerPart Response
     process = do method POST
-                 yearText  <- lookText "year"
-                 monthText <- lookText "month"
-                 dayText   <- lookText "day"
-                 let createUpdate person = do attendanceText <- lookText $ show person
-                                              return (person, (read $ unpack attendanceText) :: Attendance)
+                 yearText         <- lookText "year"
+                 monthText        <- lookText "month"
+                 dayText          <- lookText "day"
+                 personText       <- lookText "person"
+                 attendanceText   <- lookText "attendance"
+                 let person = (read $ unpack personText) :: Person
+                     attendance = (read $ unpack attendanceText) :: Attendance
                      date = (read $ unpack yearText, read $ unpack monthText, read $ unpack dayText)
+                     attendanceUpdates = [(person, attendance)]
                      meetingURL = meetingHref date 
-                 attendanceUpdates <- mapM createUpdate persons
                  liftIO $ updateCalendar date attendanceUpdates
                  seeOther (meetingURL :: String) (toResponse ())
