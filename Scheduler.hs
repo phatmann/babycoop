@@ -123,25 +123,25 @@ fillInCalendar startDate numMeetings calendar = do
       newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
   calendarAdditions <- mapM newMeeting dates
   return $ mergeCalendars calendar calendarAdditions 
-      
+           
 updateMeeting :: Calendar -> Calendar -> Date -> Meeting
 updateMeeting history calendar aDate =
   let stats = historyStats history
       Just meeting = findMeeting aDate calendar
-      meeting' = calcMeeting (length history) $ statifyMeeting meeting
+      meeting' = scheduleMeeting (length history) $ statifyMeeting meeting
       statifySlot slot = slot {stat = findStat (person slot) stats}
       statifyMeeting m = m {slots = map statifySlot (slots m)}
   in meeting'
 
-calcMeeting :: Int -> Meeting -> Meeting
-calcMeeting historyCount  (Meeting date slots) =
-  let (present, absent) = partition isPresent slots
-                          where isPresent slot = attendance slot /= Absent
+scheduleMeeting :: Int -> Meeting -> Meeting
+scheduleMeeting historyCount  (Meeting date slots) =
+  let (present, absent)      = partition isPresent slots
+                               where isPresent slot = attendance slot /= Absent
       
       (available, confirmed) = partition isAvailable present
                                where isAvailable slot = status slot == Proposed
-      rankedAvailable = sortByRank available
 
+      rankedAvailable  = sortByRank available
       sortByRank       = sortBy (compare `on` rank)
       sortByLastHosted = sortBy (compare `on` lastHostDate . stat )
 
@@ -159,7 +159,7 @@ calcMeeting historyCount  (Meeting date slots) =
                                        numberConfirmedOut   = length $ filter isOut confirmed
                                        minNumberNeededIn    = ceiling $ numberPresent % 2
                                        numberNeededIn       = minNumberNeededIn - numberConfirmedIn
-                                       numberNeededOut      = max 0 $ numberPresent - numberNeededIn - numberConfirmedOut
+                                       numberNeededOut      = max 0 $ numberPresent - numberNeededIn - numberConfirmedIn - numberConfirmedOut
                                        (favored, unfavored) = partition isFavoredForOut guests
                                        isIn slot            = attendance slot == In || attendance slot == Host
                                        isOut slot           = attendance slot == Out

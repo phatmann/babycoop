@@ -62,11 +62,19 @@ meetingHref (year, month, day) = "/meeting/" ++ (show year) ++ "/" ++ (show mont
 
 homePage :: ServerPart Response
 homePage = do
-    calendar <- liftIO readCalendar
+    fullCalendar <- liftIO readCalendar
+    pastParam <- optional $ lookText "past"
+    (past, future) <- liftIO $ pastAndFuture fullCalendar
+
+    let (calendar, linkMsg :: String, link :: String) = case pastParam of
+                                      Just _ -> (past, "Upcoming meetings", "/")
+                                      Nothing -> (future, "Past meetings", "/?past=yes")
+
     ok $ template "Seattle League of Awesome Moms Baby Co-op (SLAM)" $ do
       h2 "Seattle League of Awesome Moms Baby Co-op (SLAM)"
       ul $ forM_ calendar meetingLink
-    where meetingLink (Meeting date@(year, month, day) _) = li $ a ! href (H.toValue $ meetingHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
+      p $ a ! href (H.toValue link) $ toHtml linkMsg
+    where  meetingLink (Meeting date@(year, month, day) _) = li $ a ! href (H.toValue $ meetingHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
 
 meetingPage :: ServerPart Response
 meetingPage = msum [ view, process ]

@@ -6,7 +6,9 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import Control.Monad.Random
 import System.Directory
-
+import Data.Time
+import Data.List
+ 
 instance FromJSON Person
 instance FromJSON Attendance
 instance FromJSON Status
@@ -46,4 +48,15 @@ writeCalendar calendar = do
       encodedCalendar = encodePretty calendar
   B.writeFile tmpFileName encodedCalendar
   return tmpFileName
+
+today :: IO Date
+today = do
+  currentTime <- getCurrentTime 
+  let (y,m,d) = toGregorian $ utctDay currentTime
+  return (fromIntegral y, m, d)
+
+pastAndFuture :: Calendar -> IO (Calendar, Calendar)
+pastAndFuture calendar = do t <- today
+                            let inPast (Meeting date _) = date < t 
+                            return $ partition inPast calendar
 
