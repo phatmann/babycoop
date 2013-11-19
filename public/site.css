@@ -9,3 +9,7 @@
 .requested {
   font-weight: bold;
 }
+
+#submit-button {
+  margin-left: 10px;
+}

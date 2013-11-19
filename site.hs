@@ -12,8 +12,8 @@ import Data.Text.Lazy (unpack)
 import Data.ByteString.Lazy as B (readFile)
 import Data.Aeson
 import Happstack.Lite
-import Text.Blaze.Html5 (Html, (!), a, div, form, input, p, toHtml, label, ul, li, h2, span)
-import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_, title)
+import Text.Blaze.Html5 (Html, (!), a, div, form, input, p, toHtml, label, ul, li, h2, span, br)
+import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_, title, id)
 import qualified Text.Blaze.Html5 as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A hiding (title)
 
@@ -53,9 +53,6 @@ template title body = toResponse $
     H.body $ do
       div ! class_ "container" $ do
         body
-        div ! class_ "well" $ do
-          "If you cannot make it or want to reserve a spot, email Tony Mann at "
-          a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com"
 
 meetingHref :: Date -> String
 meetingHref (year, month, day) = "/meeting/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
@@ -74,6 +71,9 @@ homePage = do
       h2 "Seattle League of Awesome Moms Baby Co-op (SLAM)"
       ul $ forM_ calendar meetingLink
       p $ a ! href (H.toValue link) $ toHtml linkMsg
+      div ! class_ "well" $ do
+                "Any questions, contact "
+                a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com."
     where  meetingLink (Meeting date@(year, month, day) _) = li $ a ! href (H.toValue $ meetingHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
 
 meetingPage :: ServerPart Response
@@ -117,7 +117,7 @@ meetingPage = msum [ view, process ]
                         outStr     = show $ outCount stat
                         absentStr  = show $ absentCount stat
                         lastHosted = showDate $ lastHostDate stat
-                    in "In = " ++ inStr ++ ", Out = " ++ outStr ++ ", Absent = " ++ absentStr ++ ", Last Hosted=" ++ lastHosted
+                    in "Last 6 weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Last Hosted " ++ lastHosted
 
                   attendanceTooltip slot = H.toValue $ showStat $ stat slot
                   attendanceLink slot = span ! class_ (slotClass slot) $ a ! href (attendanceHref slot) ! title (attendanceTooltip slot) $ toHtml $ show $ attendance slot
@@ -140,10 +140,15 @@ meetingPage = msum [ view, process ]
                 input ! type_ "hidden" ! value (H.toValue $ month) ! name "month"
                 input ! type_ "hidden" ! value (H.toValue $ day) ! name "day"
                 case editPerson of
-                  Just p -> do 
-                    input ! type_ "submit" ! value "Save Changes"
-                    input ! type_ "hidden" ! value (H.toValue $ show p) ! name "person"
+                  Just person -> do 
+                    br
+                    a ! href (H.toValue $ meetingHref (year, month, day)) $ "Cancel"
+                    input ! type_ "submit" ! value "Save Changes" ! id "submit-button"
+                    input ! type_ "hidden" ! value (H.toValue $ show person) ! name "person"
                   Nothing -> ""
+              div ! class_ "well" $ do
+                "Click on the link next to your name to change your status. Any questions, contact "
+                a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com."
 
     process :: ServerPart Response
     process = do method POST
