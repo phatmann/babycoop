@@ -13,7 +13,7 @@ import Data.ByteString.Lazy as B (readFile)
 import Data.Aeson
 import Happstack.Lite
 import Text.Blaze.Html5 (Html, (!), a, div, form, input, p, toHtml, label, ul, li, h2, span)
-import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_)
+import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value, rel, content, class_, title)
 import qualified Text.Blaze.Html5 as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A hiding (title)
 
@@ -67,7 +67,6 @@ homePage = do
       h2 "Seattle League of Awesome Moms Baby Co-op (SLAM)"
       ul $ forM_ calendar meetingLink
     where meetingLink (Meeting date@(year, month, day) _) = li $ a ! href (H.toValue $ meetingHref date) $ toHtml $ ((show month) ++ "/" ++ (show day))
-          
 
 meetingPage :: ServerPart Response
 meetingPage = msum [ view, process ]
@@ -85,17 +84,35 @@ meetingPage = msum [ view, process ]
               h2 $ toHtml $ (show month) ++ "/" ++ (show day)
               let Just (Meeting _ slots) = findMeeting date calendar
                   date = (year, month, day)
+
                   editPerson :: Maybe Person
                   editPerson = case editParam of
                       Nothing -> Nothing
                       Just personText -> Just (read $ unpack $ personText)
+
                   slotClass :: Slot -> H.AttributeValue
                   slotClass slot =  case status slot of
                     Proposed  -> "proposed"
                     Confirmed -> "confirmed"
                     Requested -> "requested"
+
                   attendanceValues = [minBound .. maxBound] :: [Attendance]
-                  attendanceLink slot = span ! class_ (slotClass slot) $ a ! href (H.toValue $ (meetingHref (year, month, day) ++ "?edit=" ++ (show $ person slot))) $ toHtml $ show $ attendance slot
+                  attendanceHref slot = H.toValue $ meetingHref (year, month, day) ++ "?edit=" ++ (show $ person slot)
+
+                  showDate :: Date -> String
+                  showDate (0, 0, 0) = "not recently"
+                  showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
+
+                  showStat :: Stat -> String
+                  showStat stat =  
+                    let inStr      = show $ inCount stat
+                        outStr     = show $ outCount stat
+                        absentStr  = show $ absentCount stat
+                        lastHosted = showDate $ lastHostDate stat
+                    in "In = " ++ inStr ++ ", Out = " ++ outStr ++ ", Absent = " ++ absentStr ++ ", Last Hosted=" ++ lastHosted
+
+                  attendanceTooltip slot = H.toValue $ showStat $ stat slot
+                  attendanceLink slot = span ! class_ (slotClass slot) $ a ! href (attendanceHref slot) ! title (attendanceTooltip slot) $ toHtml $ show $ attendance slot
                   attendanceSelect slot = H.select ! name "attendance" $ toHtml options
                                           where options = map selectOption attendanceValues
                                                 selectOption a =  (if a == (attendance slot)
@@ -107,6 +124,7 @@ meetingPage = msum [ view, process ]
                     case editPerson of
                       Just p -> if p == (person slot) then attendanceSelect slot else attendanceLink slot
                       Nothing -> attendanceLink slot
+
               p $ a ! href "/" $ "Back to calendar"
               form ! action (H.toValue $ meetingHref (year, month, day)) ! enctype "multipart/form-data" ! A.method "POST" $ do
                 ul $ forM_ slots (\slot -> li $ showSlot slot)
