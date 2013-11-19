@@ -1,7 +1,6 @@
 module Calendar where
 
 import Scheduler
-import Requests
 import Data.ByteString.Lazy as B (writeFile, readFile)
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
