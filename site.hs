@@ -108,7 +108,7 @@ meetingPage = msum [ view, process ]
                   attendanceHref slot = H.toValue $ meetingHref (year, month, day) ++ "?edit=" ++ (show $ person slot)
 
                   showDate :: Date -> String
-                  showDate (0, 0, 0) = "not recently"
+                  showDate (0, 0, 0) = "a while ago"
                   showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)
 
                   showStat :: Stat -> String
@@ -117,7 +117,7 @@ meetingPage = msum [ view, process ]
                         outStr     = show $ outCount stat
                         absentStr  = show $ absentCount stat
                         lastHosted = showDate $ lastHostDate stat
-                    in "Last 6 weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Last Hosted " ++ lastHosted
+                    in "Last 6 weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
 
                   attendanceTooltip slot = H.toValue $ showStat $ stat slot
                   attendanceLink slot = span ! class_ (slotClass slot) $ a ! href (attendanceHref slot) ! title (attendanceTooltip slot) $ toHtml $ show $ attendance slot

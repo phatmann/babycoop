@@ -37,15 +37,15 @@ type Calendar = [Meeting]
 
 updateMeetings :: Date -> Int -> Calendar -> Calendar
 updateMeetings startDate numMeetings calendar =
-  let updateMeetings' :: Calendar -> [Date] -> Calendar
+  let updateMeetings' :: Calendar -> Calendar -> Calendar
       updateMeetings' history [] = []
-      updateMeetings' history (d:ds) =
-        let meeting = updateMeeting history calendar d
+      updateMeetings' history (m:ms) =
+        let meeting = updateMeeting history m
             history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
-        in meeting : updateMeetings' history' ds
+        in meeting : updateMeetings' history' ms
       initialHistory = gatherHistory startDate calendar
-  in updateMeetings' initialHistory $ dateRange startDate numMeetings
+  in updateMeetings' initialHistory $ meetingsAt startDate numMeetings calendar
 
 deleteMeetings :: Date -> Int -> Calendar -> Calendar
 deleteMeetings startDate numMeetings calendar =
@@ -124,13 +124,12 @@ fillInCalendar startDate numMeetings calendar = do
   calendarAdditions <- mapM newMeeting dates
   return $ mergeCalendars calendar calendarAdditions 
            
-updateMeeting :: Calendar -> Calendar -> Date -> Meeting
-updateMeeting history calendar aDate =
+updateMeeting :: Calendar -> Meeting -> Meeting
+updateMeeting history meeting  =
   let stats = historyStats history
-      Just meeting = findMeeting aDate calendar
       meeting' = scheduleMeeting (length history) $ statifyMeeting meeting
-      statifySlot slot = slot {stat = findStat (person slot) stats}
       statifyMeeting m = m {slots = map statifySlot (slots m)}
+      statifySlot slot = slot {stat = findStat (person slot) stats}
   in meeting'
 
 scheduleMeeting :: Int -> Meeting -> Meeting
@@ -225,7 +224,15 @@ gatherHistory d calendar =
   let Just dateIndex = findIndex (\m -> date m == d) calendar
       historyIndex = max 0 (dateIndex - personCount)
       historyCount = dateIndex - historyIndex
-  in take historyCount $ drop historyIndex calendar
+  in chunkAt historyIndex historyCount calendar
+
+chunkAt :: Int -> Int -> [a] -> [a]
+chunkAt index count xs = take count $ drop index xs
+
+meetingsAt :: Date -> Int -> Calendar -> Calendar
+meetingsAt d count calendar = 
+  let Just dateIndex = findIndex (\m -> date m == d) calendar
+  in chunkAt dateIndex count calendar
 
 historyStats :: Calendar -> Stats
 historyStats history = 

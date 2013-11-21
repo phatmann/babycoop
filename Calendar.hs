@@ -29,8 +29,8 @@ updateCalendar :: Date -> [(Person, Attendance)] -> IO ()
 updateCalendar date attendanceUpdates = do
   let numMeetings = personCount * 2
   calendar <- readCalendar
-  extendedCalendar <- evalRandIO(fillInCalendar date numMeetings calendar)
-  let calendarWithRequests = applyAttendanceUpdates extendedCalendar date attendanceUpdates
+  -- extendedCalendar <- evalRandIO(fillInCalendar date numMeetings calendar)
+  let calendarWithRequests = applyAttendanceUpdates calendar date attendanceUpdates
       updates = updateMeetings date numMeetings calendarWithRequests
   outFileName <- writeCalendar $ applyUpdates calendar updates
   removeFile calendarFileName
