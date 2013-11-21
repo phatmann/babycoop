@@ -1090,7 +1090,7 @@
     {
         "slots": [
             {
-                "status": "Proposed",
+                "status": "Confirmed",
                 "person": "Kasey",
                 "attendance": "In",
                 "stat": {
@@ -1141,7 +1141,7 @@
                 "rank": 33
             },
             {
-                "status": "Proposed",
+                "status": "Confirmed",
                 "person": "Erica",
                 "attendance": "Out",
                 "stat": {
@@ -1192,7 +1192,7 @@
                 "rank": 75
             },
             {
-                "status": "Proposed",
+                "status": "Confirmed",
                 "person": "Neha",
                 "attendance": "Out",
                 "stat": {
@@ -1243,7 +1243,7 @@
                 "rank": 44
             },
             {
-                "status": "Proposed",
+                "status": "Confirmed",
                 "person": "Jenny",
                 "attendance": "Host",
                 "stat": {
