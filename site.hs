@@ -133,7 +133,6 @@ meetingPage = msum [ view, process ]
                       Just p -> if p == (person slot) then attendanceSelect slot else attendanceLink slot
                       Nothing -> attendanceLink slot
 
-              p $ a ! href "/" $ "Back to calendar"
               form ! action (H.toValue $ meetingHref (year, month, day)) ! enctype "multipart/form-data" ! A.method "POST" $ do
                 ul $ forM_ slots (\slot -> li $ showSlot slot)
                 input ! type_ "hidden" ! value (H.toValue $ year) ! name "year"
@@ -146,6 +145,7 @@ meetingPage = msum [ view, process ]
                     input ! type_ "submit" ! value "Save Changes" ! id "submit-button"
                     input ! type_ "hidden" ! value (H.toValue $ show person) ! name "person"
                   Nothing -> ""
+              p $ a ! href "/" $ "Back to calendar"
               div ! class_ "well" $ do
                 "Click on the link next to your name to change your status. Any questions, contact "
                 a ! href "mailto:thephatmann@gmail.com" $ "thephatmann@gmail.com."

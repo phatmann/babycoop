@@ -24,18 +24,32 @@ instance ToJSON Slot
 instance ToJSON Meeting
 
 calendarFileName = "calendar.json"
+futureSpan = personCount * 2
+
+maintainCalendar :: IO ()
+maintainCalendar = do
+  calendar <- readCalendar
+  (past, future) <- pastAndFuture calendar
+  let calendarWithConfirmations = applyUpdates calendar $ confirmMeetings past
+  let lastMeeting = last calendar
+      futureShortfall = futureSpan - (length future)
+  extendedCalendar <- evalRandIO(fillInCalendar (date lastMeeting) futureShortfall calendarWithConfirmations)
+  saveCalendar extendedCalendar
 
 updateCalendar :: Date -> [(Person, Attendance)] -> IO ()
 updateCalendar date attendanceUpdates = do
-  let numMeetings = personCount * 2
   calendar <- readCalendar
   -- extendedCalendar <- evalRandIO(fillInCalendar date numMeetings calendar)
-  let calendarWithRequests = applyAttendanceUpdates calendar date attendanceUpdates
-      updates = updateMeetings date numMeetings calendarWithRequests
-  outFileName <- writeCalendar $ applyUpdates calendar updates
+  let updatedCalendar = applyAttendanceUpdates calendar date attendanceUpdates
+      updates         = updateMeetings date futureSpan updatedCalendar
+  saveCalendar $ applyUpdates calendar updates
+
+saveCalendar :: Calendar -> IO ()
+saveCalendar calendar = do
+  outFileName <- writeCalendar calendar
   removeFile calendarFileName
   renameFile outFileName calendarFileName
-  
+
 readCalendar :: IO Calendar
 readCalendar = do
   calendarJSON <- B.readFile calendarFileName

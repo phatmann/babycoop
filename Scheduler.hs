@@ -35,26 +35,6 @@ data Slot = Slot  { person :: Person
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic)
 type Calendar = [Meeting]
 
-updateMeetings :: Date -> Int -> Calendar -> Calendar
-updateMeetings startDate numMeetings calendar =
-  let updateMeetings' :: Calendar -> Calendar -> Calendar
-      updateMeetings' history [] = []
-      updateMeetings' history (m:ms) =
-        let meeting = updateMeeting history m
-            history' = (drop extra history) ++ [meeting]
-            extra = if length history == personCount then 1 else 0
-        in meeting : updateMeetings' history' ms
-      initialHistory = gatherHistory startDate calendar
-  in updateMeetings' initialHistory $ meetingsAt startDate numMeetings calendar
-
-deleteMeetings :: Date -> Int -> Calendar -> Calendar
-deleteMeetings startDate numMeetings calendar =
-  let datesToDelete = dateRange startDate numMeetings
-      meetingNotinDatesToDelete meeting = not $ (date meeting) `elem` datesToDelete
-  in filter meetingNotinDatesToDelete calendar
-
------------------------
-
 persons :: [Person]
 persons = [minBound .. maxBound]
 
@@ -78,6 +58,24 @@ dateRange date@(year, month, mday) numMeetings =
 sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 
+updateMeetings :: Date -> Int -> Calendar -> Calendar
+updateMeetings startDate numMeetings calendar =
+  let updateMeetings' :: Calendar -> Calendar -> Calendar
+      updateMeetings' history [] = []
+      updateMeetings' history (m:ms) =
+        let meeting = updateMeeting history m
+            history' = (drop extra history) ++ [meeting]
+            extra = if length history == personCount then 1 else 0
+        in meeting : updateMeetings' history' ms
+      initialHistory = gatherHistory startDate calendar
+  in updateMeetings' initialHistory $ meetingsAt startDate numMeetings calendar
+
+deleteMeetings :: Date -> Int -> Calendar -> Calendar
+deleteMeetings startDate numMeetings calendar =
+  let datesToDelete = dateRange startDate numMeetings
+      meetingNotinDatesToDelete meeting = not $ (date meeting) `elem` datesToDelete
+  in filter meetingNotinDatesToDelete calendar
+
 applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
 applyAttendanceUpdates calendar date [] = calendar
 applyAttendanceUpdates calendar date attendanceUpdates = 
@@ -89,6 +87,12 @@ mergeCalendars calendar calendar2 = sortBy (compare `on` date) $ unionBy sameMee
 
 applyUpdates :: Calendar -> Calendar -> Calendar
 applyUpdates calendar updates = mergeCalendars updates calendar
+
+confirmMeetings :: Calendar -> Calendar
+confirmMeetings calendar = 
+  let confirmMeeting (Meeting date slots) = Meeting date $ map confirmSlot slots
+      confirmSlot slot = if status slot == Requested then slot else slot{status = Confirmed}
+  in map confirmMeeting calendar
 
 honorRequests :: Meeting -> Meeting -> Meeting
 honorRequests meeting requests =
@@ -117,12 +121,14 @@ rankifyMeeting meeting = do
   return meeting { slots = rankedSlots }
 
 fillInCalendar :: (RandomGen g) => Date -> Int -> Calendar -> Rand g Calendar
-fillInCalendar startDate numMeetings calendar = do
-  let dates = dateRange startDate numMeetings
-      newMeeting :: (RandomGen g) => Date -> Rand g Meeting
-      newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
-  calendarAdditions <- mapM newMeeting dates
-  return $ mergeCalendars calendar calendarAdditions 
+fillInCalendar startDate numMeetings calendar 
+  | (numMeetings <= 0) = return calendar
+  | otherwise = do
+      let dates = dateRange startDate numMeetings
+          newMeeting :: (RandomGen g) => Date -> Rand g Meeting
+          newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting $ Meeting aDate []
+      calendarAdditions <- mapM newMeeting dates
+      return $ mergeCalendars calendar calendarAdditions 
            
 updateMeeting :: Calendar -> Meeting -> Meeting
 updateMeeting history meeting  =
