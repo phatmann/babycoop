@@ -39,7 +39,6 @@ maintainCalendar = do
 updateCalendar :: Date -> [(Person, Attendance)] -> IO ()
 updateCalendar date attendanceUpdates = do
   calendar <- readCalendar
-  -- extendedCalendar <- evalRandIO(fillInCalendar date numMeetings calendar)
   let updatedCalendar = applyAttendanceUpdates calendar date attendanceUpdates
       updates         = updateMeetings date futureSpan updatedCalendar
   saveCalendar $ applyUpdates calendar updates
