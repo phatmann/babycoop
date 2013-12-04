@@ -172,7 +172,7 @@ scheduleMeeting historyCount  (Meeting date slots) =
                                                                   presentCount = historyCount - (absentCount personStat)
                                                                   pctIn = ((inCount personStat) * 100) `div` presentCount
                                                                   pctOut = ((outCount personStat) * 100) `div` presentCount
-                                                              in pctOut <= 30 || pctIn >= 60
+                                                              in pctOut <= 50 || pctIn >= 50
 
       newlyOut  = map (\slot -> slot {attendance=Out}) eligible
       newlyIn   = map (\slot -> slot {attendance=In}) notEligible
