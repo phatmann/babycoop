@@ -146,36 +146,35 @@ scheduleMeeting historyCount  (Meeting date slots) =
       (available, confirmed) = partition isAvailable present
                                where isAvailable slot = status slot == Proposed
 
-      rankedAvailable  = sortByRank available
-      sortByRank       = sortBy (compare `on` rank)
-      sortByLastHosted = sortBy (compare `on` lastHostDate . stat )
+      numberOfHosts = 1
 
-      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], rankedAvailable)
+      (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
                         where needHost                         = not $ any isHost confirmed
-                              (eligibleHosts, ineligibleHosts) = choose 1 (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
-                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost rankedAvailable
+                              sortByLastHosted                 = sortBy (compare `on` lastHostDate . stat )
+                              (eligibleHosts, ineligibleHosts) = choose numberOfHosts (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
+                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
                               isHost slot                      = attendance slot == Host
-                              isFavoredToHost slot             = let personStat = stat slot
-                                                                 in (inCount personStat) <= (personCount `div` 2)
+                              isFavoredToHost slot             = (inCount $ stat slot) <= (personCount `div` 2)
 
-      (eligible, notEligible)  = choose numberNeededOut favored unfavored
-                                 where numberPresent        = length present
-                                       numberConfirmedIn    = length $ filter isIn confirmed
-                                       numberConfirmedOut   = length $ filter isOut confirmed
-                                       minNumberNeededIn    = ceiling $ numberPresent % 2
-                                       numberNeededIn       = minNumberNeededIn - numberConfirmedIn
-                                       numberNeededOut      = max 0 $ numberPresent - numberNeededIn - numberConfirmedIn - numberConfirmedOut
-                                       (favored, unfavored) = partition isFavoredForOut guests
-                                       isIn slot            = attendance slot == In || attendance slot == Host
-                                       isOut slot           = attendance slot == Out
-                                       isFavoredForOut slot = let personStat = stat slot
-                                                                  presentCount = historyCount - (absentCount personStat)
-                                                                  pctIn = ((inCount personStat) * 100) `div` presentCount
-                                                                  pctOut = ((outCount personStat) * 100) `div` presentCount
-                                                              in pctOut <= 30 || pctIn >= 60
+      (stayingIn, goingOut)  =  let  numberPresent        = length present
+                                     numberConfirmedIn    = length $ filter isIn confirmed
+                                     minNumberNeededIn    = ceiling $ numberPresent % 2
+                                     numberNeededIn       = minNumberNeededIn - numberConfirmedIn - numberOfHosts
+                                     sortedGuests         = sortBy (compare `on` boostedRank) guests
+                                     boostedRank slot     = if isFavoredForOut slot then r + 1000
+                                                              else if isFavoredForIn slot then r - 1000
+                                                              else r
+                                                            where r = rank slot 
+                                     isIn slot            = attendance slot == In || attendance slot == Host
+                                     presentCount slot    = historyCount - (absentCount $ stat slot)
+                                     pctIn slot           = ((inCount $ stat slot) * 100) `div` (presentCount slot)
+                                     pctOut slot          = ((outCount $ stat slot) * 100) `div` (presentCount slot)
+                                     isFavoredForOut slot = (pctOut slot) < 30 || (pctIn slot) > 60
+                                     isFavoredForIn slot  = (pctOut slot) > 60 || (pctIn slot) < 30
+                                in splitAt numberNeededIn sortedGuests 
 
-      newlyOut  = map (\slot -> slot {attendance=Out}) eligible
-      newlyIn   = map (\slot -> slot {attendance=In}) notEligible
+      newlyIn   = map (\slot -> slot {attendance=In}) stayingIn
+      newlyOut  = map (\slot -> slot {attendance=Out}) goingOut
       newlyHost = map (\slot -> slot {attendance=Host}) hosts
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
