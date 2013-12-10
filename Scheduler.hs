@@ -165,7 +165,7 @@ scheduleMeeting historyCount  (Meeting date slots) =
                                                               else if isFavoredForIn slot then r - 1000
                                                               else r
                                                             where r = rank slot 
-                                     isIn slot            = attendance slot == In || attendance slot == Host
+                                     isIn slot            = attendance slot == In
                                      presentCount slot    = historyCount - (absentCount $ stat slot)
                                      pctIn slot           = ((inCount $ stat slot) * 100) `div` (presentCount slot)
                                      pctOut slot          = ((outCount $ stat slot) * 100) `div` (presentCount slot)
