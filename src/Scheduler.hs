@@ -3,7 +3,6 @@
 module Scheduler where
 
 import Data.List
-import Debug.Trace
 import Data.Function (on)
 import Data.Map (Map)
 import Data.Time

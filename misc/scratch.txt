@@ -1,0 +1,6 @@
+      <!--[if lt IE 9]>
+        <script src="../../assets/js/html5shiv.js"></script>
+        <script src="../../assets/js/respond.min.js"></script>
+      <![endif]-->
+
+      <!-- <p>Don't have a login yet? <a href="/new_user">Create a new user</a></p> -->
