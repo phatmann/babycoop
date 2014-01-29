@@ -6,3 +6,4 @@ cabal-dev
 *.chs.h
 .virthualenv
 babycoop.sublime-workspace
+log
