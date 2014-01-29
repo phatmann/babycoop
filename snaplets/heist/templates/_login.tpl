@@ -1,4 +1,4 @@
-<h2>SLAM Login</h2>
+<h3>Please login</h3>
 
 <p><loginError/></p>
 

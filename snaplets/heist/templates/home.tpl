@@ -4,15 +4,14 @@
       <ul>
         <meetings>
           <li><a href="${meetingURL}">
-            <meetingDate/>
+            <meetingName/>
           </a></li>
         </meetings>
       </ul>
-      <p><a href="/?past=yes">Past meetings</a></p>
+      <p><a href="${otherCalendarURL}"><otherCalendarName/></a></p>
       <div class = "well">
         Any questions, contact <a href="mailto:thephatmann@gmail.com">thephatmann@gmail.com.</a>
       </div>
-    <p><a href="/logout">Logout</a></p>
   </ifLoggedIn>
 
   <ifLoggedOut>

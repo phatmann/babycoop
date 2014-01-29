@@ -8,6 +8,12 @@
       <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <nav class="navbar navbar-default" role="navigation">
+      <a class="navbar-brand" href="/">SLAM Baby Co-op</a>
+      <ifLoggedIn>
+        <p class="navbar-text navbar-right"><a href="/logout" class="navbar-link">Logout</a></p>
+      </ifLoggedIn>
+    </nav>
     <div id="content" class="container">
       <apply-content/>
     </div>
