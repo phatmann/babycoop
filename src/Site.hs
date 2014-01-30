@@ -186,7 +186,7 @@ app = makeSnaplet "app" "SLAM Coop" Nothing $ do
     s <- nestSnaplet "sess" sess $
            initCookieSessionManager "site_key.txt" "sess" (Just 3600)
     a <- nestSnaplet "auth" auth $
-           initJsonFileAuthManager defAuthSettings sess "users.json"
+           initJsonFileAuthManager defAuthSettings sess "data/users.json"
     addRoutes routes
     addAuthSplices h auth
     return $ App h s a

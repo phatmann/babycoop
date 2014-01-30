@@ -23,7 +23,7 @@ instance ToJSON Stat
 instance ToJSON Slot
 instance ToJSON Meeting
 
-calendarFileName = "calendar.json"
+calendarFileName = "data/calendars/slam.json"
 futureSpan = personCount * 2
 
 maintainCalendar :: IO ()
