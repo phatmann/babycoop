@@ -1,0 +1,2 @@
+aws s3 sync data s3://slamcoop.com/data
+
