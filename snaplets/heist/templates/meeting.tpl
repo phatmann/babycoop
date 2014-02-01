@@ -1,6 +1,6 @@
 <apply template="base">
   <ifLoggedIn>
-    <h2><meetingName/></h2>
+    <h2><coopName/>: <meetingName/></h2>
     <form action="${meetingURL}" method="POST">
       <ul>
         <slots>

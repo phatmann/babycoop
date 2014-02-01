@@ -29,11 +29,14 @@ import           Heist.Splices
 ------------------------------------------------------------------------------
 import           Application
 
-import Control.Monad.IO.Class
-import System.Cmd
-import Calendar
-import Scheduler
-import Control.Monad
+import           Control.Monad.IO.Class
+import           System.Cmd
+import           Calendar
+import           Scheduler
+import           Control.Monad
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HM
+import           Data.Aeson
 
 ------------------------------------------------------------------------------
 -- | Render login form
@@ -60,12 +63,33 @@ handleLogout :: Handler App (AuthManager App) ()
 handleLogout = logout >> redirect "/"
 
 ------------------------------------------------------------------------------
--- | Handle new user form submit
-handleNewUser :: Handler App (AuthManager App) ()
-handleNewUser = method GET handleForm <|> method POST handleFormSubmit
+-- | Handle new coop form
+handleNewCoop :: Handler App (AuthManager App) ()
+handleNewCoop = do
+      user <- currentUser
+
+      case user of
+        Nothing -> redirect "/"
+        Just u -> if isAdminUser user then
+                    method GET handleForm <|> method POST handleFormSubmit
+                  else
+                    redirect "/"
+                    
   where
-    handleForm = render "new_user"
-    handleFormSubmit = registerUser "login" "password" >> redirect "/"
+    handleForm = render "new_coop"
+    handleFormSubmit = do
+      user <- registerUser "login" "password"
+
+      case user of 
+        Left err  -> redirect "/new_coop"
+        Right u   -> do
+          name <- getPar "name"
+
+          case name of
+            Nothing -> redirect "/new_coop"
+            Just n  -> do
+              saveUser $ u { userMeta = HM.singleton "name" (toJSON n) }
+              redirect "/"
 
 ------------------------------------------------------------------------------
 -- | Handle home page
@@ -75,7 +99,10 @@ handleHome = do
   
   case user of 
     Nothing   -> render "home"
-    Just _    -> handleHomeLoggedIn
+    Just _    -> if isAdminUser user then
+                   render "home"
+                 else
+                   handleHomeLoggedIn
 
 handleHomeLoggedIn :: Handler App (AuthManager App) ()
 handleHomeLoggedIn = do
@@ -84,15 +111,19 @@ handleHomeLoggedIn = do
   pastParam      <- getPar "past"
   (past, future) <- liftIO $ pastAndFuture fullCalendar
 
-  let (calendar, otherCalendarName, otherCalendarURL) = case pastParam of
-                                                        Just _  -> (past, "Upcoming meetings", "/")
-                                                        Nothing -> (future, "Past meetings", "/?past=yes")
+  let pastMeetingsName   = "Past meetings"
+      futureMeetingsName = "Upcoming meetings"
+      (calendar, calendarName, otherCalendarName, otherCalendarURL) = case pastParam of
+                                                        Just _  -> (past, pastMeetingsName, futureMeetingsName, "/")
+                                                        Nothing -> (future, futureMeetingsName, pastMeetingsName, "/?past=yes")
                       
       splices :: Splices (SnapletISplice App)
       splices = do
         "meetings"          ## (meetingsSplice calendar)
+        "calendarName"      ## I.textSplice calendarName
         "otherCalendarName" ## I.textSplice otherCalendarName
         "otherCalendarURL"  ## I.textSplice otherCalendarURL
+        "coopName"          ## I.textSplice $ T.pack $ coopName user
 
   renderWithSplices "home" splices
 
@@ -123,6 +154,7 @@ handleMeeting = do
         "meetingName" ## I.textSplice $ meetingName meeting
         "meetingURL"  ## I.textSplice $ meetingURL meeting
         "editPerson"  ## I.textSplice $ T.pack $ editPerson
+        "coopName"    ## I.textSplice $ T.pack $ coopName user
         "ifEditing"   ## ifEditing
 
       slotsSplice :: [Slot] -> SnapletISplice App
@@ -187,7 +219,7 @@ routes = [ ("",                           with auth (ifTop handleHome))
          , ("/meeting/:year/:month/:day", with auth (method POST handleMeetingEdit))
          , ("/login",                     with auth handleLoginSubmit)
          , ("/logout",                    with auth handleLogout)
-         -- , ("/new_user",                  with auth handleNewUser)
+         , ("/new_coop",                  with auth handleNewCoop)
          , ("",                           serveDirectory "static")
          ]
 
@@ -228,3 +260,15 @@ getDateFromParams = do
 
 calendarFileNameForAuthUser :: Maybe AuthUser -> String
 calendarFileNameForAuthUser user = calendarFileNameForUser $ T.unpack $ userLogin $ fromJust user
+
+coopName :: Maybe AuthUser -> String
+coopName user = 
+  case nameResult of 
+    Error msg -> "<no name>"
+    Success name -> name
+  where metaMap    = userMeta $ fromJust user
+        nameResult = fromJSON $ metaMap HM.! "name"
+
+isAdminUser :: Maybe AuthUser -> Bool
+isAdminUser user = (userLogin $ fromJust user) == "admin"
+

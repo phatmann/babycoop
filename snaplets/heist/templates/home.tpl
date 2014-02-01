@@ -1,6 +1,6 @@
 <apply template="base">
   <ifLoggedIn>
-      <h2>Seattle League of Awesome Moms Baby Co-op (SLAM)</h2>
+      <h2><coopName/>: <calendarName/></h2>
       <ul>
         <meetings>
           <li><a href="${meetingURL}">
