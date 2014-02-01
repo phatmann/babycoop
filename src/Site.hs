@@ -30,6 +30,7 @@ import           Heist.Splices
 import           Application
 
 import Control.Monad.IO.Class
+import System.Cmd
 import Calendar
 import Scheduler
 
@@ -153,7 +154,7 @@ handleMeeting = do
 
   renderWithSplices "meeting" splices
 ------------------------------------------------------------------------------
--- | Handle meeting
+-- | Handle meeting edit
 handleMeetingEdit :: Handler App (AuthManager App) ()
 handleMeetingEdit = do
   calendar   <- liftIO readCalendar
@@ -163,6 +164,7 @@ handleMeetingEdit = do
   let Just meeting = findMeeting date calendar
       meetingUpdates = [(read person :: Person, read attendance :: Attendance)]
   liftIO $ updateCalendar date meetingUpdates
+  liftIO $ system "bin/sync"
   redirect $ ES.encodeUtf8 $ meetingURL meeting
 
 ------------------------------------------------------------------------------

@@ -40,7 +40,8 @@ Executable slam
     directory                 >= 1.2,
     aeson                     >= 0.6,
     aeson-pretty              >= 0.7,
-    transformers              >= 0.3
+    transformers              >= 0.3,
+    process
 
   if flag(old-base)
     build-depends:
