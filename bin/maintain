@@ -1,0 +1,2 @@
+runghc -isrc/ src/maintain.hs
+

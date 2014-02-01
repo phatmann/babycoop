@@ -23,40 +23,40 @@ instance ToJSON Stat
 instance ToJSON Slot
 instance ToJSON Meeting
 
-calendarFileName = "data/calendars/slam.json"
+calendarFolder = "data/calendars/"
 futureSpan = personCount * 2
 
-maintainCalendar :: IO ()
-maintainCalendar = do
-  calendar <- readCalendar
+maintainCalendar :: String -> IO ()
+maintainCalendar calendarFileName = do
+  calendar <- readCalendar calendarFileName
   (past, future) <- pastAndFuture calendar
   let calendarWithConfirmations = applyUpdates calendar $ confirmMeetings past
   let lastMeeting = last calendar
       futureShortfall = futureSpan - (length future)
   extendedCalendar <- evalRandIO(fillInCalendar (date lastMeeting) futureShortfall calendarWithConfirmations)
-  saveCalendar extendedCalendar
+  saveCalendar calendarFileName extendedCalendar
 
-updateCalendar :: Date -> [(Person, Attendance)] -> IO ()
-updateCalendar date attendanceUpdates = do
-  calendar <- readCalendar
+updateCalendar :: String -> Date -> [(Person, Attendance)] -> IO ()
+updateCalendar calendarFileName date attendanceUpdates = do
+  calendar <- readCalendar calendarFileName
   let updatedCalendar = applyAttendanceUpdates calendar date attendanceUpdates
       updates         = updateMeetings date futureSpan updatedCalendar
-  saveCalendar $ applyUpdates calendar updates
+  saveCalendar calendarFileName $ applyUpdates calendar updates
 
-saveCalendar :: Calendar -> IO ()
-saveCalendar calendar = do
-  outFileName <- writeCalendar calendar
+saveCalendar :: String -> Calendar -> IO ()
+saveCalendar calendarFileName calendar = do
+  tmpFileName <- writeCalendarToTempFile calendar
   removeFile calendarFileName
-  renameFile outFileName calendarFileName
+  renameFile tmpFileName calendarFileName
 
-readCalendar :: IO Calendar
-readCalendar = do
-  calendarJSON <- B.readFile calendarFileName
+readCalendar :: String -> IO Calendar
+readCalendar calendarFileName = do
+  calendarJSON <- B.readFile $ calendarFileName
   let Just calendar = decode calendarJSON :: Maybe Calendar
   return calendar
 
-writeCalendar :: Calendar -> IO String
-writeCalendar calendar = do
+writeCalendarToTempFile :: Calendar -> IO String
+writeCalendarToTempFile calendar = do
   let tmpFileName = "calendar.json.tmp"
       encodedCalendar = encodePretty calendar
   B.writeFile tmpFileName encodedCalendar
@@ -72,4 +72,7 @@ pastAndFuture :: Calendar -> IO (Calendar, Calendar)
 pastAndFuture calendar = do t <- today
                             let inPast (Meeting date _) = date < t 
                             return $ partition inPast calendar
+
+calendarFileNameForUser :: String -> String
+calendarFileNameForUser userName = calendarFolder ++ userName ++ ".json"
 

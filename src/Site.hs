@@ -33,6 +33,7 @@ import Control.Monad.IO.Class
 import System.Cmd
 import Calendar
 import Scheduler
+import Control.Monad
 
 ------------------------------------------------------------------------------
 -- | Render login form
@@ -58,7 +59,6 @@ handleLoginSubmit =
 handleLogout :: Handler App (AuthManager App) ()
 handleLogout = logout >> redirect "/"
 
-
 ------------------------------------------------------------------------------
 -- | Handle new user form submit
 handleNewUser :: Handler App (AuthManager App) ()
@@ -71,7 +71,16 @@ handleNewUser = method GET handleForm <|> method POST handleFormSubmit
 -- | Handle home page
 handleHome :: Handler App (AuthManager App) ()
 handleHome = do
-  fullCalendar   <- liftIO readCalendar
+  user <- currentUser
+  
+  case user of 
+    Nothing   -> render "home"
+    Just _    -> handleHomeLoggedIn
+
+handleHomeLoggedIn :: Handler App (AuthManager App) ()
+handleHomeLoggedIn = do
+  user           <- currentUser
+  fullCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
   pastParam      <- getPar "past"
   (past, future) <- liftIO $ pastAndFuture fullCalendar
 
@@ -100,7 +109,8 @@ handleHome = do
 -- | Handle meeting
 handleMeeting :: Handler App (AuthManager App) ()
 handleMeeting = do
-  calendar   <- liftIO readCalendar
+  user       <- currentUser
+  calendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
   editParam  <- getPar "edit"
   date       <- getDateFromParams
 
@@ -157,13 +167,15 @@ handleMeeting = do
 -- | Handle meeting edit
 handleMeetingEdit :: Handler App (AuthManager App) ()
 handleMeetingEdit = do
-  calendar   <- liftIO readCalendar
+  user       <- currentUser
+  let calendarFileName = calendarFileNameForAuthUser user
+  calendar   <- liftIO $ readCalendar calendarFileName
   date       <- getDateFromParams
   person     <- (getPar "person")     >>= return . fromMaybe ""
   attendance <- (getPar "attendance") >>= return . fromMaybe ""
   let Just meeting = findMeeting date calendar
       meetingUpdates = [(read person :: Person, read attendance :: Attendance)]
-  liftIO $ updateCalendar date meetingUpdates
+  liftIO $ updateCalendar calendarFileName date meetingUpdates
   liftIO $ system "bin/sync"
   redirect $ ES.encodeUtf8 $ meetingURL meeting
 
@@ -175,7 +187,7 @@ routes = [ ("",                           with auth (ifTop handleHome))
          , ("/meeting/:year/:month/:day", with auth (method POST handleMeetingEdit))
          , ("/login",                     with auth handleLoginSubmit)
          , ("/logout",                    with auth handleLogout)
-         , ("/new_user",                  with auth handleNewUser)
+         -- , ("/new_user",                  with auth handleNewUser)
          , ("",                           serveDirectory "static")
          ]
 
@@ -213,3 +225,6 @@ getDateFromParams = do
   dayParam   <- (getPar "day")   >>= return . fromMaybe ""
 
   return (read yearParam, read monthParam, read dayParam)
+
+calendarFileNameForAuthUser :: Maybe AuthUser -> String
+calendarFileNameForAuthUser user = calendarFileNameForUser $ T.unpack $ userLogin $ fromJust user
