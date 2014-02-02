@@ -113,17 +113,17 @@ handleHomeLoggedIn = do
 
   let pastMeetingsName   = "Past meetings"
       futureMeetingsName = "Upcoming meetings"
-      (calendar, calendarName, otherCalendarName, otherCalendarURL) = case pastParam of
+      (meetings, calendarName, otherCalendarName, otherCalendarURL) = case pastParam of
                                                         Just _  -> (past, pastMeetingsName, futureMeetingsName, "/")
                                                         Nothing -> (future, futureMeetingsName, pastMeetingsName, "/?past=yes")
                       
       splices :: Splices (SnapletISplice App)
       splices = do
-        "meetings"          ## (meetingsSplice calendar)
+        "meetings"          ## (meetingsSplice meetings)
         "calendarName"      ## I.textSplice calendarName
         "otherCalendarName" ## I.textSplice otherCalendarName
         "otherCalendarURL"  ## I.textSplice otherCalendarURL
-        "coopName"          ## I.textSplice $ T.pack $ coopName user
+        "coopName"          ## I.textSplice $ T.pack $ title calendar
 
   renderWithSplices "home" splices
 
@@ -154,7 +154,7 @@ handleMeeting = do
         "meetingName" ## I.textSplice $ meetingName meeting
         "meetingURL"  ## I.textSplice $ meetingURL meeting
         "editPerson"  ## I.textSplice $ T.pack $ editPerson
-        "coopName"    ## I.textSplice $ T.pack $ coopName user
+        "coopName"    ## I.textSplice $ T.pack $ title calendar
         "ifEditing"   ## ifEditing
 
       slotsSplice :: [Slot] -> SnapletISplice App
@@ -259,15 +259,14 @@ getDateFromParams = do
   return (read yearParam, read monthParam, read dayParam)
 
 calendarFileNameForAuthUser :: Maybe AuthUser -> String
-calendarFileNameForAuthUser user = calendarFileNameForUser $ T.unpack $ userLogin $ fromJust user
+calendarFileNameForAuthUser user = calendarFileNameForUser $ head $ calendarsForAuthUser user
 
-coopName :: Maybe AuthUser -> String
-coopName user = 
-  case nameResult of 
-    Error msg -> "<no name>"
-    Success name -> name
-  where metaMap    = userMeta $ fromJust user
-        nameResult = fromJSON $ metaMap HM.! "name"
+calendarsForAuthUser :: Maybe AuthUser -> [String]
+calendarsForAuthUser user = 
+  case fromJSON $ meta HM.! "calendars" of 
+    Error msg -> []
+    Success calendars -> calendars
+  where meta = userMeta $ fromJust user
 
 isAdminUser :: Maybe AuthUser -> Bool
 isAdminUser user = (userLogin $ fromJust user) == "admin"

@@ -34,6 +34,7 @@ data Slot = Slot  { person :: Person
 data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic)
 data Calendar = Calendar { persons :: [Person]
                          , meetings :: [Meeting]
+                         , title :: String
                          } deriving (Show, Generic)
 
 emptyDate :: Date
