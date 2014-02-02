@@ -35,8 +35,10 @@ maintainCalendar calendarFileName = do
   let calendarWithConfirmations = calendar { meetings = applyUpdates ms $ confirmMeetings past }
       lastMeeting = last ms
       futureShortfall = (futureSpan $ persons calendar) - (length future)
-  extendedCalendar <- evalRandIO(fillInCalendar (date lastMeeting) futureShortfall calendarWithConfirmations)
+      lastDate = date lastMeeting
+  extendedCalendar <- evalRandIO(fillInCalendar lastDate futureShortfall calendarWithConfirmations)
   saveCalendar calendarFileName calendar { meetings = extendedCalendar }
+  updateCalendar calendarFileName lastDate []
 
 updateCalendar :: String -> Date -> [(Person, Attendance)] -> IO ()
 updateCalendar calendarFileName date attendanceUpdates = do

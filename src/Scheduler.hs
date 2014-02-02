@@ -55,7 +55,7 @@ sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
 
 updateMeetings :: Date -> Int -> Calendar -> [Meeting]
-updateMeetings startDate numMeetings groupCalendar  =
+updateMeetings startDate numMeetings calendar  =
   let updateMeetings' :: [Meeting] -> [Meeting] -> [Meeting]
       updateMeetings' history [] = []
       updateMeetings' history (m:ms) =
@@ -63,9 +63,9 @@ updateMeetings startDate numMeetings groupCalendar  =
             history' = (drop extra history) ++ [meeting]
             extra = if length history == personCount then 1 else 0
         in meeting : updateMeetings' history' ms
-      initialHistory = gatherHistory startDate personCount $ meetings groupCalendar
-      personCount = length $ persons groupCalendar
-  in updateMeetings' initialHistory $ meetingsAt startDate numMeetings $ meetings groupCalendar
+      initialHistory = gatherHistory startDate personCount $ meetings calendar
+      personCount = length $ persons calendar
+  in updateMeetings' initialHistory $ meetingsAt startDate numMeetings $ meetings calendar
 
 deleteMeetings :: Date -> Int -> [Meeting] -> [Meeting]
 deleteMeetings startDate numMeetings meetings =
@@ -74,10 +74,10 @@ deleteMeetings startDate numMeetings meetings =
   in filter meetingNotinDatesToDelete meetings
 
 applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> [Meeting]
-applyAttendanceUpdates groupCalendar date [] = meetings groupCalendar
-applyAttendanceUpdates groupCalendar date attendanceUpdates = 
+applyAttendanceUpdates calendar date [] = meetings calendar
+applyAttendanceUpdates calendar date attendanceUpdates = 
   let requestSlots = map (\x -> slot (fst x) (snd x) Requested) attendanceUpdates
-  in mergeRequestCalendar groupCalendar [Meeting date requestSlots]
+  in mergeRequestCalendar calendar [Meeting date requestSlots]
 
 mergeCalendars :: [Meeting] -> [Meeting] -> [Meeting]
 mergeCalendars meetings calendar2 = sortBy (compare `on` date) $ unionBy sameMeeting meetings calendar2
@@ -104,12 +104,12 @@ honorRequests meeting requests =
   in meeting {slots = slots'}
 
 mergeRequestCalendar :: Calendar -> [Meeting] -> [Meeting]
-mergeRequestCalendar groupCalendar requestCalendar = 
+mergeRequestCalendar calendar requestCalendar = 
   let findMeetingAlways aDate = case findMeeting aDate requestCalendar of
                             Just m -> m
                             Nothing -> Meeting aDate []
-      findRequests meeting = fullySlotifyMeeting (persons groupCalendar) $ findMeetingAlways (date meeting)
-  in map (\meeting -> honorRequests meeting (findRequests meeting)) $ meetings groupCalendar
+      findRequests meeting = fullySlotifyMeeting (persons calendar) $ findMeetingAlways (date meeting)
+  in map (\meeting -> honorRequests meeting (findRequests meeting)) $ meetings calendar
 
 rankifyMeeting :: (RandomGen g) => Meeting -> Rand g Meeting
 rankifyMeeting meeting = do
@@ -118,14 +118,14 @@ rankifyMeeting meeting = do
   return meeting { slots = rankedSlots }
 
 fillInCalendar :: (RandomGen g) => Date -> Int -> Calendar -> Rand g [Meeting]
-fillInCalendar startDate numMeetings groupCalendar 
-  | (numMeetings <= 0) = return $ meetings groupCalendar
+fillInCalendar startDate numMeetings calendar 
+  | (numMeetings <= 0) = return $ meetings calendar
   | otherwise = do
       let dates = dateRange startDate numMeetings
           newMeeting :: (RandomGen g) => Date -> Rand g Meeting
-          newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting (persons groupCalendar) $ Meeting aDate []
+          newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting (persons calendar) $ Meeting aDate []
       calendarAdditions <- mapM newMeeting dates
-      return $ mergeCalendars (meetings groupCalendar) calendarAdditions 
+      return $ mergeCalendars (meetings calendar) calendarAdditions 
            
 updateMeeting :: [Meeting] -> Int -> Meeting -> Meeting
 updateMeeting history personsCount meeting  =
