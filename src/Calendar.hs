@@ -8,15 +8,16 @@ import Control.Monad.Random
 import System.Directory
 import Data.Time
 import Data.List
+import Data.Maybe
  
-instance FromJSON Person
+instance FromJSON GroupCalendar
 instance FromJSON Attendance
 instance FromJSON Status
 instance FromJSON Stat
 instance FromJSON Slot
 instance FromJSON Meeting
 
-instance ToJSON Person
+instance ToJSON GroupCalendar
 instance ToJSON Attendance
 instance ToJSON Status
 instance ToJSON Stat
@@ -24,41 +25,41 @@ instance ToJSON Slot
 instance ToJSON Meeting
 
 calendarFolder = "data/calendars/"
-futureSpan = personCount * 2
+futureSpan persons = (length persons) * 2
 
 maintainCalendar :: String -> IO ()
 maintainCalendar calendarFileName = do
-  calendar <- readCalendar calendarFileName
-  (past, future) <- pastAndFuture calendar
-  let calendarWithConfirmations = applyUpdates calendar $ confirmMeetings past
-  let lastMeeting = last calendar
-      futureShortfall = futureSpan - (length future)
+  groupCalendar <- readCalendar calendarFileName
+  let cal = calendar groupCalendar
+  (past, future) <- pastAndFuture cal
+  let calendarWithConfirmations = groupCalendar { calendar = applyUpdates cal $ confirmMeetings past }
+      lastMeeting = last cal
+      futureShortfall = (futureSpan $ persons groupCalendar) - (length future)
   extendedCalendar <- evalRandIO(fillInCalendar (date lastMeeting) futureShortfall calendarWithConfirmations)
-  saveCalendar calendarFileName extendedCalendar
+  saveCalendar calendarFileName groupCalendar { calendar = extendedCalendar }
 
 updateCalendar :: String -> Date -> [(Person, Attendance)] -> IO ()
 updateCalendar calendarFileName date attendanceUpdates = do
-  calendar <- readCalendar calendarFileName
-  let updatedCalendar = applyAttendanceUpdates calendar date attendanceUpdates
-      updates         = updateMeetings date futureSpan updatedCalendar
-  saveCalendar calendarFileName $ applyUpdates calendar updates
+  groupCalendar <- readCalendar calendarFileName
+  let updatedCalendar = groupCalendar { calendar = applyAttendanceUpdates groupCalendar date attendanceUpdates }
+      updates         = updateMeetings date (futureSpan $ persons groupCalendar) updatedCalendar
+  saveCalendar calendarFileName $ groupCalendar { calendar = applyUpdates (calendar groupCalendar) updates }
 
-saveCalendar :: String -> Calendar -> IO ()
-saveCalendar calendarFileName calendar = do
-  tmpFileName <- writeCalendarToTempFile calendar
+saveCalendar :: String -> GroupCalendar -> IO ()
+saveCalendar calendarFileName groupCalendar = do
+  tmpFileName <- writeCalendarToTempFile groupCalendar
   removeFile calendarFileName
   renameFile tmpFileName calendarFileName
 
-readCalendar :: String -> IO Calendar
+readCalendar :: String -> IO GroupCalendar
 readCalendar calendarFileName = do
   calendarJSON <- B.readFile $ calendarFileName
-  let Just calendar = decode calendarJSON :: Maybe Calendar
-  return calendar
+  return $ fromJust (decode calendarJSON :: Maybe GroupCalendar)
 
-writeCalendarToTempFile :: Calendar -> IO String
-writeCalendarToTempFile calendar = do
+writeCalendarToTempFile :: GroupCalendar -> IO String
+writeCalendarToTempFile groupCalendar = do
   let tmpFileName = "calendar.json.tmp"
-      encodedCalendar = encodePretty calendar
+      encodedCalendar = encodePretty groupCalendar
   B.writeFile tmpFileName encodedCalendar
   return tmpFileName
 

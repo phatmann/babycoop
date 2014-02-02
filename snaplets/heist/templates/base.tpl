@@ -15,6 +15,9 @@
       </ifLoggedIn>
     </nav>
     <div id="content" class="container">
+      <ifLoggedIn>
+        <h2><coopName/></h2>
+      </ifLoggedIn>
       <apply-content/>
     </div>
   </body>

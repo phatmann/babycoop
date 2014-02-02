@@ -106,10 +106,10 @@ handleHome = do
 
 handleHomeLoggedIn :: Handler App (AuthManager App) ()
 handleHomeLoggedIn = do
-  user           <- currentUser
-  fullCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
-  pastParam      <- getPar "past"
-  (past, future) <- liftIO $ pastAndFuture fullCalendar
+  user                <- currentUser
+  fullGroupCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
+  pastParam           <- getPar "past"
+  (past, future)      <- liftIO $ pastAndFuture $ calendar fullGroupCalendar
 
   let pastMeetingsName   = "Past meetings"
       futureMeetingsName = "Upcoming meetings"
@@ -140,12 +140,12 @@ handleHomeLoggedIn = do
 -- | Handle meeting
 handleMeeting :: Handler App (AuthManager App) ()
 handleMeeting = do
-  user       <- currentUser
-  calendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
-  editParam  <- getPar "edit"
-  date       <- getDateFromParams
+  user            <- currentUser
+  groupCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
+  editParam       <- getPar "edit"
+  date            <- getDateFromParams
 
-  let Just meeting = findMeeting date calendar
+  let Just meeting = findMeeting date $ calendar groupCalendar
       editPerson = fromMaybe "" editParam
 
       splices :: Splices (SnapletISplice App)
@@ -163,7 +163,7 @@ handleMeeting = do
       slotSplices :: Monad m => Slot -> Splices (I.Splice m)
       slotSplices slot = do
         "slotClass"        ## I.textSplice $ slotClass slot
-        "slotPerson"       ## I.textSplice $ T.pack $ show $ person slot
+        "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
@@ -201,11 +201,11 @@ handleMeetingEdit :: Handler App (AuthManager App) ()
 handleMeetingEdit = do
   user       <- currentUser
   let calendarFileName = calendarFileNameForAuthUser user
-  calendar   <- liftIO $ readCalendar calendarFileName
-  date       <- getDateFromParams
-  person     <- (getPar "person")     >>= return . fromMaybe ""
-  attendance <- (getPar "attendance") >>= return . fromMaybe ""
-  let Just meeting = findMeeting date calendar
+  groupCalendar   <- liftIO $ readCalendar calendarFileName
+  date            <- getDateFromParams
+  person          <- (getPar "person")     >>= return . fromMaybe ""
+  attendance      <- (getPar "attendance") >>= return . fromMaybe ""
+  let Just meeting = findMeeting date $ calendar groupCalendar
       meetingUpdates = [(read person :: Person, read attendance :: Attendance)]
   liftIO $ updateCalendar calendarFileName date meetingUpdates
   liftIO $ system "bin/sync"

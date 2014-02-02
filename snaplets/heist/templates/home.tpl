@@ -1,6 +1,6 @@
 <apply template="base">
   <ifLoggedIn>
-      <h2><coopName/>: <calendarName/></h2>
+      <h3><calendarName/></h3>
       <ul>
         <meetings>
           <li><a href="${meetingURL}">
