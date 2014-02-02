@@ -107,9 +107,9 @@ handleHome = do
 handleHomeLoggedIn :: Handler App (AuthManager App) ()
 handleHomeLoggedIn = do
   user                <- currentUser
-  fullGroupCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
+  calendar            <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
   pastParam           <- getPar "past"
-  (past, future)      <- liftIO $ pastAndFuture $ calendar fullGroupCalendar
+  (past, future)      <- liftIO $ pastAndFuture $ meetings calendar
 
   let pastMeetingsName   = "Past meetings"
       futureMeetingsName = "Upcoming meetings"
@@ -128,7 +128,7 @@ handleHomeLoggedIn = do
   renderWithSplices "home" splices
 
   where
-    meetingsSplice :: Calendar -> SnapletISplice App
+    meetingsSplice :: [Meeting] -> SnapletISplice App
     meetingsSplice = I.mapSplices $ I.runChildrenWith . meetingSplices
 
     meetingSplices :: Monad n => Meeting -> Splices (I.Splice n)
@@ -141,11 +141,11 @@ handleHomeLoggedIn = do
 handleMeeting :: Handler App (AuthManager App) ()
 handleMeeting = do
   user            <- currentUser
-  groupCalendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
+  calendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
   editParam       <- getPar "edit"
   date            <- getDateFromParams
 
-  let Just meeting = findMeeting date $ calendar groupCalendar
+  let Just meeting = findMeeting date $ meetings calendar
       editPerson = fromMaybe "" editParam
 
       splices :: Splices (SnapletISplice App)
@@ -171,11 +171,11 @@ handleMeeting = do
 
       ifSlotViewing :: Monad m => Slot -> I.Splice m
       ifSlotViewing slot = 
-        ifISplice $ editPerson /= (show $ person slot)
+        ifISplice $ editPerson /= person slot
 
       ifSlotEditing :: Monad m => Slot -> I.Splice m
       ifSlotEditing slot = 
-        ifISplice $ editPerson == (show $ person slot)
+        ifISplice $ editPerson == person slot
 
       ifEditing :: Monad m => I.Splice m
       ifEditing = 
@@ -201,11 +201,11 @@ handleMeetingEdit :: Handler App (AuthManager App) ()
 handleMeetingEdit = do
   user       <- currentUser
   let calendarFileName = calendarFileNameForAuthUser user
-  groupCalendar   <- liftIO $ readCalendar calendarFileName
+  calendar   <- liftIO $ readCalendar calendarFileName
   date            <- getDateFromParams
   person          <- (getPar "person")     >>= return . fromMaybe ""
   attendance      <- (getPar "attendance") >>= return . fromMaybe ""
-  let Just meeting = findMeeting date $ calendar groupCalendar
+  let Just meeting = findMeeting date $ meetings calendar
       meetingUpdates = [(read person :: Person, read attendance :: Attendance)]
   liftIO $ updateCalendar calendarFileName date meetingUpdates
   liftIO $ system "bin/sync"
