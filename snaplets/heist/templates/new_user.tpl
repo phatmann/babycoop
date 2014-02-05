@@ -1,10 +1,10 @@
 <apply template="base">
-  <h1>Register a new coop</h1>
+  <h1>Register a new user</h1>
 
-  <form method="post" action="/new_coop">
+  <form method="post" action="/new_user">
     <table id="info">
       <tr>
-        <td>Co-op Name:</td><td><input type="text" name="name" size="60" /></td>
+        <td>Calendar:</td><td><input type="text" name="calendar" size="60" /></td>
       </tr>
       <tr>
         <td>Login:</td><td><input type="text" name="login" size="20" /></td>

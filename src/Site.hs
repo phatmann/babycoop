@@ -64,8 +64,8 @@ handleLogout = logout >> redirect "/"
 
 ------------------------------------------------------------------------------
 -- | Handle new coop form
-handleNewCoop :: Handler App (AuthManager App) ()
-handleNewCoop = do
+handleNewUser :: Handler App (AuthManager App) ()
+handleNewUser = do
       user <- currentUser
 
       case user of
@@ -76,19 +76,19 @@ handleNewCoop = do
                     redirect "/"
                     
   where
-    handleForm = render "new_coop"
+    handleForm = render "new_user"
     handleFormSubmit = do
       user <- registerUser "login" "password"
 
       case user of 
-        Left err  -> redirect "/new_coop"
+        Left err  -> redirect "/new_user"
         Right u   -> do
-          name <- getPar "name"
+          calendar <- getPar "calendar"
 
-          case name of
-            Nothing -> redirect "/new_coop"
-            Just n  -> do
-              saveUser $ u { userMeta = HM.singleton "name" (toJSON n) }
+          case calendar of
+            Nothing -> redirect "/new_user"
+            Just c  -> do
+              saveUser $ u { userMeta = HM.singleton "calendars" (toJSON [c]) }
               redirect "/"
 
 ------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ routes = [ ("",                           with auth (ifTop handleHome))
          , ("/meeting/:year/:month/:day", with auth (method POST handleMeetingEdit))
          , ("/login",                     with auth handleLoginSubmit)
          , ("/logout",                    with auth handleLogout)
-         , ("/new_coop",                  with auth handleNewCoop)
+         , ("/new_user",                  with auth handleNewUser)
          , ("",                           serveDirectory "static")
          ]
 
