@@ -1,4 +1,18 @@
-module Calendar where
+module Calendar (
+  readCalendar,
+  pastAndFuture,
+  findMeeting,
+  updateCalendar,
+  calendarFileNameForUser,
+  calendarFolder,
+  maintainCalendar,
+  Meeting(..),
+  Calendar(..),
+  Slot(..),
+  Status(..),
+  Attendance,
+  Date
+) where
 
 import Scheduler
 import Data.ByteString.Lazy as B (writeFile, readFile)

@@ -1,6 +1,20 @@
 {-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 
-module Scheduler where
+module Scheduler (
+  Calendar(..),
+  Meeting(..),
+  Slot(..),
+  Status(..),
+  Attendance,
+  Stat,
+  Date,
+  Person,
+  confirmMeetings,
+  fillInCalendar,
+  applyUpdates,
+  applyAttendanceUpdates,
+  findMeeting,
+  updateMeetings) where
 
 import Data.List
 import Data.Function (on)

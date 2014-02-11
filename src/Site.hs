@@ -32,7 +32,6 @@ import           Application
 import           Control.Monad.IO.Class
 import           System.Cmd
 import           Calendar
-import           Scheduler
 import           Control.Monad
 import           Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HM
