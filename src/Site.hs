@@ -164,6 +164,7 @@ handleMeeting = do
         "slotClass"        ## I.textSplice $ slotClass slot
         "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
+        "slotStat"         ## I.textSplice $ T.pack $ showStat $ stat slot
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
         "selectAttendance" ## selectAttendance slot
@@ -270,3 +271,14 @@ calendarsForAuthUser user =
 isAdminUser :: Maybe AuthUser -> Bool
 isAdminUser user = (userLogin $ fromJust user) == "admin"
 
+showStat :: Stat -> String
+showStat stat =  
+  let inStr      = show $ inCount stat
+      outStr     = show $ outCount stat
+      absentStr  = show $ absentCount stat
+      lastHosted = showDate $ lastHostDate stat
+  in "Last 6 weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
+
+showDate :: Date -> String
+showDate (0, 0, 0) = "a while ago"
+showDate (year, month, day) = (show month) ++ "/" ++ (show day) ++ "/" ++ (show year)

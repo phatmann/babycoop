@@ -7,7 +7,7 @@
           <li>
             <slotPerson/>: 
               <ifSlotViewing>
-                <a href="${meetingURL}?edit=${slotPerson}" class="${slotClass}"><slotAttendance/></a>
+                <a href="${meetingURL}?edit=${slotPerson}" class="${slotClass}" title="${slotStat}"><slotAttendance/></a>
               </ifSlotViewing>
 
               <ifSlotEditing>

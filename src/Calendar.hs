@@ -10,8 +10,13 @@ module Calendar (
   Calendar(..),
   Slot(..),
   Status(..),
+  Stat,
   Attendance,
-  Date
+  Date,
+  inCount,
+  outCount,
+  absentCount,
+  lastHostDate
 ) where
 
 import Scheduler
