@@ -30,6 +30,8 @@ import Data.Ratio
 import Data.Maybe
 import Control.Monad.Random
 import GHC.Generics
+import Test.QuickCheck (Arbitrary, quickCheck)
+import qualified Test.QuickCheck as QC
 import qualified Data.Map as Map
 
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
@@ -300,3 +302,15 @@ prop_confirmPast calendar pastMeetings =
       meetingAtDateConfirmed date = allSlotsConfirmed meeting
         where meeting = fromJust $ findMeeting date (meetings calendar)
   in all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
+
+instance Arbitrary Slot where
+  arbitrary = do
+    person <- QC.elements ["Person1", "Person2", "Person3", "Person4", "Person5", "Person6"]
+    attendance <- QC.elements [TBD, In, Out, Host, Absent]
+    let status = Proposed
+    return $ slot person attendance status
+                    
+                    
+
+--instance Arbitrary Meeting where
+  --arbitrary = Meeting
