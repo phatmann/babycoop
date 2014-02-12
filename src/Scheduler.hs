@@ -13,18 +13,21 @@ module Scheduler (
   outCount,
   absentCount,
   lastHostDate,
-  confirmMeetings,
+  confirmPastMeetings,
   fillInCalendar,
-  applyUpdates,
-  applyAttendanceUpdates,
   findMeeting,
-  updateMeetings) where
+  applyUpdates,
+  updateCalendar,
+
+  prop_confirmPast
+  ) where
 
 import Data.List
 import Data.Function (on)
 import Data.Map (Map)
 import Data.Time
 import Data.Ratio
+import Data.Maybe
 import Control.Monad.Random
 import GHC.Generics
 import qualified Data.Map as Map
@@ -61,6 +64,9 @@ emptyDate = (0, 0, 0)
 slot :: Person -> Attendance -> Status -> Slot
 slot person attendance status = Slot person attendance status emptyStat 0
 
+futureSpan :: [Person] -> Int
+futureSpan persons = (length persons) * 2
+
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
 dateRange date@(year, month, mday) numMeetings = 
@@ -71,6 +77,12 @@ dateRange date@(year, month, mday) numMeetings =
 
 sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
+
+updateCalendar :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
+updateCalendar calendar date attendanceUpdates = do
+  let updatedCalendar = calendar { meetings = applyAttendanceUpdates calendar date attendanceUpdates }
+      updates         = updateMeetings date (futureSpan $ persons calendar) updatedCalendar
+  calendar { meetings = applyUpdates (meetings calendar) updates }
 
 updateMeetings :: Date -> Int -> Calendar -> [Meeting]
 updateMeetings startDate numMeetings calendar  =
@@ -103,11 +115,12 @@ mergeCalendars meetings calendar2 = sortBy (compare `on` date) $ unionBy sameMee
 applyUpdates :: [Meeting] -> [Meeting] -> [Meeting]
 applyUpdates meetings updates = mergeCalendars updates meetings
 
-confirmMeetings :: [Meeting] -> [Meeting]
-confirmMeetings meetings = 
+confirmPastMeetings :: Calendar -> [Meeting] -> Calendar
+confirmPastMeetings calendar pastMeetings = 
   let confirmMeeting (Meeting date slots) = Meeting date $ map confirmSlot slots
       confirmSlot slot = if status slot == Requested then slot else slot{status = Confirmed}
-  in map confirmMeeting meetings
+      confirmedMeetings = map confirmMeeting pastMeetings
+  in calendar { meetings = applyUpdates (meetings calendar) confirmedMeetings }
 
 honorRequests :: Meeting -> Meeting -> Meeting
 honorRequests meeting requests =
@@ -135,15 +148,22 @@ rankifyMeeting meeting = do
   let rankedSlots = map (\(s, r) -> s{rank = r}) $ zip (slots meeting) rs
   return meeting { slots = rankedSlots }
 
-fillInCalendar :: (RandomGen g) => Date -> Int -> Calendar -> Rand g [Meeting]
-fillInCalendar startDate numMeetings calendar 
-  | (numMeetings <= 0) = return $ meetings calendar
-  | otherwise = do
-      let dates = dateRange startDate numMeetings
-          newMeeting :: (RandomGen g) => Date -> Rand g Meeting
-          newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting (persons calendar) $ Meeting aDate []
-      calendarAdditions <- mapM newMeeting dates
-      return $ mergeCalendars (meetings calendar) calendarAdditions 
+fillInCalendar :: (RandomGen g) => Int -> Calendar -> Rand g Calendar
+fillInCalendar numFutureMeetings calendar = do
+  let numMeetings = (futureSpan $ persons calendar) - numFutureMeetings
+
+  if numMeetings <= 0 then
+    return calendar
+  else do
+    let dates = dateRange lastDate numMeetings
+        lastDate = date $ last $ meetings calendar
+
+        newMeeting :: (RandomGen g) => Date -> Rand g Meeting
+        newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting (persons calendar) $ Meeting aDate []
+
+    calendarAdditions <- mapM newMeeting dates
+    let extendedMeetings = mergeCalendars (meetings calendar) calendarAdditions 
+    return $ updateCalendar (calendar {meetings = extendedMeetings}) lastDate []
            
 updateMeeting :: [Meeting] -> Int -> Meeting -> Meeting
 updateMeeting history personsCount meeting  =
@@ -270,3 +290,13 @@ historyStats history =
                     in Map.alter (\_ -> Just newStat) key stats
       emptyStats = Map.empty :: Stats
   in foldl gatherMeetingStats emptyStats history
+
+----------------------------
+-- TESTS
+----------------------------
+prop_confirmPast :: Calendar -> [Meeting] -> Bool
+prop_confirmPast calendar pastMeetings = 
+  let allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
+      meetingAtDateConfirmed date = allSlotsConfirmed meeting
+        where meeting = fromJust $ findMeeting date (meetings calendar)
+  in all (\m -> meetingAtDateConfirmed $ date m) pastMeetings

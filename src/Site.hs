@@ -207,7 +207,8 @@ handleMeetingEdit = do
   attendance      <- (getPar "attendance") >>= return . fromMaybe ""
   let Just meeting = findMeeting date $ meetings calendar
       meetingUpdates = [(person, read attendance :: Attendance)]
-  liftIO $ updateCalendar calendarFileName date meetingUpdates
+      updatedCalendar = updateCalendar calendar date meetingUpdates
+  liftIO $ saveCalendar calendarFileName updatedCalendar 
   liftIO $ system "bin/sync"
   redirect $ ES.encodeUtf8 $ meetingURL meeting
 
