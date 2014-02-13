@@ -30,8 +30,9 @@ import Data.Ratio
 import Data.Maybe
 import Control.Monad.Random
 import GHC.Generics
-import Test.QuickCheck (Arbitrary, quickCheck)
+import Test.QuickCheck (Arbitrary, Property, Gen, quickCheck)
 import qualified Test.QuickCheck as QC
+import qualified Test.QuickCheck.Monadic as QC (assert, monadicIO, pick, pre, run) 
 import qualified Data.Map as Map
 
 data Attendance = TBD | In | Out | Host | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
@@ -296,6 +297,13 @@ historyStats history =
 ----------------------------
 -- TESTS
 ----------------------------
+prop_fillInCalendarLength :: Calendar -> Property
+prop_fillInCalendarLength calendar = QC.monadicIO $ do
+  numFutureMeetings <- QC.pick (QC.choose(1, 6) :: Gen Int)
+  let numMeetings = (futureSpan $ persons calendar) - numFutureMeetings
+  calendar' <- QC.run $ evalRandIO(fillInCalendar numFutureMeetings calendar)
+  QC.assert $ (length $ meetings calendar') == numMeetings
+
 prop_confirmPast :: Calendar -> [Meeting] -> Bool
 prop_confirmPast calendar pastMeetings = 
   let allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
@@ -303,14 +311,14 @@ prop_confirmPast calendar pastMeetings =
         where meeting = fromJust $ findMeeting date (meetings calendar)
   in all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
 
-instance Arbitrary Slot where
-  arbitrary = do
-    person <- QC.elements ["Person1", "Person2", "Person3", "Person4", "Person5", "Person6"]
-    attendance <- QC.elements [TBD, In, Out, Host, Absent]
-    let status = Proposed
-    return $ slot person attendance status
+instance Arbitrary Calendar where
+  arbitrary = return Calendar {
+     title    = "Sample Calendar"
+    ,persons  = ["Person1", "Person2", "Person3", "Person4", "Person5", "Person6"]
+    ,meetings = [Meeting {date = (2014,1,1), slots=[]} ]
+  }
                     
-                    
+                   
 
 --instance Arbitrary Meeting where
   --arbitrary = Meeting
