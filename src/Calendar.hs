@@ -29,6 +29,7 @@ import System.Directory
 import Data.Time
 import Data.List
 import Data.Maybe
+import Test.QuickCheck.Gen
  
 instance FromJSON Calendar
 instance FromJSON Attendance
@@ -51,7 +52,9 @@ maintainCalendar calendarFileName = do
   calendar <- readCalendar calendarFileName
   (pastMeetings, futureMeetings) <- pastAndFuture $ meetings calendar
   let confirmedCalendar = confirmPastMeetings calendar pastMeetings
-  extendedCalendar <- evalRandIO(fillInCalendar (length futureMeetings) confirmedCalendar)
+  gen <- getStdGen
+  let extendCalendar = extendCalendarIntoFuture (length futureMeetings) confirmedCalendar
+      extendedCalendar = unGen extendCalendar gen 99999 
   saveCalendar calendarFileName extendedCalendar
 
 saveCalendar :: String -> Calendar -> IO ()
