@@ -1,7 +1,8 @@
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
 module Main where
 
-import System.Exit (exitFailure)
+import Test.Framework
+import Test.Framework.BlackBoxTest
+import {-@ HTF_TESTS @-} Scheduler
 
-main = do
-    putStrLn "Add tests!"
-    exitFailure
+main = htfMain htf_importedTests

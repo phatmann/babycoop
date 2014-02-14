@@ -24,11 +24,11 @@ import Scheduler
 import Data.ByteString.Lazy as B (writeFile, readFile)
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
-import Control.Monad.Random
 import System.Directory
 import Data.Time
 import Data.List
 import Data.Maybe
+import System.Random
 import Test.QuickCheck.Gen
  
 instance FromJSON Calendar
