@@ -162,7 +162,7 @@ newMeeting aPersons aDate  = rankifyMeeting $ fullySlotifyMeeting aPersons $ Mee
 
 fillInCalendar :: Int -> Calendar -> Gen Calendar
 fillInCalendar numMeetings calendar
-  | numMeetings == 0 = return calendar
+  | numMeetings <= 0 = return calendar
   | otherwise        = do
                         let dates = tail $ dateRange lastDate (numMeetings + 1)
                             lastDate = date $ last $ meetings calendar
@@ -318,6 +318,22 @@ prop_confirmPast calendar = do
       meetingAtDateConfirmed date = allSlotsConfirmed meeting
         where meeting = fromJust $ findMeeting date (meetings calendar')
   return $ all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
+
+prop_extendCalendarLength :: Calendar -> Property
+prop_extendCalendarLength calendar = QC.forAll numMeetings test
+  where showCalendarLength = putStrLn $ "Calendar length = " ++ (show $ length $ meetings calendar)
+        numMeetings = QC.choose(0, length $ meetings calendar)
+        test numFutureMeetingsExisting = QC.whenFail' showCalendarLength $ do
+          let numFutureMeetingsRequired = futureSpan $ persons calendar
+              numFutureMeetingsNeeded   = numFutureMeetingsRequired - numFutureMeetingsExisting
+              expectedNewCalendarLength = (length $ meetings calendar) +
+                                            if numFutureMeetingsNeeded > 0 then 
+                                             numFutureMeetingsNeeded
+                                            else
+                                             0
+
+          calendar' <- extendCalendarIntoFuture numFutureMeetingsExisting calendar
+          return $ (length $ meetings calendar') == expectedNewCalendarLength
 
 sampleCalendar :: Gen Calendar
 sampleCalendar = do
