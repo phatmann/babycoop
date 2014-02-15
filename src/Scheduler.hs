@@ -46,15 +46,15 @@ data Stat = Stat   { inDates :: [Date]
                    , outDates :: [Date]
                    , hostDates :: [Date]
                    , absentDates :: [Date]
-                   } deriving (Show, Generic)
+                   } deriving (Show, Generic, Eq)
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
                   , rank :: Rank
-                  } deriving (Show, Generic)
-data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic)
+                  } deriving (Show, Generic, Eq)
+data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic, Eq)
 data Calendar = Calendar { persons :: [Person]
                          , meetings :: [Meeting]
                          , title :: String
@@ -307,7 +307,12 @@ prop_fillInCalendarLength :: Calendar -> Gen Bool
 prop_fillInCalendarLength calendar = do
   numMeetings <- QC.choose(1, 6)
   calendar'   <- fillInCalendar numMeetings calendar
-  return $ (length $ meetings calendar') == numMeetings
+  return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings - 1
+
+prop_fillInZeroCalendarLength :: Calendar -> Gen Bool
+prop_fillInZeroCalendarLength calendar = do
+  calendar' <- fillInCalendar 0 calendar
+  return $ (meetings calendar') == (meetings calendar)
 
 --prop_confirmPast :: Calendar -> [Meeting] -> Bool
 --prop_confirmPast calendar pastMeetings = 
@@ -324,7 +329,10 @@ emptyCalendar = return Calendar {
                        }
 
 instance Arbitrary Calendar where
-  arbitrary = emptyCalendar
+  arbitrary =  do
+    numMeetings <- QC.choose(0, 20)
+    calendar    <- emptyCalendar
+    fillInCalendar numMeetings calendar
                     
                    
 
