@@ -29,8 +29,8 @@ import Data.Time
 import Data.Ratio
 import Data.Maybe
 import GHC.Generics
-import Test.QuickCheck (Arbitrary, Property, Gen, quickCheck)
 import qualified Test.QuickCheck as QC
+import Test.QuickCheck (Arbitrary, Property, Gen, quickCheck)
 import Test.Framework
 import qualified Data.Map as Map
 
@@ -145,31 +145,31 @@ mergeRequestCalendar calendar requestCalendar =
   in map (\meeting -> honorRequests meeting (findRequests meeting)) $ meetings calendar
 
 extendCalendarIntoFuture :: Int -> Calendar -> Gen Calendar
-extendCalendarIntoFuture numFutureMeetingsExisting calendar =
-  fillInCalendar numFutureMeetingsNeeded calendar 
-    where numFutureMeetingsRequired = futureSpan $ persons calendar
-          numFutureMeetingsNeeded = numFutureMeetingsRequired - numFutureMeetingsExisting
+extendCalendarIntoFuture numFutureMeetingsExisting calendar = do
+  let numFutureMeetingsRequired = futureSpan $ persons calendar
+      numFutureMeetingsNeeded   = numFutureMeetingsRequired - numFutureMeetingsExisting
+      lastDate = date $ last $ meetings calendar
+  calendar' <- fillInCalendar numFutureMeetingsNeeded calendar 
+  return $ updateCalendar calendar' lastDate []
 
-fillInCalendar :: Int -> Calendar -> Gen Calendar
-fillInCalendar numMeetings calendar = do
-  if numMeetings <= 0 then
-    return calendar
-  else do
-    let dates = dateRange lastDate numMeetings
-        lastDate = date $ last $ meetings calendar
-
-        rankifyMeeting :: Meeting -> Gen Meeting
+newMeeting :: [Person] -> Date ->  Gen Meeting
+newMeeting aPersons aDate  = rankifyMeeting $ fullySlotifyMeeting aPersons $ Meeting aDate []
+  where rankifyMeeting :: Meeting -> Gen Meeting
         rankifyMeeting meeting = do
           let rankSlot s = (QC.choose (1,100) :: Gen Rank) >>= (\r -> return s{rank = r})
           rankedSlots <- mapM rankSlot $ slots meeting
           return meeting { slots = rankedSlots }
 
-        newMeeting :: Date -> Gen Meeting
-        newMeeting aDate = rankifyMeeting $ fullySlotifyMeeting (persons calendar) $ Meeting aDate []
+fillInCalendar :: Int -> Calendar -> Gen Calendar
+fillInCalendar numMeetings calendar
+  | numMeetings == 0 = return calendar
+  | otherwise        = do
+                        let dates = tail $ dateRange lastDate (numMeetings + 1)
+                            lastDate = date $ last $ meetings calendar
 
-    calendarAdditions <- mapM newMeeting dates
-    let extendedMeetings = mergeCalendars (meetings calendar) calendarAdditions 
-    return $ updateCalendar (calendar {meetings = extendedMeetings}) lastDate []
+                        calendarAdditions <- mapM (newMeeting $ persons calendar) dates
+                        let extendedMeetings = mergeCalendars (meetings calendar) calendarAdditions 
+                        return $ calendar {meetings = extendedMeetings}
            
 updateMeeting :: [Meeting] -> Int -> Meeting -> Meeting
 updateMeeting history personsCount meeting  =
@@ -301,40 +301,36 @@ historyStats history =
 -- TESTS
 ----------------------------
 prop_fillInEmptyCalendarLength :: Property
-prop_fillInEmptyCalendarLength = QC.forAll emptyCalendar prop_fillInCalendarLength
+prop_fillInEmptyCalendarLength = QC.forAll sampleCalendar prop_fillInCalendarLength
 
 prop_fillInCalendarLength :: Calendar -> Gen Bool
 prop_fillInCalendarLength calendar = do
-  numMeetings <- QC.choose(1, 6)
+  numMeetings <- QC.choose(0, 6)
   calendar'   <- fillInCalendar numMeetings calendar
-  return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings - 1
+  return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings
 
-prop_fillInZeroCalendarLength :: Calendar -> Gen Bool
-prop_fillInZeroCalendarLength calendar = do
-  calendar' <- fillInCalendar 0 calendar
-  return $ (meetings calendar') == (meetings calendar)
+prop_confirmPast :: Calendar -> Gen Bool
+prop_confirmPast calendar = do
+  splitPoint <- QC.choose(0, length $ meetings calendar)
+  let pastMeetings = drop splitPoint (meetings calendar)
+      calendar' = confirmPastMeetings calendar pastMeetings
+      allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
+      meetingAtDateConfirmed date = allSlotsConfirmed meeting
+        where meeting = fromJust $ findMeeting date (meetings calendar')
+  return $ all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
 
---prop_confirmPast :: Calendar -> [Meeting] -> Bool
---prop_confirmPast calendar pastMeetings = 
---  let allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
---      meetingAtDateConfirmed date = allSlotsConfirmed meeting
---        where meeting = fromJust $ findMeeting date (meetings calendar)
---  in all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
-
-emptyCalendar :: Gen Calendar
-emptyCalendar = return Calendar {
-                           title    = "Sample Calendar"
-                          ,persons  = ["Person1", "Person2", "Person3", "Person4", "Person5", "Person6"]
-                          ,meetings = [Meeting {date = (2014,1,1), slots=[]} ]
-                       }
+sampleCalendar :: Gen Calendar
+sampleCalendar = do
+  let ps = ["Person1", "Person2", "Person3", "Person4", "Person5", "Person6"]
+  meeting <- newMeeting ps (2014,1,1)
+  return Calendar {
+             title    = "Sample Calendar"
+            ,persons  = ps
+            ,meetings = [meeting]
+         }
 
 instance Arbitrary Calendar where
   arbitrary =  do
     numMeetings <- QC.choose(0, 20)
-    calendar    <- emptyCalendar
-    fillInCalendar numMeetings calendar
-                    
-                   
-
---instance Arbitrary Meeting where
-  --arbitrary = Meeting
+    calendar    <- sampleCalendar
+    fillInCalendar numMeetings calendar      
