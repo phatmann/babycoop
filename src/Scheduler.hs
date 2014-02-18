@@ -198,20 +198,22 @@ scheduleMeeting historyCount personCount (Meeting date slots) =
                               isFavoredToHost slot             = (inCount $ stat slot) <= (personCount `div` 2)
 
       (stayingIn, goingOut)  =  let  numberPresent        = length present
-                                     numberConfirmedIn    = length $ filter isIn confirmed
+                                     numberConfirmedIn    = length $ filter (\slot -> attendance slot == In) confirmed
                                      minNumberNeededIn    = ceiling $ numberPresent % 2
                                      numberNeededIn       = minNumberNeededIn - numberConfirmedIn - numberOfHosts
                                      sortedGuests         = sortBy (compare `on` boostedRank) guests
-                                     boostedRank slot     = if isFavoredForOut slot then r + 1000
-                                                              else if isFavoredForIn slot then r - 1000
-                                                              else r
-                                                            where r = rank slot 
-                                     isIn slot            = attendance slot == In
+                                     boostedRank slot     
+                                      | historyCount == 0 = rank slot
+                                      | otherwise         =  if isFavoredForOut slot then r + 1000
+                                                               else if isFavoredForIn slot then r - 1000
+                                                               else r
+                                                             where r = rank slot 
+                                     
+                                     isFavoredForOut slot = (pctOut slot) < 30 || (pctIn slot) > 60
+                                     isFavoredForIn slot  = (pctOut slot) > 60 || (pctIn slot) < 30
                                      presentCount slot    = historyCount - (absentCount $ stat slot)
                                      pctIn slot           = ((inCount $ stat slot) * 100) `div` (presentCount slot)
                                      pctOut slot          = ((outCount $ stat slot) * 100) `div` (presentCount slot)
-                                     isFavoredForOut slot = (pctOut slot) < 30 || (pctIn slot) > 60
-                                     isFavoredForIn slot  = (pctOut slot) > 60 || (pctIn slot) < 30
                                 in splitAt numberNeededIn sortedGuests 
 
       newlyIn   = map (\slot -> slot {attendance=In}) stayingIn
@@ -303,37 +305,43 @@ historyStats history =
 prop_fillInEmptyCalendarLength :: Property
 prop_fillInEmptyCalendarLength = QC.forAll sampleCalendar prop_fillInCalendarLength
 
-prop_fillInCalendarLength :: Calendar -> Gen Bool
-prop_fillInCalendarLength calendar = do
-  numMeetings <- QC.choose(0, 6)
-  calendar'   <- fillInCalendar numMeetings calendar
-  return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings
+prop_fillInCalendarLength :: Calendar -> Property
+prop_fillInCalendarLength calendar = QC.forAll (QC.choose (0, 6)) test
+  where test :: Int -> Gen Bool
+        test numMeetings = do 
+          numMeetings <- QC.choose(0, 6)
+          calendar'   <- fillInCalendar numMeetings calendar
+          return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings
 
-prop_confirmPast :: Calendar -> Gen Bool
-prop_confirmPast calendar = do
-  splitPoint <- QC.choose(0, length $ meetings calendar)
-  let pastMeetings = drop splitPoint (meetings calendar)
-      calendar' = confirmPastMeetings calendar pastMeetings
-      allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
-      meetingAtDateConfirmed date = allSlotsConfirmed meeting
-        where meeting = fromJust $ findMeeting date (meetings calendar')
-  return $ all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
+prop_confirmPast :: Calendar -> Property
+prop_confirmPast calendar =  QC.forAll (numMeetingsFromCalendar calendar) test
+  where test :: Int -> Gen Bool
+        test splitPoint = do
+          let pastMeetings = drop splitPoint (meetings calendar)
+              calendar' = confirmPastMeetings calendar pastMeetings
+              allSlotsConfirmed meeting = all (\s -> status s == Confirmed || status s == Requested) $ slots meeting
+              meetingAtDateConfirmed date = allSlotsConfirmed meeting
+                where meeting = fromJust $ findMeeting date (meetings calendar')
+          return $ all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
 
 prop_extendCalendarLength :: Calendar -> Property
-prop_extendCalendarLength calendar = QC.forAll numMeetings test
-  where showCalendarLength = putStrLn $ "Calendar length = " ++ (show $ length $ meetings calendar)
-        numMeetings = QC.choose(0, length $ meetings calendar)
-        test numFutureMeetingsExisting = QC.whenFail' showCalendarLength $ do
+prop_extendCalendarLength calendar = QC.forAll (numMeetingsFromCalendar calendar) test
+  where test :: Int -> Gen Bool
+        test numFutureMeetingsExisting  = do
           let numFutureMeetingsRequired = futureSpan $ persons calendar
               numFutureMeetingsNeeded   = numFutureMeetingsRequired - numFutureMeetingsExisting
-              expectedNewCalendarLength = (length $ meetings calendar) +
-                                            if numFutureMeetingsNeeded > 0 then 
-                                             numFutureMeetingsNeeded
-                                            else
-                                             0
+              expectedNewCalendarLength =
+                (length $ meetings calendar) + if numFutureMeetingsNeeded > 0 then numFutureMeetingsNeeded else 0
 
           calendar' <- extendCalendarIntoFuture numFutureMeetingsExisting calendar
           return $ (length $ meetings calendar') == expectedNewCalendarLength
+
+prop_meetingOneHost :: Meeting -> Gen Bool
+prop_meetingOneHost meeting = return $ numHosts == 1
+  where numHosts = length . filter (\slot -> attendance slot == Host) $ slots meeting
+
+numMeetingsFromCalendar :: Calendar -> Gen Int
+numMeetingsFromCalendar calendar = QC.choose(0, length $ meetings calendar)
 
 sampleCalendar :: Gen Calendar
 sampleCalendar = do
@@ -347,6 +355,13 @@ sampleCalendar = do
 
 instance Arbitrary Calendar where
   arbitrary =  do
-    numMeetings <- QC.choose(0, 20)
+    numMeetings <- QC.choose (0, 20)
     calendar    <- sampleCalendar
-    fillInCalendar numMeetings calendar      
+    fillInCalendar numMeetings calendar   
+
+instance Arbitrary Meeting where
+  arbitrary =  do
+    calendar <- arbitrary :: Gen Calendar
+    meeting  <- elements $ meetings calendar
+    let meeting' = head $ updateMeetings (date meeting) 1 calendar
+    return meeting'
