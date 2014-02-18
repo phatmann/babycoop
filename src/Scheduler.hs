@@ -337,8 +337,15 @@ prop_extendCalendarLength calendar = QC.forAll (numMeetingsFromCalendar calendar
           return $ (length $ meetings calendar') == expectedNewCalendarLength
 
 prop_meetingOneHost :: Meeting -> Gen Bool
-prop_meetingOneHost meeting = return $ numHosts == 1
-  where numHosts = length . filter (\slot -> attendance slot == Host) $ slots meeting
+prop_meetingOneHost meeting = return $ (numWithAttendance Host meeting) == 1
+
+prop_meetingHasAtLeastHalfIn :: Meeting -> Gen Bool
+prop_meetingHasAtLeastHalfIn meeting = return $ (numWithAttendance In meeting) + (numWithAttendance Host meeting) >= ((length $ slots meeting) `div` 2)
+
+prop_meetingHasAtMostHalfOut :: Meeting -> Gen Bool
+prop_meetingHasAtMostHalfOut meeting = return $ (numWithAttendance Out meeting) <= ((length $ slots meeting) `div` 2)
+
+numWithAttendance aAttendance meeting = length . filter (\slot -> attendance slot == aAttendance) $ slots meeting
 
 numMeetingsFromCalendar :: Calendar -> Gen Int
 numMeetingsFromCalendar calendar = QC.choose(0, length $ meetings calendar)
