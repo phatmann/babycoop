@@ -1,13 +1,14 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Calendar (
   readCalendar,
   pastAndFuture,
   findMeeting,
   updateCalendar,
-  calendarFileNameForUser,
+  calendarFileNameForCoop,
   calendarFolder,
   maintainCalendar,
   saveCalendar,
-  historySpan,
   Meeting(..),
   Calendar(..),
   Slot(..),
@@ -31,13 +32,19 @@ import Data.List
 import Data.Maybe
 import System.Random
 import Test.QuickCheck.Gen
- 
+import Control.Applicative
+
 instance FromJSON Calendar
 instance FromJSON Attendance
 instance FromJSON Status
 instance FromJSON Stat
 instance FromJSON Slot
-instance FromJSON Meeting
+
+instance FromJSON Meeting where
+  parseJSON (Object v) =
+    Meeting <$> v .:  "date"
+            <*> v .:? "historyCount" .!= 0
+            <*> v .:  "slots"
 
 instance ToJSON Calendar
 instance ToJSON Attendance
@@ -84,11 +91,11 @@ pastAndFuture calendar = do
         let (y,m,d) = toGregorian $ utctDay currentTime
         return (fromIntegral y, m, d)
   t <- today
-  let inPast (Meeting date _) = date < t 
+  let inPast (Meeting date _ _) = date < t 
   return $ partition inPast calendar
 
-calendarFileNameForUser :: String -> String
-calendarFileNameForUser userName = calendarFolder ++ userName ++ ".json"
+calendarFileNameForCoop :: String -> String
+calendarFileNameForCoop coopName = calendarFolder ++ coopName ++ ".json"
 
 
 

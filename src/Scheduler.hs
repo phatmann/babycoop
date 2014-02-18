@@ -19,7 +19,6 @@ module Scheduler (
   findMeeting,
   applyUpdates,
   updateCalendar,
-  historySpan,
   htf_thisModulesTests
   ) where
 
@@ -55,7 +54,7 @@ data Slot = Slot  { person :: Person
                   , stat :: Stat
                   , rank :: Rank
                   } deriving (Show, Generic, Eq)
-data Meeting = Meeting { date :: Date, slots :: [Slot] } deriving (Show, Generic, Eq)
+data Meeting = Meeting { date :: Date,  historyCount :: Int, slots :: [Slot]} deriving (Show, Generic, Eq)
 data Calendar = Calendar { persons :: [Person]
                          , meetings :: [Meeting]
                          , title :: String
@@ -70,9 +69,6 @@ slot person attendance status = Slot person attendance status emptyStat 0
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
 
-historySpan :: [Person] -> Int
-historySpan persons = (length persons) * 2
-
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
 dateRange date@(year, month, mday) numMeetings = 
@@ -82,7 +78,7 @@ dateRange date@(year, month, mday) numMeetings =
   in date : dateRange nextMeeting (numMeetings - signum numMeetings)
 
 sameMeeting :: Meeting -> Meeting -> Bool
-sameMeeting (Meeting date1 _) (Meeting date2 _) = date1 == date2
+sameMeeting (Meeting date1 _ _) (Meeting date2 _ _) = date1 == date2
 
 updateCalendar :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
 updateCalendar calendar date attendanceUpdates = do
@@ -95,12 +91,12 @@ updateMeetings startDate numMeetings calendar  =
   let updateMeetings' :: [Meeting] -> [Meeting] -> [Meeting]
       updateMeetings' history [] = []
       updateMeetings' history (m:ms) =
-        let meeting = updateMeeting history (length $ persons calendar) m
+        let meeting = updateMeeting history m
             history' = (drop extra history) ++ [meeting]
             extra = if length history == historyCount then 1 else 0
         in meeting : updateMeetings' history' ms
       initialHistory = gatherHistory startDate historyCount $ meetings calendar
-      historyCount = historySpan $ persons calendar
+      historyCount   = (length $ persons calendar) * 2
   in updateMeetings' initialHistory $ meetingsAt startDate numMeetings $ meetings calendar
 
 deleteMeetings :: Date -> Int -> [Meeting] -> [Meeting]
@@ -113,7 +109,7 @@ applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> [Meeting
 applyAttendanceUpdates calendar date [] = meetings calendar
 applyAttendanceUpdates calendar date attendanceUpdates = 
   let requestSlots = map (\x -> slot (fst x) (snd x) Requested) attendanceUpdates
-  in mergeRequestCalendar calendar [Meeting date requestSlots]
+  in mergeRequestCalendar calendar [Meeting date 0 requestSlots]
 
 mergeCalendars :: [Meeting] -> [Meeting] -> [Meeting]
 mergeCalendars meetings calendar2 = sortBy (compare `on` date) $ unionBy sameMeeting meetings calendar2
@@ -123,7 +119,7 @@ applyUpdates meetings updates = mergeCalendars updates meetings
 
 confirmPastMeetings :: Calendar -> [Meeting] -> Calendar
 confirmPastMeetings calendar pastMeetings = 
-  let confirmMeeting (Meeting date slots) = Meeting date $ map confirmSlot slots
+  let confirmMeeting (Meeting date historyCount slots) = Meeting date historyCount $ map confirmSlot slots
       confirmSlot slot = if status slot == Requested then slot else slot{status = Confirmed}
       confirmedMeetings = map confirmMeeting pastMeetings
   in calendar { meetings = applyUpdates (meetings calendar) confirmedMeetings }
@@ -144,7 +140,7 @@ mergeRequestCalendar :: Calendar -> [Meeting] -> [Meeting]
 mergeRequestCalendar calendar requestCalendar = 
   let findMeetingAlways aDate = case findMeeting aDate requestCalendar of
                             Just m -> m
-                            Nothing -> Meeting aDate []
+                            Nothing -> Meeting aDate 0 []
       findRequests meeting = fullySlotifyMeeting (persons calendar) $ findMeetingAlways (date meeting)
   in map (\meeting -> honorRequests meeting (findRequests meeting)) $ meetings calendar
 
@@ -157,7 +153,7 @@ extendCalendarIntoFuture numFutureMeetingsExisting calendar = do
   return $ updateCalendar calendar' lastDate []
 
 newMeeting :: [Person] -> Date ->  Gen Meeting
-newMeeting aPersons aDate  = rankifyMeeting $ fullySlotifyMeeting aPersons $ Meeting aDate []
+newMeeting aPersons aDate  = rankifyMeeting $ fullySlotifyMeeting aPersons $ Meeting aDate 0 []
   where rankifyMeeting :: Meeting -> Gen Meeting
         rankifyMeeting meeting = do
           let rankSlot s = (QC.choose (1,100) :: Gen Rank) >>= (\r -> return s{rank = r})
@@ -175,16 +171,16 @@ fillInCalendar numMeetings calendar
                         let extendedMeetings = mergeCalendars (meetings calendar) calendarAdditions 
                         return $ calendar {meetings = extendedMeetings}
            
-updateMeeting :: [Meeting] -> Int -> Meeting -> Meeting
-updateMeeting history personsCount meeting  =
+updateMeeting :: [Meeting] -> Meeting -> Meeting
+updateMeeting history meeting  =
   let stats = historyStats history
-      meeting' = scheduleMeeting (length history) personsCount $ statifyMeeting meeting
-      statifyMeeting m = m {slots = map statifySlot (slots m)}
+      meeting' = scheduleMeeting $ statifyMeeting meeting
+      statifyMeeting m = m {slots = map statifySlot (slots m), historyCount = length history}
       statifySlot slot = slot {stat = findStat (person slot) stats}
   in meeting'
 
-scheduleMeeting :: Int -> Int -> Meeting -> Meeting
-scheduleMeeting historyCount personCount (Meeting date slots) =
+scheduleMeeting :: Meeting -> Meeting
+scheduleMeeting (Meeting date historyCount slots) =
   let (present, absent)      = partition isPresent slots
                                where isPresent slot = attendance slot /= Absent
       
@@ -192,6 +188,7 @@ scheduleMeeting historyCount personCount (Meeting date slots) =
                                where isAvailable slot = status slot == Proposed
 
       numberOfHosts = 1
+      personCount   = length slots 
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
                         where needHost                         = not $ any isHost confirmed
@@ -226,7 +223,7 @@ scheduleMeeting historyCount personCount (Meeting date slots) =
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` person) newSlots
-  in  Meeting date sortedSlots
+  in  Meeting date historyCount sortedSlots
 
 chooseFavored :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
 chooseFavored numberNeeded favored unfavored =
@@ -288,7 +285,7 @@ meetingsAt d count meetings =
 historyStats :: [Meeting] -> Stats
 historyStats history = 
   let gatherMeetingStats :: Stats -> Meeting -> Stats
-      gatherMeetingStats stats (Meeting slotDate slots) = foldl incrementSlotStat stats slots
+      gatherMeetingStats stats (Meeting slotDate _ slots) = foldl incrementSlotStat stats slots
         where incrementSlotStat :: Stats -> Slot -> Stats
               incrementSlotStat stats slot =
                 let key = person slot

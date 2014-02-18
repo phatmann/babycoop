@@ -146,8 +146,6 @@ handleMeeting = do
 
   let Just meeting = findMeeting date $ meetings calendar
       editPerson = fromMaybe "" editParam
-      historyCount = historySpan $ persons calendar
-
       splices :: Splices (SnapletISplice App)
       splices = do
         "slots"       ## slotsSplice $ slots meeting
@@ -165,7 +163,7 @@ handleMeeting = do
         "slotClass"        ## I.textSplice $ slotClass slot
         "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
-        "slotStat"         ## I.textSplice $ T.pack $ showStat historyCount $ stat slot
+        "slotStat"         ## I.textSplice $ T.pack $ showStat meeting $ stat slot
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
         "selectAttendance" ## selectAttendance slot
@@ -242,10 +240,10 @@ app = makeSnaplet "app" "SLAM Coop" Nothing $ do
 ------------------------------------------------------------------------------
 
 meetingURL :: Meeting -> T.Text
-meetingURL (Meeting (year, month, day) _) = T.pack $ "/meeting/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
+meetingURL (Meeting (year, month, day) _ _) = T.pack $ "/meeting/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
 
 meetingName :: Meeting -> T.Text
-meetingName (Meeting (_, month, day) _) =  T.pack $ (show month) ++ "/" ++ (show day)
+meetingName (Meeting (_, month, day) _ _) =  T.pack $ (show month) ++ "/" ++ (show day)
 
 getPar :: String -> Handler App (AuthManager App) (Maybe String)
 getPar name = do
@@ -261,7 +259,7 @@ getDateFromParams = do
   return (read yearParam, read monthParam, read dayParam)
 
 calendarFileNameForAuthUser :: Maybe AuthUser -> String
-calendarFileNameForAuthUser user = calendarFileNameForUser $ head $ calendarsForAuthUser user
+calendarFileNameForAuthUser user = calendarFileNameForCoop $ head $ calendarsForAuthUser user
 
 calendarsForAuthUser :: Maybe AuthUser -> [String]
 calendarsForAuthUser user = 
@@ -273,13 +271,13 @@ calendarsForAuthUser user =
 isAdminUser :: Maybe AuthUser -> Bool
 isAdminUser user = (userLogin $ fromJust user) == "admin"
 
-showStat :: Int -> Stat -> String
-showStat historyCount stat =  
+showStat :: Meeting -> Stat -> String
+showStat meeting stat =  
   let inStr      = show $ inCount stat
       outStr     = show $ outCount stat
       absentStr  = show $ absentCount stat
       lastHosted = showDate $ lastHostDate stat
-  in "Last " ++ (show historyCount) ++ " weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
+  in "Last " ++ (show $ historyCount meeting) ++ " weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
 
 showDate :: Date -> String
 showDate (0, 0, 0) = "a while ago"
