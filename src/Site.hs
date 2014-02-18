@@ -140,12 +140,13 @@ handleHomeLoggedIn = do
 handleMeeting :: Handler App (AuthManager App) ()
 handleMeeting = do
   user            <- currentUser
-  calendar   <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
+  calendar        <- liftIO $ readCalendar $ calendarFileNameForAuthUser user
   editParam       <- getPar "edit"
   date            <- getDateFromParams
 
   let Just meeting = findMeeting date $ meetings calendar
       editPerson = fromMaybe "" editParam
+      historyCount = historySpan $ persons calendar
 
       splices :: Splices (SnapletISplice App)
       splices = do
@@ -164,7 +165,7 @@ handleMeeting = do
         "slotClass"        ## I.textSplice $ slotClass slot
         "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
-        "slotStat"         ## I.textSplice $ T.pack $ showStat $ stat slot
+        "slotStat"         ## I.textSplice $ T.pack $ showStat historyCount $ stat slot
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
         "selectAttendance" ## selectAttendance slot
@@ -272,13 +273,13 @@ calendarsForAuthUser user =
 isAdminUser :: Maybe AuthUser -> Bool
 isAdminUser user = (userLogin $ fromJust user) == "admin"
 
-showStat :: Stat -> String
-showStat stat =  
+showStat :: Int -> Stat -> String
+showStat historyCount stat =  
   let inStr      = show $ inCount stat
       outStr     = show $ outCount stat
       absentStr  = show $ absentCount stat
       lastHosted = showDate $ lastHostDate stat
-  in "Last 6 weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
+  in "Last " ++ (show historyCount) ++ " weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
 
 showDate :: Date -> String
 showDate (0, 0, 0) = "a while ago"

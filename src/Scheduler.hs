@@ -19,6 +19,7 @@ module Scheduler (
   findMeeting,
   applyUpdates,
   updateCalendar,
+  historySpan,
   htf_thisModulesTests
   ) where
 
@@ -69,6 +70,9 @@ slot person attendance status = Slot person attendance status emptyStat 0
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
 
+historySpan :: [Person] -> Int
+historySpan persons = (length persons) * 2
+
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
 dateRange date@(year, month, mday) numMeetings = 
@@ -91,12 +95,12 @@ updateMeetings startDate numMeetings calendar  =
   let updateMeetings' :: [Meeting] -> [Meeting] -> [Meeting]
       updateMeetings' history [] = []
       updateMeetings' history (m:ms) =
-        let meeting = updateMeeting history personCount m
+        let meeting = updateMeeting history (length $ persons calendar) m
             history' = (drop extra history) ++ [meeting]
-            extra = if length history == personCount then 1 else 0
+            extra = if length history == historyCount then 1 else 0
         in meeting : updateMeetings' history' ms
-      initialHistory = gatherHistory startDate personCount $ meetings calendar
-      personCount = length $ persons calendar
+      initialHistory = gatherHistory startDate historyCount $ meetings calendar
+      historyCount = historySpan $ persons calendar
   in updateMeetings' initialHistory $ meetingsAt startDate numMeetings $ meetings calendar
 
 deleteMeetings :: Date -> Int -> [Meeting] -> [Meeting]
@@ -362,7 +366,7 @@ sampleCalendar = do
 
 instance Arbitrary Calendar where
   arbitrary =  do
-    numMeetings <- QC.choose (0, 20)
+    numMeetings <- QC.choose (0, 52)
     calendar    <- sampleCalendar
     fillInCalendar numMeetings calendar   
 

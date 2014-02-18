@@ -7,6 +7,7 @@ module Calendar (
   calendarFolder,
   maintainCalendar,
   saveCalendar,
+  historySpan,
   Meeting(..),
   Calendar(..),
   Slot(..),
