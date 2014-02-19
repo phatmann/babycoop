@@ -29,6 +29,8 @@ import Data.Time
 import Data.Ratio
 import Data.Maybe
 import GHC.Generics
+import Debug.Trace
+import Control.Applicative
 import qualified Test.QuickCheck as QC
 import Test.QuickCheck (Arbitrary, Property, Gen, quickCheck)
 import Test.Framework
@@ -174,10 +176,9 @@ fillInCalendar numMeetings calendar
 updateMeeting :: [Meeting] -> Meeting -> Meeting
 updateMeeting history meeting  =
   let stats = historyStats history
-      meeting' = scheduleMeeting $ statifyMeeting meeting
       statifyMeeting m = m {slots = map statifySlot (slots m), historyCount = length history}
       statifySlot slot = slot {stat = findStat (person slot) stats}
-  in meeting'
+  in scheduleMeeting $ statifyMeeting meeting
 
 scheduleMeeting :: Meeting -> Meeting
 scheduleMeeting (Meeting date historyCount slots) =
@@ -268,11 +269,11 @@ lastHostDate stat = case hostDates stat of
                       ds  -> last ds
 
 gatherHistory :: Date -> Int -> [Meeting] -> [Meeting]
-gatherHistory d personCount meetings = 
+gatherHistory d historyCount meetings = 
   let Just dateIndex = findIndex (\m -> date m == d) meetings
-      historyIndex = max 0 (dateIndex - personCount)
-      historyCount = dateIndex - historyIndex
-  in chunkAt historyIndex historyCount meetings
+      historyIndex = max 0 (dateIndex - historyCount)
+      historyCount' = dateIndex - historyIndex
+  in chunkAt historyIndex historyCount' meetings
 
 chunkAt :: Int -> Int -> [a] -> [a]
 chunkAt index count xs = take count $ drop index xs
@@ -337,6 +338,17 @@ prop_extendCalendarLength calendar = QC.forAll (numMeetingsFromCalendar calendar
           calendar' <- extendCalendarIntoFuture numFutureMeetingsExisting calendar
           return $ (length $ meetings calendar') == expectedNewCalendarLength
 
+prop_firstMeetingIsValid :: Property
+prop_firstMeetingIsValid = forAll firstMeeting $ (\m -> conjoin [
+  QC.property $ prop_meetingWasScheduled m,
+  QC.property $ prop_meetingOneHost m,
+  QC.property $ prop_meetingHasAtLeastHalfIn m,
+  QC.property $ prop_meetingHasAtMostHalfOut m,
+  prop_meetingHistoryCount m])
+
+prop_meetingWasScheduled :: Meeting -> Gen Bool
+prop_meetingWasScheduled meeting = return $ all (\s -> attendance s /= TBD) $ slots meeting
+
 prop_meetingOneHost :: Meeting -> Gen Bool
 prop_meetingOneHost meeting = return $ (numWithAttendance Host meeting) == 1
 
@@ -345,6 +357,18 @@ prop_meetingHasAtLeastHalfIn meeting = return $ (numWithAttendance In meeting) +
 
 prop_meetingHasAtMostHalfOut :: Meeting -> Gen Bool
 prop_meetingHasAtMostHalfOut meeting = return $ (numWithAttendance Out meeting) <= ((length $ slots meeting) `div` 2)
+
+prop_meetingHistoryCount :: Meeting -> Property
+prop_meetingHistoryCount meeting = QC.whenFail printFailMsg $ all statMatchesHistoryCount $ stat <$> slots meeting
+  where statMatchesHistoryCount stat = (statSum stat) == (historyCount meeting)
+        statSum stat = sum $ map (\f -> length $ f stat) [inDates, outDates, absentDates]
+        printFailMsg = mapM_ (print . statSum) (stat <$> slots meeting)
+
+---------------------------
+-- Generators and Helpers
+---------------------------
+
+tracef m f = trace (m ++ ": " ++ show f) f
 
 numWithAttendance aAttendance meeting = length . filter (\slot -> attendance slot == aAttendance) $ slots meeting
 
@@ -361,15 +385,21 @@ sampleCalendar = do
             ,meetings = [meeting]
          }
 
+firstMeeting = do
+    calendar <- arbitrary :: Gen Calendar
+    return $ head $ meetings calendar 
+
 instance Arbitrary Calendar where
   arbitrary =  do
-    numMeetings <- QC.choose (0, 52)
-    calendar    <- sampleCalendar
-    fillInCalendar numMeetings calendar   
+    numExtraMeetings <- QC.choose (0, 12)
+    calendar         <- sampleCalendar
+    calendar'        <- fillInCalendar numExtraMeetings calendar 
+    let startDate   = date $ head $ meetings calendar'
+        numMeetings = length $ meetings calendar'
+        updates     = updateMeetings startDate numMeetings calendar'
+    return $ calendar { meetings = applyUpdates (meetings calendar) updates }
 
 instance Arbitrary Meeting where
   arbitrary =  do
     calendar <- arbitrary :: Gen Calendar
-    meeting  <- elements $ meetings calendar
-    let meeting' = head $ updateMeetings (date meeting) 1 calendar
-    return meeting'
+    elements $ meetings calendar
