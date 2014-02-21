@@ -163,7 +163,7 @@ handleMeeting = do
         "slotClass"        ## I.textSplice $ slotClass slot
         "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
-        "slotStat"         ## I.textSplice $ T.pack $ showStat meeting $ stat slot
+        "slotStat"         ## I.textSplice $ T.pack $ (showStat meeting $ stat slot) ++ (showRecentStat meeting $ recentStat slot) ++ (showLastHosted $ stat slot) 
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
         "selectAttendance" ## selectAttendance slot
@@ -271,13 +271,24 @@ calendarsForAuthUser user =
 isAdminUser :: Maybe AuthUser -> Bool
 isAdminUser user = (userLogin $ fromJust user) == "admin"
 
+
+showLastHosted :: Stat -> String
+showLastHosted stat = "\nLast hosted " ++ (showDate $ lastHostDate stat)
+
 showStat :: Meeting -> Stat -> String
 showStat meeting stat =  
   let inStr      = show $ inCount stat
       outStr     = show $ outCount stat
       absentStr  = show $ absentCount stat
       lastHosted = showDate $ lastHostDate stat
-  in "Last " ++ (show $ historyCount meeting) ++ " weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr ++ ", Hosted " ++ lastHosted
+  in "Past " ++ (show $ historyCount meeting) ++ " weeks: In " ++ inStr ++ ", Out " ++ outStr ++ ", Absent " ++ absentStr
+
+showRecentStat :: Meeting -> Stat -> String
+showRecentStat meeting stat
+  | historyCount meeting <= recentHistoryCount = ""
+  | otherwise = let inStr      = show $ length $ inDates stat
+                    outStr     = show $ outCount stat
+                in "\nRecent: In " ++ inStr ++ ", Out " ++ outStr
 
 showDate :: Date -> String
 showDate (0, 0, 0) = "a while ago"

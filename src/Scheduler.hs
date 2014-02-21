@@ -6,7 +6,7 @@ module Scheduler (
   Meeting(..),
   Slot(..),
   Status(..),
-  Stat,
+  Stat(..),
   Attendance,
   Date,
   Person,
@@ -20,6 +20,7 @@ module Scheduler (
   applyUpdates,
   updateCalendar,
   emptyStat,
+  recentHistoryCount,
   htf_thisModulesTests
   ) where
 
@@ -54,7 +55,7 @@ data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
-                  , shortTermStat :: Stat
+                  , recentStat :: Stat
                   , rank :: Rank
                   } deriving (Show, Generic, Eq)
 data Meeting = Meeting { date :: Date,  historyCount :: Int, slots :: [Slot]} deriving (Show, Generic, Eq)
@@ -72,7 +73,7 @@ slot person attendance status = Slot person attendance status emptyStat emptySta
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
 
-shortTermHistoryCount = 2
+recentHistoryCount = 2
 
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
@@ -178,12 +179,12 @@ fillInCalendar numMeetings calendar
            
 updateMeeting :: [Meeting] -> Meeting -> Meeting
 updateMeeting history meeting  =
-  let shortTermHistory  = drop ((length history) - shortTermHistoryCount) history
+  let recentHistory  = drop ((length history) - recentHistoryCount) history
       stats             = historyStats history
-      shortTermStats    = historyStats shortTermHistory
+      recentStats    = historyStats recentHistory
       statifyMeeting m  = m {slots = map statifySlot (slots m), historyCount = length history}
       statifySlot slot  = slot { stat          = findStat (person slot) stats,
-                                 shortTermStat = findStat (person slot) shortTermStats }
+                                 recentStat = findStat (person slot) recentStats }
   in scheduleMeeting $ statifyMeeting meeting
 
 scheduleMeeting :: Meeting -> Meeting
@@ -220,8 +221,8 @@ scheduleMeeting (Meeting date historyCount slots) =
                                      
                                      isFavoredForOut slot      = (pctOut slot) < 30 || (pctIn slot) > 60 
                                      isFavoredForIn slot       = (pctOut slot) > 60 || (pctIn slot) < 30
-                                     tooManyRecentOuts slot    = (outCount $ shortTermStat slot) == shortTermHistoryCount
-                                     tooManyRecentIns slot     = (inCount $ shortTermStat slot)  == shortTermHistoryCount
+                                     tooManyRecentOuts slot    = (outCount $ recentStat slot) == recentHistoryCount
+                                     tooManyRecentIns slot     = (inCount $ recentStat slot)  == recentHistoryCount
                                      presentCount slot         = historyCount - (absentCount $ stat slot)
                                      pctIn slot                = ((inCount $ stat slot) * 100) `div` (presentCount slot)
                                      pctOut slot               = ((outCount $ stat slot) * 100) `div` (presentCount slot)
