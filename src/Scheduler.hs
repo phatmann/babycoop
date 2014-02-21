@@ -6,7 +6,7 @@ module Scheduler (
   Meeting(..),
   Slot(..),
   Status(..),
-  Stat,
+  Stat(..),
   Attendance,
   Date,
   Person,
@@ -19,6 +19,8 @@ module Scheduler (
   findMeeting,
   applyUpdates,
   updateCalendar,
+  emptyStat,
+  recentHistoryCount,
   htf_thisModulesTests
   ) where
 
@@ -31,8 +33,7 @@ import Data.Maybe
 import GHC.Generics
 import Debug.Trace
 import Control.Applicative
-import qualified Test.QuickCheck as QC
-import Test.QuickCheck (Arbitrary, Property, Gen, quickCheck)
+import Test.QuickCheck
 import Test.Framework
 import qualified Data.Map as Map
 
@@ -54,6 +55,7 @@ data Slot = Slot  { person :: Person
                   , attendance :: Attendance
                   , status :: Status
                   , stat :: Stat
+                  , recentStat :: Stat
                   , rank :: Rank
                   } deriving (Show, Generic, Eq)
 data Meeting = Meeting { date :: Date,  historyCount :: Int, slots :: [Slot]} deriving (Show, Generic, Eq)
@@ -66,10 +68,12 @@ emptyDate :: Date
 emptyDate = (0, 0, 0)
 
 slot :: Person -> Attendance -> Status -> Slot
-slot person attendance status = Slot person attendance status emptyStat 0
+slot person attendance status = Slot person attendance status emptyStat emptyStat 0
 
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
+
+recentHistoryCount = 2
 
 dateRange :: Date -> Int -> [Date]
 dateRange _ 0 = []
@@ -158,7 +162,7 @@ newMeeting :: [Person] -> Date ->  Gen Meeting
 newMeeting aPersons aDate  = rankifyMeeting $ fullySlotifyMeeting aPersons $ Meeting aDate 0 []
   where rankifyMeeting :: Meeting -> Gen Meeting
         rankifyMeeting meeting = do
-          let rankSlot s = (QC.choose (1,100) :: Gen Rank) >>= (\r -> return s{rank = r})
+          let rankSlot s = (choose (1,100) :: Gen Rank) >>= (\r -> return s{rank = r})
           rankedSlots <- mapM rankSlot $ slots meeting
           return meeting { slots = rankedSlots }
 
@@ -175,9 +179,12 @@ fillInCalendar numMeetings calendar
            
 updateMeeting :: [Meeting] -> Meeting -> Meeting
 updateMeeting history meeting  =
-  let stats = historyStats history
-      statifyMeeting m = m {slots = map statifySlot (slots m), historyCount = length history}
-      statifySlot slot = slot {stat = findStat (person slot) stats}
+  let recentHistory  = drop ((length history) - recentHistoryCount) history
+      stats             = historyStats history
+      recentStats    = historyStats recentHistory
+      statifyMeeting m  = m {slots = map statifySlot (slots m), historyCount = length history}
+      statifySlot slot  = slot { stat          = findStat (person slot) stats,
+                                 recentStat = findStat (person slot) recentStats }
   in scheduleMeeting $ statifyMeeting meeting
 
 scheduleMeeting :: Meeting -> Meeting
@@ -206,16 +213,19 @@ scheduleMeeting (Meeting date historyCount slots) =
                                      sortedGuests         = sortBy (compare `on` boostedRank) guests
                                      boostedRank slot     
                                       | historyCount == 0 = rank slot
-                                      | otherwise         =  if isFavoredForOut slot then r + 1000
-                                                               else if isFavoredForIn slot then r - 1000
-                                                               else r
-                                                             where r = rank slot 
+                                      | otherwise         = rank slot
+                                                              + if tooManyRecentOuts slot then (-10000) else 0
+                                                              + if tooManyRecentIns slot then 10000 else 0
+                                                              + if isFavoredForOut slot then 1000 else 0
+                                                              + if isFavoredForIn slot then (-1000) else 0
                                      
-                                     isFavoredForOut slot = (pctOut slot) < 30 || (pctIn slot) > 60
-                                     isFavoredForIn slot  = (pctOut slot) > 60 || (pctIn slot) < 30
-                                     presentCount slot    = historyCount - (absentCount $ stat slot)
-                                     pctIn slot           = ((inCount $ stat slot) * 100) `div` (presentCount slot)
-                                     pctOut slot          = ((outCount $ stat slot) * 100) `div` (presentCount slot)
+                                     isFavoredForOut slot      = (pctOut slot) < 30 || (pctIn slot) > 60 
+                                     isFavoredForIn slot       = (pctOut slot) > 60 || (pctIn slot) < 30
+                                     tooManyRecentOuts slot    = (outCount $ recentStat slot) == recentHistoryCount
+                                     tooManyRecentIns slot     = (inCount $ recentStat slot)  == recentHistoryCount
+                                     presentCount slot         = historyCount - (absentCount $ stat slot)
+                                     pctIn slot                = ((inCount $ stat slot) * 100) `div` (presentCount slot)
+                                     pctOut slot               = ((outCount $ stat slot) * 100) `div` (presentCount slot)
                                 in splitAt numberNeededIn sortedGuests 
 
       newlyIn   = map (\slot -> slot {attendance=In}) stayingIn
@@ -252,7 +262,7 @@ findStat :: Person -> Stats -> Stat
 findStat = Map.findWithDefault emptyStat
 
 inCount :: Stat -> Int
-inCount = length . inDates
+inCount stat = (length $ inDates stat) + (length $ hostDates stat)
 
 outCount :: Stat -> Int
 outCount = length . outDates
@@ -292,9 +302,9 @@ historyStats history =
                 let key = person slot
                     oldStat = findStat key stats
                     newStat = case attendance slot of
-                      In     -> oldStat {inDates = (inDates oldStat) ++ [slotDate]}
-                      Out    -> oldStat {outDates = (outDates oldStat) ++ [slotDate]}
-                      Host   -> oldStat {inDates = (inDates oldStat) ++ [slotDate], hostDates = (hostDates oldStat) ++ [slotDate]}
+                      In     -> oldStat {inDates     = (inDates oldStat) ++ [slotDate]}
+                      Out    -> oldStat {outDates    = (outDates oldStat) ++ [slotDate]}
+                      Host   -> oldStat {hostDates   = (hostDates oldStat) ++ [slotDate]}
                       Absent -> oldStat {absentDates = (absentDates oldStat) ++ [slotDate]}
                       TBD    -> oldStat
                     in Map.alter (\_ -> Just newStat) key stats
@@ -305,18 +315,18 @@ historyStats history =
 -- TESTS
 ----------------------------
 prop_fillInEmptyCalendarLength :: Property
-prop_fillInEmptyCalendarLength = QC.forAll sampleCalendar prop_fillInCalendarLength
+prop_fillInEmptyCalendarLength = forAll sampleCalendar prop_fillInCalendarLength
 
 prop_fillInCalendarLength :: Calendar -> Property
-prop_fillInCalendarLength calendar = QC.forAll (QC.choose (0, 6)) test
+prop_fillInCalendarLength calendar = forAll (choose (0, 6)) test
   where test :: Int -> Gen Bool
         test numMeetings = do 
-          numMeetings <- QC.choose(0, 6)
+          numMeetings <- choose(0, 6)
           calendar'   <- fillInCalendar numMeetings calendar
           return $ (length $ meetings calendar') == (length $ meetings calendar) + numMeetings
 
 prop_confirmPast :: Calendar -> Property
-prop_confirmPast calendar =  QC.forAll (numMeetingsFromCalendar calendar) test
+prop_confirmPast calendar =  forAll (numMeetingsFromCalendar calendar) test
   where test :: Int -> Gen Bool
         test splitPoint = do
           let pastMeetings = drop splitPoint (meetings calendar)
@@ -327,7 +337,7 @@ prop_confirmPast calendar =  QC.forAll (numMeetingsFromCalendar calendar) test
           return $ all (\m -> meetingAtDateConfirmed $ date m) pastMeetings
 
 prop_extendCalendarLength :: Calendar -> Property
-prop_extendCalendarLength calendar = QC.forAll (numMeetingsFromCalendar calendar) test
+prop_extendCalendarLength calendar = forAll (numMeetingsFromCalendar calendar) test
   where test :: Int -> Gen Bool
         test numFutureMeetingsExisting  = do
           let numFutureMeetingsRequired = futureSpan $ persons calendar
@@ -340,11 +350,11 @@ prop_extendCalendarLength calendar = QC.forAll (numMeetingsFromCalendar calendar
 
 prop_firstMeetingIsValid :: Property
 prop_firstMeetingIsValid = forAll firstMeeting $ (\m -> conjoin [
-  QC.property $ prop_meetingWasScheduled m,
-  QC.property $ prop_meetingOneHost m,
-  QC.property $ prop_meetingHasAtLeastHalfIn m,
-  QC.property $ prop_meetingHasAtMostHalfOut m,
-  prop_meetingHistoryCount m])
+  property $ prop_meetingWasScheduled m,
+  property $ prop_meetingOneHost m,
+  property $ prop_meetingHasAtLeastHalfIn m,
+  property $ prop_meetingHasAtMostHalfOut m,
+  property $ prop_meetingHistoryCount m])
 
 prop_meetingWasScheduled :: Meeting -> Gen Bool
 prop_meetingWasScheduled meeting = return $ all (\s -> attendance s /= TBD) $ slots meeting
@@ -359,10 +369,20 @@ prop_meetingHasAtMostHalfOut :: Meeting -> Gen Bool
 prop_meetingHasAtMostHalfOut meeting = return $ (numWithAttendance Out meeting) <= ((length $ slots meeting) `div` 2)
 
 prop_meetingHistoryCount :: Meeting -> Property
-prop_meetingHistoryCount meeting = QC.whenFail printFailMsg $ all statMatchesHistoryCount $ stat <$> slots meeting
+prop_meetingHistoryCount meeting = whenFail printFailMsg $ all statMatchesHistoryCount $ stat <$> slots meeting
   where statMatchesHistoryCount stat = (statSum stat) == (historyCount meeting)
-        statSum stat = sum $ map (\f -> length $ f stat) [inDates, outDates, absentDates]
+        statSum stat = sum $ map (\f -> length $ f stat) [hostDates, inDates, outDates, absentDates]
         printFailMsg = mapM_ (print . statSum) (stat <$> slots meeting)
+
+prop_noPersonHasSameAttendanceThreeConsecutiveMeetings :: Calendar -> Property
+prop_noPersonHasSameAttendanceThreeConsecutiveMeetings calendar = forAll (dateFromCalendar calendar) test
+  where test :: Date -> Property
+        test date = do
+          let threeMeetings = meetingsAt date 3 $ meetings calendar
+              stats = snd <$> (Map.toList $ historyStats threeMeetings)
+              printAttendance = print $ map (\s -> (person s, attendance s)) <$> slots <$> threeMeetings
+          whenFail printAttendance $ all (\s -> (length $ inDates s) < 3 && outCount s < 3) stats
+
 
 ---------------------------
 -- Generators and Helpers
@@ -373,7 +393,10 @@ tracef m f = trace (m ++ ": " ++ show f) f
 numWithAttendance aAttendance meeting = length . filter (\slot -> attendance slot == aAttendance) $ slots meeting
 
 numMeetingsFromCalendar :: Calendar -> Gen Int
-numMeetingsFromCalendar calendar = QC.choose(0, length $ meetings calendar)
+numMeetingsFromCalendar calendar = choose (0, length $ meetings calendar)
+
+dateFromCalendar :: Calendar -> Gen Date
+dateFromCalendar calendar = elements $ date <$> meetings calendar
 
 sampleCalendar :: Gen Calendar
 sampleCalendar = do
@@ -391,7 +414,7 @@ firstMeeting = do
 
 instance Arbitrary Calendar where
   arbitrary =  do
-    numExtraMeetings <- QC.choose (0, 12)
+    numExtraMeetings <- choose (0, 12)
     calendar         <- sampleCalendar
     calendar'        <- fillInCalendar numExtraMeetings calendar 
     let startDate   = date $ head $ meetings calendar'
