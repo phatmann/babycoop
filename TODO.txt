@@ -1,0 +1,2 @@
+* If page is stale redirect to login page instead of throwing exception
+* Fix 3 weeks in a row issue
