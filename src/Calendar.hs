@@ -9,6 +9,7 @@ module Calendar (
   calendarFolder,
   maintainCalendar,
   saveCalendar,
+  emptyStat,
   Meeting(..),
   Calendar(..),
   Slot(..),
@@ -38,13 +39,16 @@ instance FromJSON Calendar
 instance FromJSON Attendance
 instance FromJSON Status
 instance FromJSON Stat
-instance FromJSON Slot
+instance FromJSON Meeting
 
-instance FromJSON Meeting where
+instance FromJSON Slot where
   parseJSON (Object v) =
-    Meeting <$> v .:  "date"
-            <*> v .:? "historyCount" .!= 0
-            <*> v .:  "slots"
+    Slot    <$> v .:  "person"
+            <*> v .:  "attendance"
+            <*> v .:  "status"
+            <*> v .:  "stat"
+            <*> v .:? "shortTermStat" .!= emptyStat
+            <*> v .:  "rank"
 
 instance ToJSON Calendar
 instance ToJSON Attendance
