@@ -28,6 +28,7 @@ import Data.List
 import Data.Function (on)
 import Data.Map (Map)
 import Data.Time
+import Data.Time.Calendar.WeekDate
 import Data.Ratio
 import Data.Maybe
 import GHC.Generics
@@ -43,6 +44,7 @@ type Year = Int
 type Month = Int
 type MDay = Int
 type Date = (Year, Month, MDay)
+type Weekday = Int -- 1 = Monday, 7 = Sunday
 type Rank = Int
 type Person = String
 data Stat = Stat   { inDates :: [Date]
@@ -87,10 +89,18 @@ sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _ _) (Meeting date2 _ _) = date1 == date2
 
 updateCalendar :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
-updateCalendar calendar date attendanceUpdates = do
+updateCalendar calendar date attendanceUpdates =
   let updatedCalendar = calendar { meetings = applyAttendanceUpdates calendar date attendanceUpdates }
       updates         = updateMeetings date (futureSpan $ persons calendar) updatedCalendar
-  calendar { meetings = applyUpdates (meetings calendar) updates }
+  in calendar { meetings = applyUpdates (meetings calendar) updates }
+
+updateMeetingWeekday :: Calendar -> Date -> Weekday -> Calendar
+updateMeetingWeekday calendar d weekday = 
+  let ms = meetings calendar
+      Just dateIndex = findIndex (\m -> date m == d) ms
+      (oldMeetings, newMeetings) = splitAt dateIndex ms
+      newMeetings' = changeMeetingDay weekday newMeetings 
+  in calendar { meetings = oldMeetings ++ newMeetings'}
 
 updateMeetings :: Date -> Int -> Calendar -> [Meeting]
 updateMeetings startDate numMeetings calendar  =
@@ -235,6 +245,23 @@ scheduleMeeting (Meeting date historyCount slots) =
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` person) newSlots
   in  Meeting date historyCount sortedSlots
+
+meetingWeekday :: Meeting -> Weekday
+meetingWeekday Meeting {date=(y,m,d)} = weekday
+  where (_, _, weekday) = toWeekDate $ fromGregorian (toInteger y) m d
+
+changeMeetingDay :: Weekday -> [Meeting] -> [Meeting]
+changeMeetingDay newWeekday meetings  = 
+  let currentWeekday = meetingWeekday $ head meetings
+      delta          = toInteger $ newWeekday - currentWeekday
+      
+      shiftDate (y, m, d) = 
+        let (y',m',d') = toGregorian $ addDays delta $ fromGregorian (toInteger y) m d
+        in (fromIntegral y', m', d') :: Date
+
+  in map (\m -> m {date = shiftDate $ date m}) meetings
+
+
 
 chooseFavored :: Int -> [Slot] -> [Slot] -> ([Slot], [Slot])
 chooseFavored numberNeeded favored unfavored =
@@ -383,6 +410,33 @@ prop_noPersonHasSameAttendanceThreeConsecutiveMeetings calendar = forAll (dateFr
               printAttendance = print $ map (\s -> (person s, attendance s)) <$> slots <$> threeMeetings
           whenFail printAttendance $ all (\s -> (length $ inDates s) < 3 && outCount s < 3) stats
 
+-- prop_hostRotatesProperly = undefined
+
+prop_canChangeMeetingDay :: Calendar -> Property
+prop_canChangeMeetingDay calendar =
+  forAll (choose (1,7)) (\weekday ->
+    forAll (meetingsFromCalendar calendar) $ test weekday)
+  where test :: Weekday -> [Meeting] -> Gen Bool
+        test weekday meetings = 
+            let meetings' = changeMeetingDay weekday meetings
+            in return $ all (\m -> (meetingWeekday m) == weekday) meetings'
+
+prop_updateMeetingWeekday :: Calendar -> Property
+prop_updateMeetingWeekday calendar = forAll (choose (1,7)) (\weekday ->
+    forAll (dateFromCalendar calendar) $ test weekday)
+  where test :: Weekday -> Date -> Gen Bool
+        test weekday d = 
+            let ms = meetings calendar
+                Just index = findIndex (\m -> date m == d) ms 
+                (oldMeetings, newMeetings) = splitAt index ms 
+                calendar' = updateMeetingWeekday calendar d weekday
+                (oldMeetings', newMeetings') = splitAt index $ meetings calendar' 
+            in return $ (all (\m -> (meetingWeekday m) == weekday) newMeetings') &&
+                        (oldMeetings == oldMeetings')
+
+
+
+
 
 ---------------------------
 -- Generators and Helpers
@@ -397,6 +451,14 @@ numMeetingsFromCalendar calendar = choose (0, length $ meetings calendar)
 
 dateFromCalendar :: Calendar -> Gen Date
 dateFromCalendar calendar = elements $ date <$> meetings calendar
+
+meetingsFromCalendar :: Calendar -> Gen [Meeting]
+meetingsFromCalendar calendar = do
+  let ms = meetings calendar
+      len  = length ms
+  index <- choose (0, len - 1)
+  count <- choose (1, len - index)
+  return $ take count $ drop index ms
 
 sampleCalendar :: Gen Calendar
 sampleCalendar = do
