@@ -10,6 +10,7 @@ module Scheduler (
   Attendance,
   Date,
   Person,
+  Weekday,
   inCount,
   outCount,
   absentCount,
@@ -19,6 +20,7 @@ module Scheduler (
   findMeeting,
   applyUpdates,
   updateCalendar,
+  updateMeetingWeekday,
   emptyStat,
   recentHistoryCount,
   htf_thisModulesTests
@@ -94,8 +96,8 @@ updateCalendar calendar date attendanceUpdates =
       updates         = updateMeetings date (futureSpan $ persons calendar) updatedCalendar
   in calendar { meetings = applyUpdates (meetings calendar) updates }
 
-updateMeetingWeekday :: Calendar -> Date -> Weekday -> Calendar
-updateMeetingWeekday calendar d weekday = 
+updateMeetingWeekday :: Date -> Weekday -> Calendar -> Calendar
+updateMeetingWeekday d weekday calendar  = 
   let ms = meetings calendar
       Just dateIndex = findIndex (\m -> date m == d) ms
       (oldMeetings, newMeetings) = splitAt dateIndex ms
@@ -429,7 +431,7 @@ prop_updateMeetingWeekday calendar = forAll (choose (1,7)) (\weekday ->
             let ms = meetings calendar
                 Just index = findIndex (\m -> date m == d) ms 
                 (oldMeetings, newMeetings) = splitAt index ms 
-                calendar' = updateMeetingWeekday calendar d weekday
+                calendar' = updateMeetingWeekday d weekday calendar
                 (oldMeetings', newMeetings') = splitAt index $ meetings calendar' 
             in return $ (all (\m -> (meetingWeekday m) == weekday) newMeetings') &&
                         (oldMeetings == oldMeetings')
