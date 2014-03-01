@@ -1,2 +1,3 @@
 * If page is stale redirect to login page instead of throwing exception
 * Reb should host 3/4
+* Avoid thrice test needs more conditions, sometimes fails

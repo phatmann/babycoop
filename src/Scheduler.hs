@@ -40,7 +40,7 @@ import Test.QuickCheck
 import Test.Framework
 import qualified Data.Map as Map
 
-data Attendance = TBD | In | Out | Host | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
+data Attendance = Host | TBD | In | Out | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
@@ -57,6 +57,7 @@ data Stat = Stat   { inDates :: [Date]
 type Stats = Map Person Stat
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
+                  , isHosting :: Bool
                   , status :: Status
                   , stat :: Stat
                   , recentStat :: Stat
@@ -72,7 +73,7 @@ emptyDate :: Date
 emptyDate = (0, 0, 0)
 
 slot :: Person -> Attendance -> Status -> Slot
-slot person attendance status = Slot person attendance status emptyStat emptyStat 0
+slot person attendance status = Slot person attendance False status emptyStat emptyStat 0
 
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
@@ -211,11 +212,10 @@ scheduleMeeting (Meeting date historyCount slots) =
       personCount   = length slots 
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
-                        where needHost                         = not $ any isHost confirmed
+                        where needHost                         = not $ any isHosting confirmed
                               sortByLastHosted                 = sortBy (compare `on` lastHostDate . stat )
                               (eligibleHosts, ineligibleHosts) = chooseFavored numberOfHosts (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
-                              isHost slot                      = attendance slot == Host
                               isFavoredToHost slot             = (inCount $ stat slot) <= (personCount `div` 2)
 
       (stayingIn, goingOut)  =  let  numberPresent        = length present
@@ -242,7 +242,7 @@ scheduleMeeting (Meeting date historyCount slots) =
 
       newlyIn   = map (\slot -> slot {attendance=In}) stayingIn
       newlyOut  = map (\slot -> slot {attendance=Out}) goingOut
-      newlyHost = map (\slot -> slot {attendance=Host}) hosts
+      newlyHost = map (\slot -> slot {isHosting=True, attendance=In}) hosts
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` person) newSlots
@@ -333,10 +333,12 @@ historyStats history =
                     newStat = case attendance slot of
                       In     -> oldStat {inDates     = (inDates oldStat) ++ [slotDate]}
                       Out    -> oldStat {outDates    = (outDates oldStat) ++ [slotDate]}
-                      Host   -> oldStat {hostDates   = (hostDates oldStat) ++ [slotDate]}
                       Absent -> oldStat {absentDates = (absentDates oldStat) ++ [slotDate]}
                       TBD    -> oldStat
-                    in Map.alter (\_ -> Just newStat) key stats
+                    newStat' = if isHosting slot
+                               then newStat {hostDates = (hostDates oldStat) ++ [slotDate]}
+                               else newStat
+                    in Map.alter (\_ -> Just newStat') key stats
       emptyStats = Map.empty :: Stats
   in foldl gatherMeetingStats emptyStats history
 
@@ -389,10 +391,10 @@ prop_meetingWasScheduled :: Meeting -> Gen Bool
 prop_meetingWasScheduled meeting = return $ all (\s -> attendance s /= TBD) $ slots meeting
 
 prop_meetingOneHost :: Meeting -> Gen Bool
-prop_meetingOneHost meeting = return $ (numWithAttendance Host meeting) == 1
+prop_meetingOneHost meeting = return $ (numHosting meeting) == 1
 
 prop_meetingHasAtLeastHalfIn :: Meeting -> Gen Bool
-prop_meetingHasAtLeastHalfIn meeting = return $ (numWithAttendance In meeting) + (numWithAttendance Host meeting) >= ((length $ slots meeting) `div` 2)
+prop_meetingHasAtLeastHalfIn meeting = return $ (numWithAttendance In meeting) >= ((length $ slots meeting) `div` 2)
 
 prop_meetingHasAtMostHalfOut :: Meeting -> Gen Bool
 prop_meetingHasAtMostHalfOut meeting = return $ (numWithAttendance Out meeting) <= ((length $ slots meeting) `div` 2)
@@ -400,7 +402,7 @@ prop_meetingHasAtMostHalfOut meeting = return $ (numWithAttendance Out meeting) 
 prop_meetingHistoryCount :: Meeting -> Property
 prop_meetingHistoryCount meeting = whenFail printFailMsg $ all statMatchesHistoryCount $ stat <$> slots meeting
   where statMatchesHistoryCount stat = (statSum stat) == (historyCount meeting)
-        statSum stat = sum $ map (\f -> length $ f stat) [hostDates, inDates, outDates, absentDates]
+        statSum stat = sum $ map (\f -> length $ f stat) [inDates, outDates, absentDates]
         printFailMsg = mapM_ (print . statSum) (stat <$> slots meeting)
 
 prop_noPersonHasSameAttendanceThreeConsecutiveMeetings :: Calendar -> Property
@@ -446,7 +448,11 @@ prop_updateMeetingWeekday calendar = forAll (choose (1,7)) (\weekday ->
 
 tracef m f = trace (m ++ ": " ++ show f) f
 
+numWithAttendance :: Attendance -> Meeting -> Int
 numWithAttendance aAttendance meeting = length . filter (\slot -> attendance slot == aAttendance) $ slots meeting
+
+numHosting :: Meeting -> Int
+numHosting meeting = length . filter (\slot -> isHosting slot) $ slots meeting
 
 numMeetingsFromCalendar :: Calendar -> Gen Int
 numMeetingsFromCalendar calendar = choose (0, length $ meetings calendar)

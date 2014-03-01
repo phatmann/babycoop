@@ -48,6 +48,7 @@ instance FromJSON Slot where
   parseJSON (Object v) =
     Slot    <$> v .:  "person"
             <*> v .:  "attendance"
+            <*> v .:? "isHosting" .!= False
             <*> v .:  "status"
             <*> v .:  "stat"
             <*> v .:? "recentStat" .!= emptyStat
