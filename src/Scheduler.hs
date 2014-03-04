@@ -206,10 +206,7 @@ updateMeeting history meeting  =
 
 scheduleMeeting :: Meeting -> Meeting
 scheduleMeeting (Meeting date historyCount slots) =
-  let (present, absent)      = partition isPresent slots
-                               where isPresent slot = attendance slot /= Absent
-      
-      (available, confirmed) = partition isAvailable present
+  let (available, confirmed) = partition isAvailable slots
                                where isAvailable slot = status slot == Proposed
 
       numberOfHosts = 1
@@ -222,10 +219,11 @@ scheduleMeeting (Meeting date historyCount slots) =
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
                               isFavoredToHost slot             = (inCount $ stat slot) <= (personCount `div` 2)
 
-      (stayingIn, goingOut)  =  let  numberPresent        = length present
+      (stayingIn, goingOut)  =  let  numberPresent        = length $ filter (\slot -> attendance slot /= Absent) slots
                                      numberConfirmedIn    = length $ filter (\slot -> attendance slot == In) confirmed
+                                     numberHostsIn        = length hosts
                                      minNumberNeededIn    = ceiling $ numberPresent % 2
-                                     numberNeededIn       = minNumberNeededIn - numberConfirmedIn
+                                     numberNeededIn       = minNumberNeededIn - numberConfirmedIn - numberHostsIn
                                      sortedGuests         = sortBy (compare `on` boostedRank) guests
                                      boostedRank slot     
                                       | historyCount == 0 = rank slot
@@ -248,7 +246,7 @@ scheduleMeeting (Meeting date historyCount slots) =
       newlyOut  = map (\slot -> slot {hosting=WontHost, attendance=Out}) goingOut
       newlyHost = map (\slot -> slot {hosting=WillHost, attendance=In}) hosts
 
-      newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
+      newSlots    = confirmed ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` person) newSlots
   in  Meeting date historyCount sortedSlots
 
