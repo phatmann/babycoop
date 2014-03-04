@@ -10,7 +10,7 @@ applyFunctionToCalendar f coopName = do
   saveCalendar filename $ f calendar
 
 apply_addHistoryCount :: Calendar -> Calendar
-addHistoryCount calendar =
+apply_addHistoryCount calendar =
   let ms = zip (meetings calendar) [0..]
       updateCount (m, c) = m {historyCount = if c >= 6 then 6 else c}
   in calendar {meetings = map updateCount ms}
@@ -19,11 +19,11 @@ apply_setIsHostingField :: Calendar -> Calendar
 apply_setIsHostingField calendar = 
   let updateMeeting meeting = meeting {slots = map updateSlot $ slots meeting }
       updateSlot slot = if attendance slot == Host
-                        then slot {attendance = In, isHosting = True}
-                        else slot {isHosting = False}
+                        then slot {attendance = In, hosting = WillHost}
+                        else slot {hosting = WontHost}
   in calendar {meetings = map updateMeeting $ meetings calendar}
 
-cmd_setIsHostingField :: String
+cmd_setIsHostingField :: String -> IO ()
 cmd_setIsHostingField coopName = applyFunctionToCalendar apply_setIsHostingField coopName
 
 cmd_changeWeekday :: Date -> Weekday -> String -> IO ()

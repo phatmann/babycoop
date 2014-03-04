@@ -7,7 +7,8 @@ module Scheduler (
   Slot(..),
   Status(..),
   Stat(..),
-  Attendance,
+  Attendance(..),
+  Hosting(..),
   Date,
   Person,
   Weekday,
@@ -40,7 +41,7 @@ import Test.QuickCheck
 import Test.Framework
 import qualified Data.Map as Map
 
-data Attendance = Host | TBD | In | Out | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
+data Attendance = XHost | TBD | In | Out | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
@@ -55,9 +56,10 @@ data Stat = Stat   { inDates :: [Date]
                    , absentDates :: [Date]
                    } deriving (Show, Generic, Eq)
 type Stats = Map Person Stat
+data Hosting = WillHost | WontHost | CanHost deriving (Show, Generic, Eq)
 data Slot = Slot  { person :: Person
                   , attendance :: Attendance
-                  , isHosting :: Bool
+                  , hosting :: Hosting
                   , status :: Status
                   , stat :: Stat
                   , recentStat :: Stat
@@ -72,8 +74,8 @@ data Calendar = Calendar { persons :: [Person]
 emptyDate :: Date
 emptyDate = (0, 0, 0)
 
-slot :: Person -> Attendance -> Status -> Slot
-slot person attendance status = Slot person attendance False status emptyStat emptyStat 0
+slot :: Person -> Attendance -> Hosting -> Status -> Slot
+slot person attendance hosting status = Slot person attendance hosting status emptyStat emptyStat 0
 
 futureSpan :: [Person] -> Int
 futureSpan persons = (length persons) * 2
@@ -91,7 +93,7 @@ dateRange date@(year, month, mday) numMeetings =
 sameMeeting :: Meeting -> Meeting -> Bool
 sameMeeting (Meeting date1 _ _) (Meeting date2 _ _) = date1 == date2
 
-updateCalendar :: Calendar -> Date -> [(Person, Attendance)] -> Calendar
+updateCalendar :: Calendar -> Date -> [(Person, Attendance, Hosting)] -> Calendar
 updateCalendar calendar date attendanceUpdates =
   let updatedCalendar = calendar { meetings = applyAttendanceUpdates calendar date attendanceUpdates }
       updates         = updateMeetings date (futureSpan $ persons calendar) updatedCalendar
@@ -124,10 +126,10 @@ deleteMeetings startDate numMeetings meetings =
       meetingNotinDatesToDelete meeting = not $ (date meeting) `elem` datesToDelete
   in filter meetingNotinDatesToDelete meetings
 
-applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance)] -> [Meeting]
+applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance, Hosting)] -> [Meeting]
 applyAttendanceUpdates calendar date [] = meetings calendar
 applyAttendanceUpdates calendar date attendanceUpdates = 
-  let requestSlots = map (\x -> slot (fst x) (snd x) Requested) attendanceUpdates
+  let  requestSlots = map (\(person, attendance, hosting) -> slot person attendance hosting Requested) attendanceUpdates
   in mergeRequestCalendar calendar [Meeting date 0 requestSlots]
 
 mergeCalendars :: [Meeting] -> [Meeting] -> [Meeting]
@@ -146,9 +148,11 @@ confirmPastMeetings calendar pastMeetings =
 honorRequests :: Meeting -> Meeting -> Meeting
 honorRequests meeting requests =
   let sortByPerson = sortBy (compare `on` person)
-      mergeRequest slot requestSlot = slot {status=newStatus, attendance=newAttendance}
+      mergeRequest slot requestSlot = slot {status=newStatus, attendance=newAttendance, hosting=newHosting}
                                         where newAttendance = attendance requestSlot
-                                              newStatus = if newAttendance == TBD then Proposed else Requested
+                                              newHosting    = hosting requestSlot
+                                              isRequest     = newAttendance /= TBD && newHosting /= CanHost
+                                              newStatus     = if isRequest then Requested else Proposed
       mergeSlots (slot1, slot2) = if (status slot2 == Requested)
                                   then mergeRequest slot1 slot2
                                   else slot1
@@ -212,7 +216,7 @@ scheduleMeeting (Meeting date historyCount slots) =
       personCount   = length slots 
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
-                        where needHost                         = not $ any isHosting confirmed
+                        where needHost                         = not $ any (\s -> hosting s == WillHost) confirmed
                               sortByLastHosted                 = sortBy (compare `on` lastHostDate . stat )
                               (eligibleHosts, ineligibleHosts) = chooseFavored numberOfHosts (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
                               (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
@@ -221,7 +225,7 @@ scheduleMeeting (Meeting date historyCount slots) =
       (stayingIn, goingOut)  =  let  numberPresent        = length present
                                      numberConfirmedIn    = length $ filter (\slot -> attendance slot == In) confirmed
                                      minNumberNeededIn    = ceiling $ numberPresent % 2
-                                     numberNeededIn       = minNumberNeededIn - numberConfirmedIn - numberOfHosts
+                                     numberNeededIn       = minNumberNeededIn - numberConfirmedIn
                                      sortedGuests         = sortBy (compare `on` boostedRank) guests
                                      boostedRank slot     
                                       | historyCount == 0 = rank slot
@@ -240,9 +244,9 @@ scheduleMeeting (Meeting date historyCount slots) =
                                      pctOut slot               = ((outCount $ stat slot) * 100) `div` (presentCount slot)
                                 in splitAt numberNeededIn sortedGuests 
 
-      newlyIn   = map (\slot -> slot {attendance=In}) stayingIn
-      newlyOut  = map (\slot -> slot {attendance=Out}) goingOut
-      newlyHost = map (\slot -> slot {isHosting=True, attendance=In}) hosts
+      newlyIn   = map (\slot -> slot {hosting=WontHost, attendance=In}) stayingIn
+      newlyOut  = map (\slot -> slot {hosting=WontHost, attendance=Out}) goingOut
+      newlyHost = map (\slot -> slot {hosting=WillHost, attendance=In}) hosts
 
       newSlots    = confirmed ++ absent ++ newlyIn ++ newlyOut ++ newlyHost
       sortedSlots = sortBy (compare `on` person) newSlots
@@ -276,7 +280,7 @@ chooseFavored numberNeeded favored unfavored =
 
 fullySlotifyMeeting :: [Person] -> Meeting -> Meeting
 fullySlotifyMeeting persons meeting =
-  let personSlots = map (\p -> slot p TBD Proposed) persons
+  let personSlots = map (\p -> slot p TBD CanHost Proposed) persons
       slotsHaveSamePerson slot1 slot2 = (person slot1) == (person slot2)
       mergedSlots = unionBy slotsHaveSamePerson (slots meeting) personSlots
   in meeting { slots = mergedSlots }
@@ -335,7 +339,7 @@ historyStats history =
                       Out    -> oldStat {outDates    = (outDates oldStat) ++ [slotDate]}
                       Absent -> oldStat {absentDates = (absentDates oldStat) ++ [slotDate]}
                       TBD    -> oldStat
-                    newStat' = if isHosting slot
+                    newStat' = if hosting slot == WillHost
                                then newStat {hostDates = (hostDates oldStat) ++ [slotDate]}
                                else newStat
                     in Map.alter (\_ -> Just newStat') key stats
@@ -452,7 +456,7 @@ numWithAttendance :: Attendance -> Meeting -> Int
 numWithAttendance aAttendance meeting = length . filter (\slot -> attendance slot == aAttendance) $ slots meeting
 
 numHosting :: Meeting -> Int
-numHosting meeting = length . filter (\slot -> isHosting slot) $ slots meeting
+numHosting meeting = length . filter (\slot -> (hosting slot) == WillHost)  $ slots meeting
 
 numMeetingsFromCalendar :: Calendar -> Gen Int
 numMeetingsFromCalendar calendar = choose (0, length $ meetings calendar)

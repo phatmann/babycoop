@@ -16,7 +16,8 @@ module Calendar (
   Slot(..),
   Status(..),
   Stat(..),
-  Attendance,
+  Attendance(..),
+  Hosting(..),
   Date,
   Weekday,
   inCount,
@@ -40,6 +41,7 @@ import Control.Applicative
 
 instance FromJSON Calendar
 instance FromJSON Attendance
+instance FromJSON Hosting
 instance FromJSON Status
 instance FromJSON Stat
 instance FromJSON Meeting
@@ -48,7 +50,7 @@ instance FromJSON Slot where
   parseJSON (Object v) =
     Slot    <$> v .:  "person"
             <*> v .:  "attendance"
-            <*> v .:? "isHosting" .!= False
+            <*> v .:? "hosting" .!= CanHost
             <*> v .:  "status"
             <*> v .:  "stat"
             <*> v .:? "recentStat" .!= emptyStat
@@ -56,6 +58,7 @@ instance FromJSON Slot where
 
 instance ToJSON Calendar
 instance ToJSON Attendance
+instance ToJSON Hosting
 instance ToJSON Status
 instance ToJSON Stat
 instance ToJSON Slot

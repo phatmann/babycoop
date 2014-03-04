@@ -12,6 +12,7 @@ module Site
 import           Control.Applicative
 import           Data.Maybe
 import           Data.ByteString (ByteString)
+import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as ES
 import qualified Text.XmlHtml as X
@@ -39,7 +40,7 @@ import           Data.Aeson
 
 ------------------------------------------------------------------------------
 -- | Render login form
-handleLogin :: Maybe T.Text -> Handler App (AuthManager App) ()
+handleLogin :: Maybe Text -> Handler App (AuthManager App) ()
 handleLogin authError = heistLocal (I.bindSplices errs) $ render "login"
   where
     errs = maybe noSplices splice authError
@@ -163,10 +164,12 @@ handleMeeting = do
         "slotClass"        ## I.textSplice $ slotClass slot
         "slotPerson"       ## I.textSplice $ T.pack $ person slot
         "slotAttendance"   ## I.textSplice $ T.pack $ show $ attendance slot
+        "slotHosting"      ## I.textSplice $ hostingName $ hosting slot
         "slotStat"         ## I.textSplice $ T.pack $ (showStat meeting $ stat slot) ++ (showRecentStat meeting $ recentStat slot) ++ (showLastHosted $ stat slot) 
         "ifSlotViewing"    ## ifSlotViewing slot
         "ifSlotEditing"    ## ifSlotEditing slot
         "selectAttendance" ## selectAttendance slot
+        "selectHosting"    ## selectHosting slot
 
       ifSlotViewing :: Monad m => Slot -> I.Splice m
       ifSlotViewing slot = 
@@ -180,6 +183,18 @@ handleMeeting = do
       ifEditing = 
         ifISplice $ editParam /= Nothing
 
+      hostingName :: Hosting -> Text
+      hostingName hosting = T.pack $ case hosting of 
+        WillHost -> "Host"
+        WontHost -> ""
+        CanHost  -> "TBD"
+
+      hostingValue :: Hosting -> Text
+      hostingValue hosting = T.pack $ case hosting of 
+        WillHost -> "Host"
+        WontHost -> "Guest"
+        CanHost  -> "TBD"
+
       selectAttendance :: Monad m => Slot -> I.Splice m
       selectAttendance slot = selectSplice name name options (Just $ attendanceName $ attendance slot)
         where name = T.pack "attendance"
@@ -187,7 +202,12 @@ handleMeeting = do
               attendanceName attendance = T.pack $ show attendance
               attendanceValues = [minBound .. maxBound] :: [Attendance]
 
-      slotClass :: Slot -> T.Text
+      selectHosting :: Monad m => Slot -> I.Splice m
+      selectHosting slot = selectSplice name name options (Just $ hostingValue $ hosting slot)
+        where name = T.pack "hosting"
+              options = map (\x -> (x, x)) ["TBD", "Host", "Guest"]
+
+      slotClass :: Slot -> Text
       slotClass slot =  case status slot of
                           Proposed  -> "proposed"
                           Confirmed -> "confirmed"
@@ -204,8 +224,13 @@ handleMeetingEdit = do
   date            <- getDateFromParams
   person          <- (getPar "person")     >>= return . fromMaybe ""
   attendance      <- (getPar "attendance") >>= return . fromMaybe ""
+  hostingString   <- (getPar "hosting")    >>= return . fromMaybe ""
   let Just meeting = findMeeting date $ meetings calendar
-      meetingUpdates = [(person, read attendance :: Attendance)]
+      hosting = case hostingString of
+        "TBD"   -> CanHost
+        "Guest" -> WontHost
+        "Host"  -> WillHost
+      meetingUpdates = [(person, read attendance :: Attendance, hosting)]
       updatedCalendar = updateCalendar calendar date meetingUpdates
   liftIO $ saveCalendar calendarFileName updatedCalendar 
   liftIO $ system "bin/sync"
@@ -239,10 +264,10 @@ app = makeSnaplet "app" "SLAM Coop" Nothing $ do
 
 ------------------------------------------------------------------------------
 
-meetingURL :: Meeting -> T.Text
+meetingURL :: Meeting -> Text
 meetingURL (Meeting (year, month, day) _ _) = T.pack $ "/meeting/" ++ (show year) ++ "/" ++ (show month) ++ "/" ++ (show day)
 
-meetingName :: Meeting -> T.Text
+meetingName :: Meeting -> Text
 meetingName (Meeting (_, month, day) _ _) =  T.pack $ (show month) ++ "/" ++ (show day)
 
 getPar :: String -> Handler App (AuthManager App) (Maybe String)
