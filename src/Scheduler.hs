@@ -41,7 +41,7 @@ import Test.QuickCheck
 import Test.Framework
 import qualified Data.Map as Map
 
-data Attendance = XHost | TBD | In | Out | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
+data Attendance = TBD | In | Out | Absent deriving (Show, Read, Eq, Ord, Bounded, Enum, Generic)
 data Status = Proposed | Confirmed | Requested deriving (Eq, Show, Generic)
 type Year = Int
 type Month = Int
