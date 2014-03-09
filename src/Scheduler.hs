@@ -229,9 +229,9 @@ scheduleMeeting (Meeting date historyCount slots) =
                                       | historyCount == 0 = rank slot
                                       | otherwise         = rank slot
                                                               + if tooManyRecentOuts slot then (-10000) else 0
-                                                              + if tooManyRecentIns slot then 10000 else 0
-                                                              + if isFavoredForOut slot then 1000 else 0
-                                                              + if isFavoredForIn slot then (-1000) else 0
+                                                              + if tooManyRecentIns  slot then 10000    else 0
+                                                              + if isFavoredForOut   slot then 1000     else 0
+                                                              + if isFavoredForIn    slot then (-1000)  else 0
                                      
                                      isFavoredForOut slot      = (pctOut slot) < 30 || (pctIn slot) > 60 
                                      isFavoredForIn slot       = (pctOut slot) > 60 || (pctIn slot) < 30
@@ -293,7 +293,7 @@ findStat :: Person -> Stats -> Stat
 findStat = Map.findWithDefault emptyStat
 
 inCount :: Stat -> Int
-inCount stat = (length $ inDates stat) + (length $ hostDates stat)
+inCount = length . inDates
 
 outCount :: Stat -> Int
 outCount = length . outDates
@@ -412,9 +412,19 @@ prop_noPersonHasSameAttendanceThreeConsecutiveMeetings calendar = forAll (dateFr
   where test :: Date -> Property
         test date = do
           let threeMeetings = meetingsAt date 3 $ meetings calendar
-              stats = snd <$> (Map.toList $ historyStats threeMeetings)
-              printAttendance = print $ map (\s -> (person s, attendance s)) <$> slots <$> threeMeetings
-          whenFail printAttendance $ all (\s -> (length $ inDates s) < 3 && outCount s < 3) stats
+              gatherMeetingStats stats (Meeting slotDate _ slots) = foldl incrementSlotStat stats slots
+                where incrementSlotStat stats slot =
+                        let key = person slot
+                            oldStat = Map.findWithDefault (0, 0) key stats
+                            newStat = case attendance slot of
+                              In     -> (if hosting slot == WillHost then fst oldStat else (fst oldStat) + 1, snd oldStat)
+                              Out    -> (fst oldStat, (snd oldStat) + 1)
+                            in Map.alter (\_ -> Just newStat) key stats
+              emptyStats = Map.empty :: Map Person (Int, Int)
+              gatheredStats = map snd $ Map.toList $ foldl gatherMeetingStats emptyStats threeMeetings
+              printAttendance      = print $ map (\s -> (person s, attendance s, stat s)) <$> slots <$> threeMeetings
+              notConsecutive s     = fst s < 3  && snd s < 3
+          whenFail printAttendance $ all (\s -> notConsecutive s) gatheredStats
 
 -- prop_hostRotatesProperly = undefined
 
@@ -480,6 +490,7 @@ sampleCalendar = do
             ,meetings = [meeting]
          }
 
+firstMeeting :: Gen Meeting
 firstMeeting = do
     calendar <- arbitrary :: Gen Calendar
     return $ head $ meetings calendar 
