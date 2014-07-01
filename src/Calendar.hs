@@ -83,6 +83,12 @@ removeMeetingsFromCalendar calendarFileName date numMeetings = do
       calendar' = calendar { meetings = meetings'}
   saveCalendar calendarFileName calendar'
 
+removePersonFromCalendar :: String -> String -> Date -> IO ()
+removePersonFromCalendar calendarFileName personToRemove date = do
+  calendar <- readCalendar calendarFileName
+  let calendar' = deletePerson personToRemove date calendar
+  saveCalendar calendarFileName  $ updateCalendar calendar' date []
+
 saveCalendar :: String -> Calendar -> IO ()
 saveCalendar calendarFileName calendar = do
   tmpFileName <- writeCalendarToTempFile calendar

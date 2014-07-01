@@ -25,6 +25,7 @@ module Scheduler (
   emptyStat,
   recentHistoryCount,
   deleteMeetings,
+  deletePerson,
   htf_thisModulesTests
   ) where
 
@@ -126,6 +127,20 @@ deleteMeetings startDate numMeetings meetings =
   let datesToDelete = dateRange startDate numMeetings
       meetingNotinDatesToDelete meeting = not $ (date meeting) `elem` datesToDelete
   in filter meetingNotinDatesToDelete meetings
+
+deletePerson :: Person -> Date -> Calendar -> Calendar
+deletePerson personToDelete startDate calendar = 
+  let persons' = filter (\p -> p /= personToDelete) $ persons calendar 
+      datesToEdit = dateRange startDate 999
+      meetingInDatesToEdit meeting = (date meeting) `elem` datesToEdit
+      (meetingsToEdit, oldMeetings) = partition meetingInDatesToEdit $ meetings calendar
+      removePersonFromMeeting meeting = 
+        let slots' = filter (\s -> (person s) /= personToDelete) $ slots meeting
+        in meeting {slots = slots'}
+      editedMeetings = map removePersonFromMeeting meetingsToEdit
+      meetings' = mergeCalendars oldMeetings editedMeetings
+  in calendar {persons = persons', meetings = meetings'}
+
 
 applyAttendanceUpdates :: Calendar -> Date -> [(Person, Attendance, Hosting)] -> [Meeting]
 applyAttendanceUpdates calendar date [] = meetings calendar
