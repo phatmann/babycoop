@@ -76,6 +76,13 @@ maintainCalendar calendarFileName = do
       extendedCalendar = unGen extendCalendar gen 99999 
   saveCalendar calendarFileName extendedCalendar
 
+removeMeetingsFromCalendar :: String -> Date -> Int -> IO ()
+removeMeetingsFromCalendar calendarFileName date numMeetings = do
+  calendar <- readCalendar calendarFileName
+  let meetings' = deleteMeetings date numMeetings $ meetings calendar
+      calendar' = calendar { meetings = meetings'}
+  saveCalendar calendarFileName calendar'
+
 saveCalendar :: String -> Calendar -> IO ()
 saveCalendar calendarFileName calendar = do
   tmpFileName <- writeCalendarToTempFile calendar

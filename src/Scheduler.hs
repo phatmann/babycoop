@@ -24,6 +24,7 @@ module Scheduler (
   updateMeetingWeekday,
   emptyStat,
   recentHistoryCount,
+  deleteMeetings,
   htf_thisModulesTests
   ) where
 
@@ -209,15 +210,19 @@ scheduleMeeting (Meeting date historyCount slots) =
   let (available, confirmed) = partition isAvailable slots
                                where isAvailable slot = status slot == Proposed
 
-      numberOfHosts = 1
-      personCount   = length slots 
+      numberOfHosts        = 1
+      personCount          = length slots 
+      presentCount slot    = historyCount - (absentCount $ stat slot)
+      pctIn slot           = if (presentCount slot) == 0 then 0 else ((inCount $ stat slot) * 100) `div` (presentCount slot)
+      pctOut slot          = if (presentCount slot) == 0 then 0 else ((outCount $ stat slot) * 100) `div` (presentCount slot)
+      isFavoredForOut slot = (pctOut slot) < 30 || (pctIn slot) > 60 
+      isFavoredForIn slot  = (pctOut slot) > 60 || (pctIn slot) < 30
 
       (hosts, guests) = if needHost then (eligibleHosts, ineligibleHosts) else ([], available)
                         where needHost                         = not $ any (\s -> hosting s == WillHost) confirmed
                               sortByLastHosted                 = sortBy (compare `on` lastHostDate . stat )
                               (eligibleHosts, ineligibleHosts) = chooseFavored numberOfHosts (sortByLastHosted favoredHosts) (sortByLastHosted unfavoredHosts)
-                              (favoredHosts, unfavoredHosts)   = partition isFavoredToHost available
-                              isFavoredToHost slot             = (inCount $ stat slot) <= (personCount `div` 2)
+                              (unfavoredHosts, favoredHosts)   = partition isFavoredForOut available
 
       (stayingIn, goingOut)  =  let  numberPresent        = length $ filter (\slot -> attendance slot /= Absent) slots
                                      numberConfirmedIn    = length $ filter (\slot -> attendance slot == In) confirmed
@@ -233,13 +238,8 @@ scheduleMeeting (Meeting date historyCount slots) =
                                                               + if isFavoredForOut   slot then 1000     else 0
                                                               + if isFavoredForIn    slot then (-1000)  else 0
                                      
-                                     isFavoredForOut slot      = (pctOut slot) < 30 || (pctIn slot) > 60 
-                                     isFavoredForIn slot       = (pctOut slot) > 60 || (pctIn slot) < 30
                                      tooManyRecentOuts slot    = (outCount $ recentStat slot) == recentHistoryCount
                                      tooManyRecentIns slot     = (inCount $ recentStat slot)  == recentHistoryCount
-                                     presentCount slot         = historyCount - (absentCount $ stat slot)
-                                     pctIn slot                = ((inCount $ stat slot) * 100) `div` (presentCount slot)
-                                     pctOut slot               = ((outCount $ stat slot) * 100) `div` (presentCount slot)
                                 in splitAt numberNeededIn sortedGuests 
 
       newlyIn   = map (\slot -> slot {hosting=WontHost, attendance=In}) stayingIn
@@ -426,7 +426,12 @@ prop_noPersonHasSameAttendanceThreeConsecutiveMeetings calendar = forAll (dateFr
               notConsecutive s     = fst s < 3  && snd s < 3
           whenFail printAttendance $ all (\s -> notConsecutive s) gatheredStats
 
--- prop_hostRotatesProperly = undefined
+prop_hostRotates :: Meeting -> Property
+prop_hostRotates meeting = whenFail (printHostInfo meeting) $ hostIsCorrect meeting
+  where hostIsCorrect meeting = (lastHostDate $ stat $ hostSlot meeting) == (minimum $ snd <$> hostDates meeting)
+        hostDates meeting     = map (\s -> (person s, lastHostDate $ stat s)) $ slots meeting
+        hostSlot meeting      = fromJust $ find (\s -> hosting s == WillHost) $ slots meeting
+        printHostInfo meeting = print (hostDates meeting, hostSlot meeting)
 
 prop_canChangeMeetingDay :: Calendar -> Property
 prop_canChangeMeetingDay calendar =
