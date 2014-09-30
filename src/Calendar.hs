@@ -98,7 +98,10 @@ saveCalendar calendarFileName calendar = do
 readCalendar :: String -> IO Calendar
 readCalendar calendarFileName = do
   calendarJSON <- B.readFile $ calendarFileName
-  return $ fromJust (decode calendarJSON :: Maybe Calendar)
+  let calendar = decode calendarJSON :: Maybe Calendar
+  case calendar of
+    Nothing -> error $ "Calendar " ++ calendarFileName ++ " cannot be parsed"
+    Just c  -> return c
 
 writeCalendarToTempFile :: Calendar -> IO String
 writeCalendarToTempFile calendar = do
