@@ -71,6 +71,7 @@ data Meeting = Meeting { date :: Date,  historyCount :: Int, slots :: [Slot]} de
 data Calendar = Calendar { persons :: [Person]
                          , meetings :: [Meeting]
                          , title :: String
+                         , allowMoreOutThanIn :: Bool
                          } deriving (Show, Generic)
 
 emptyDate :: Date
@@ -114,7 +115,7 @@ updateMeetings startDate numMeetings calendar  =
   let updateMeetings' :: [Meeting] -> [Meeting] -> [Meeting]
       updateMeetings' history [] = []
       updateMeetings' history (m:ms) =
-        let meeting = updateMeeting history m
+        let meeting = updateMeeting history m (allowMoreOutThanIn calendar)
             history' = (drop extra history) ++ [meeting]
             extra = if length history == historyCount then 1 else 0
         in meeting : updateMeetings' history' ms
@@ -210,18 +211,18 @@ fillInCalendar numMeetings calendar
                         let extendedMeetings = mergeCalendars (meetings calendar) calendarAdditions 
                         return $ calendar {meetings = extendedMeetings}
            
-updateMeeting :: [Meeting] -> Meeting -> Meeting
-updateMeeting history meeting  =
+updateMeeting :: [Meeting] -> Meeting -> Bool -> Meeting
+updateMeeting history meeting allowMoreOutThanIn  =
   let recentHistory  = drop ((length history) - recentHistoryCount) history
       stats             = historyStats history
       recentStats    = historyStats recentHistory
       statifyMeeting m  = m {slots = map statifySlot (slots m), historyCount = length history}
       statifySlot slot  = slot { stat          = findStat (person slot) stats,
                                  recentStat = findStat (person slot) recentStats }
-  in scheduleMeeting $ statifyMeeting meeting
+  in scheduleMeeting (statifyMeeting meeting) allowMoreOutThanIn
 
-scheduleMeeting :: Meeting -> Meeting
-scheduleMeeting (Meeting date historyCount slots) =
+scheduleMeeting :: Meeting -> Bool -> Meeting
+scheduleMeeting (Meeting date historyCount slots) allowMoreOutThanIn =
   let (available, confirmed) = partition isAvailable slots
                                where isAvailable slot = status slot == Proposed
 
@@ -242,7 +243,7 @@ scheduleMeeting (Meeting date historyCount slots) =
       (stayingIn, goingOut)  =  let  numberPresent        = length $ filter (\slot -> attendance slot /= Absent) slots
                                      numberConfirmedIn    = length $ filter (\slot -> attendance slot == In) confirmed
                                      numberHostsIn        = length hosts
-                                     minNumberNeededIn    = ceiling $ numberPresent % 2
+                                     minNumberNeededIn    = (if allowMoreOutThanIn then floor else ceiling) $ numberPresent % 2
                                      numberNeededIn       = minNumberNeededIn - numberConfirmedIn - numberHostsIn
                                      sortedGuests         = sortBy (compare `on` boostedRank) guests
                                      boostedRank slot     
